@@ -1,29 +1,12 @@
-import {
-  NavigationProp,
-  RouteProp,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/core';
 import React from 'react';
-import {
-  StyleSheet,
-  SafeAreaView,
-  ScrollView,
-  LayoutAnimation,
-  FlatList,
-} from 'react-native';
-import {Header} from 'react-native-elements';
+import {StyleSheet} from 'react-native';
 
-import {Button, Colors} from 'react-native-ui-lib';
 import {View, Text, Image} from 'react-native-ui-lib';
 import {RootState} from '../../../redux/store';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import URL from '../../../config/Api';
-import {IProduct} from '../../../types/IProduct';
-import ItemCart from './components/ItemCart';
-import {IItemCart, IResCart} from '../../../types/ItemCart';
-import {onGetProduct} from '../../../redux/authProductSlice';
-import {onGetCart} from '../../../redux/authCartSlice';
+
+import {IItemCart} from '../../../types/ItemCart';
 
 const Cart = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
