@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
 
-import {View, Text, Image} from 'react-native-ui-lib';
+import {View, Text} from 'react-native-ui-lib';
 import {RootState} from '../../../redux/store';
 import {useSelector} from 'react-redux';
 import URL from '../../../config/Api';
