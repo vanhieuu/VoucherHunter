@@ -56,7 +56,7 @@ const Cart = () => {
 
   return (
     <View flex>
-      <Text h20 red>
+      <Text h20 black>
         {itemCart?.cart.items.map((product_id, id) => {
           <View>
             <Text key={id}>{product_id.product_id.description}</Text>
