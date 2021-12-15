@@ -1,12 +1,14 @@
 import React from 'react';
-import {StyleSheet} from 'react-native';
-
-import {View, Text} from 'react-native-ui-lib';
+import {SafeAreaView, ScrollView, StyleSheet} from 'react-native';
+import {View, Text, Colors, Button} from 'react-native-ui-lib';
 import {RootState} from '../../../redux/store';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import URL from '../../../config/Api';
-
 import {IItemCart} from '../../../types/ItemCart';
+import {Header} from 'react-native-elements';
+import CartCard from './components/CartCard';
+import {numberFormat} from '../../../config/formatCurrency';
+import {getTotals} from '../../../redux/authCartSlice';
 
 const Cart = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
@@ -15,6 +17,8 @@ const Cart = () => {
   const quantity = useSelector<RootState, number>(
     state => state.product.quantity,
   );
+  const cart = useSelector<RootState>(state => state.cart);
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
     if (!token) return;
@@ -30,6 +34,7 @@ const Cart = () => {
       .then(json => {
         setItemCart(json);
         setLoading(false);
+
         return json;
       })
       .catch(err => {
@@ -38,16 +43,68 @@ const Cart = () => {
   }, []);
 
   return (
-    <View flex>
-      <Text h20 black>
-        {itemCart?.cart.items.map((product_id, id) => {
-          <View>
-            <Text key={id}>{product_id.product_id.description}</Text>
-          </View>;
-          console.log(product_id.product_id.description);
+    <SafeAreaView style={styles.container}>
+      <Header
+        placement="center"
+        centerComponent={{
+          text: 'Shopping',
+          style: {color: Colors.primary, fontSize: 20},
+        }}
+        containerStyle={{
+          backgroundColor: 'white',
+          justifyContent: 'space-around',
+        }}
+        barStyle="light-content"
+        statusBarProps={{barStyle: 'light-content'}}
+      />
+      <ScrollView contentContainerStyle={styles.content}>
+        {itemCart?.cart.items.map((product_id, index) => {
+          return (
+            <CartCard
+              key={index}
+              _id={product_id._id}
+              name={product_id.product_id.name}
+              discountPrice={product_id.product_id.discountPrice}
+              is_hot={false}
+              listphotos={[]}
+              createdAt={''}
+              updateAt={''}
+              deletedAt={''}
+              quantity={quantity}
+              img={product_id.product_id.img}
+              tags={[]}
+              description={''}
+              sold={0}
+              vote={0}
+              supplier={''}
+              listedPrice={0}
+            />
+          );
         })}
-      </Text>
-    </View>
+
+        <View style={styles.totalSection}>
+          <Text h28 black>
+            {' '}
+            Thanh toán
+          </Text>
+          <View row center style={{justifyContent: 'space-between'}}>
+            <Text h24 color={Colors.primary}>
+              Thành tiền
+            </Text>
+            <View style={styles.divider} />
+            <Text h18 color={Colors.black}>
+              {0}
+            </Text>
+          </View>
+          <View flex marginH-60 marginT-100>
+            <Button label={'CheckOut'} />
+          </View>
+        </View>
+      </ScrollView>
+      <View flex>
+        <Text h20 black></Text>
+      </View>
+    </SafeAreaView>
 
     // <SafeAreaView style={styles.container}>
     //   <Header

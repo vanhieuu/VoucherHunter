@@ -12,7 +12,7 @@ import {FONTS} from '../../config/Typo';
 import ShowModal from './components/ShowModal';
 import LikeProductModal from './components/LikeProductModal';
 
-const widthBanner = Dimensions.get('window').width;
+const widthBanner = Dimensions.get('screen').width;
 const heightBanner = (widthBanner / 1600) * 1000;
 
 const ItemBanner = ({image}: {image: string}) => {
@@ -45,7 +45,7 @@ const DetailItems = () => {
   }, []);
 
   return (
-    <View style={{flex: 1, backgroundColor: '#FFF'}}>
+    <View style={{flex: 1, backgroundColor: '#FFF',marginTop:10}}>
       <HeaderDetail scrollY={scrollY} title={product.name} />
 
       <Animated.ScrollView
@@ -130,7 +130,6 @@ const DetailItems = () => {
         </View>
         <View height={1} bg-dark80 marginT-12 />
         <View row centerV marginH-16 paddingR-15>
-         
           <View>
             <Text
               marginL-12
@@ -147,15 +146,9 @@ const DetailItems = () => {
             </Text>
           ) : null}
         </View>
-        <View
-         row
-         spread
-         bottom 
-         backgroundColor={'#fff'}
-          >
-          <ShowModal item={product}/>
+        <View row spread bottom backgroundColor={'#fff'}>
+          <ShowModal item={product} />
         </View>
-        
       </Animated.ScrollView>
     </View>
   );

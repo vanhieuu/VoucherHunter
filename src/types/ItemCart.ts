@@ -1,27 +1,19 @@
-import { IProduct } from "./IProduct";
-
-
-
-
-
+import {IProduct} from './IProduct';
 
 export interface IItemCart {
-    cart:{
+  cart: {
+    _id: string;
+    items: [
+      {
+        product_id: IProduct;
+        quantity: number,
         _id:string,
-        items:[
-            {
-
-                product_id:IProduct
-            }
-        ]
-    }
+        totalPrice:number
+      },
+     
+    ];
+  };
 }
-export interface IResCart{
-        
-            product_id:IProduct
-        
-
-        
-       
-    
+export interface IResCart {
+  product_id: IProduct;
 }

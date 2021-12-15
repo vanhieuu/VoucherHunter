@@ -12,44 +12,47 @@ import {useDispatch, useSelector} from 'react-redux';
 import URL from '../../../config/Api';
 import {MainTabParamList} from '../../../nav/MainTab';
 import {RootStackParamList} from '../../../nav/RootStack';
+import {addToCart} from '../../../redux/authCartSlice';
 import {onGetProduct} from '../../../redux/authProductSlice';
+import {IAuthRegister} from '../../../redux/authRegisterSlice';
+import {getAuthAsync, IAuth} from '../../../redux/authSlice';
 import {RootState} from '../../../redux/store';
 import {IProduct} from '../../../types/IProduct';
 
 const ShowModal = ({item}: {item: IProduct}) => {
-  const {navigate} = useNavigation<NavigationProp<MainTabParamList>>();
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [cart, setNewCart] = React.useState<IProduct>();
-  const dispatch = useDispatch();
-  const token = useSelector<RootState, string>(state => state.auth.accessToken);
-  console.log(token)
-  const route = useRoute<RouteProp<RootStackParamList, 'DetailItems'>>();
-  
-  
 
-   
+  const route = useRoute<RouteProp<RootStackParamList, 'DetailItems'>>();
+  const registerToken = useSelector<RootState, string>(
+    state => state.register.accessToken,
+  );
   const product = route.params.item;
   const id = product._id;
+  const cart = useSelector<RootState>(state => state.cart);
+  const dispatch = useDispatch();
+
   const addItemCart = React.useCallback(async () => {
+    const auth: IAuth | null = await getAuthAsync();
+    const registerAuth: IAuthRegister | null = await getAuthAsync();
     setLoading(true);
-    if (!token) return;
-    await fetch(URL.addItemCart, {
+    fetch(URL.addItemCart, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        Authorization: `Bearer${token}`,
+        Authorization: `Bearer ${
+          auth?.accessToken || registerAuth?.accessToken
+        }`,
       },
       body: JSON.stringify({
-        product_id:id
+        product_id: id,
       }),
     })
       .then(response => response.json())
       .then(json => {
-        
-        console.log(json);
-        dispatch(onGetProduct(json));
+        Alert.alert(json.message);
+        dispatch(addToCart(json));
       })
       .catch(err => {
         console.error(err);
@@ -70,25 +73,25 @@ const ShowModal = ({item}: {item: IProduct}) => {
           <View style={styles.modalView}>
             <View
               row
-              spread
-              marginB-100
-              paddingR-60
+              flex
               style={{
-                justifyContent: 'space-between',
+                justifyContent: 'center',
                 alignItems: 'center',
-                backgroundColor: 'blue',
+                alignSelf: 'center',
               }}>
               <Image
                 source={{uri: product.img}}
                 style={{
                   width: 150,
                   height: 150,
-                  marginRight: 50,
                 }}
               />
-              <Text h17 color={Colors.white}>
-                {' '}
-                Số lượng{' '}
+              <Text
+                style={{fontSize: 20}}
+                color={Colors.black}
+                center
+                marginL-12>
+                {item.name}
               </Text>
             </View>
             <Pressable
@@ -97,7 +100,6 @@ const ShowModal = ({item}: {item: IProduct}) => {
                 alignItems: 'flex-start',
                 alignSelf: 'flex-start',
                 position: 'absolute',
-
                 flexDirection: 'row-reverse',
               }}
               onPress={() => setModalVisible(!modalVisible)}>
@@ -124,7 +126,7 @@ const ShowModal = ({item}: {item: IProduct}) => {
                 alignSelf: 'center',
                 marginTop: 12,
               }}>
-              Thanh toán
+              Thêm vào giỏ hàng
             </Text>
           </Pressable>
         </View>
@@ -146,7 +148,7 @@ const styles = StyleSheet.create({
     marginTop: 22,
   },
   modalView: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.white,
     padding: 15,
     alignItems: 'center',
     height: '45%',

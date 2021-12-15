@@ -15,7 +15,7 @@ Typography.loadTypographies({
   h15: {fontSize: 15, lineHeight: 20, fontFamily: FONTS.Heavy},
   h16: {fontSize: 16, lineHeight: 20, fontFamily: FONTS.Heavy},
   h17: {fontSize: 17, lineHeight: 22, fontFamily: FONTS.Heavy},
-  h20: {fontSize: 20, lineHeight: 20, fontFamily: FONTS.Heavy},
+  h20: {fontSize: 20,  fontFamily: FONTS.Heavy},
   h24: {fontSize: 24, lineHeight: 36, fontFamily: FONTS.Heavy},
   h26: {fontSize: 27, lineHeight: 40, fontFamily: FONTS.Heavy},
   h27: {fontSize: 27, lineHeight: 42, fontFamily: FONTS.Heavy},
