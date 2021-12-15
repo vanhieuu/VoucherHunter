@@ -8,7 +8,6 @@ import {IItemCart} from '../../../types/ItemCart';
 import {Header} from 'react-native-elements';
 import CartCard from './components/CartCard';
 import {numberFormat} from '../../../config/formatCurrency';
-import {getTotals} from '../../../redux/authCartSlice';
 
 const Cart = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
@@ -17,8 +16,6 @@ const Cart = () => {
   const quantity = useSelector<RootState, number>(
     state => state.product.quantity,
   );
-  const cart = useSelector<RootState>(state => state.cart);
-  const dispatch = useDispatch();
 
   React.useEffect(() => {
     if (!token) return;

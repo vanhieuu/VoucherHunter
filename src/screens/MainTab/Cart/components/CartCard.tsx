@@ -9,24 +9,22 @@ import {RootState} from '../../../../redux/store';
 import {onUpdateQuantity} from '../../../../redux/authProductSlice';
 import {numberFormat} from '../../../../config/formatCurrency';
 import {
-  addToCart,
-  decreaseCart,
-  removeFromCart,
+  onDecreaseQuantity,
+  onIncreaseQuantity,
 } from '../../../../redux/authCartSlice';
 
 interface Props extends IProduct {}
-const CartCard = ({name, img, discountPrice,_id}: Props) => {
+const CartCard = ({name, img, discountPrice, _id}: Props) => {
+  const [quantity, setQuantity] = React.useState(0);
 
   const dispatch = useDispatch();
-  const [quantity,setQuantity] = React.useState(0)
-  const handleRemoveFromCart = React.useCallback(({item}:{item:IProduct}) => {
-    dispatch(removeFromCart(item));
+  const handleIncrease = React.useCallback(quantity => {
+    dispatch(onIncreaseQuantity(quantity));
+    console.log(quantity)
   }, []);
-
- 
-
-  const handleDecreaseCart = React.useCallback(product => {
-    dispatch(decreaseCart(product));
+  const handleDecrease = React.useCallback(quantity => {
+    dispatch(onDecreaseQuantity(quantity));
+    console.log(_id)
   }, []);
 
   return (
@@ -40,16 +38,13 @@ const CartCard = ({name, img, discountPrice,_id}: Props) => {
             {name}
           </Text>
           <View row center style={styles.action}>
-            <Text style={styles.quantityUpdate} onPress={handleDecreaseCart}>
+            <Text style={styles.quantityUpdate} onPress={handleDecrease}>
               -
             </Text>
-            <Text style={{fontWeight: 'bold'}} h17> 
+            <Text style={{fontWeight: 'bold'}} h17>
               {quantity}
             </Text>
-            <Text style={styles.quantityUpdate} onPress={()=>{
-              setQuantity(quantity + 1)
-              console.log(_id)
-            }}>
+            <Text style={styles.quantityUpdate} onPress={handleIncrease}>
               +
             </Text>
           </View>

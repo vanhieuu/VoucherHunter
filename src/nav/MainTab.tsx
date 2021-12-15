@@ -12,6 +12,10 @@ import Profile from '../screens/MainTab/Profile';
 import { NavigationProp, useNavigation } from '@react-navigation/core';
 import { RootStackParamList } from './RootStack';
 import { IProduct } from '../types/IProduct';
+import { IAuth } from '../redux/authCartSlice';
+import { useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
+
 
 export type MainTabParamList = {
   Home: undefined;
@@ -24,6 +28,12 @@ export type MainTabParamList = {
 const Tab = createBottomTabNavigator();
 
 const MainTab = () => {
+
+
+  // const [numberCart,setNumberCart] = React.useState<IAuth>()
+
+  
+   
   const {navigate} = useNavigation<NavigationProp<RootStackParamList>>()
   return (
     <Tab.Navigator
@@ -42,7 +52,7 @@ const MainTab = () => {
           ),
           tabBarLabel: 'Trang chủ',
           headerTransparent: true,
-          header: (props: BottomTabHeaderProps) => (
+          header: () => (
             <Header
               title="Home"
               headerTitleStyle={{
@@ -102,7 +112,7 @@ const MainTab = () => {
           ),
           tabBarLabel: 'Giỏ hàng',
           headerShown: false,
-          tabBarBadge: 1
+          tabBarBadge:1
         }}
       />
       <Tab.Screen
@@ -126,4 +136,4 @@ const MainTab = () => {
 
 export default MainTab;
 
-const styles = StyleSheet.create({});
+

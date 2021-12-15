@@ -1,19 +1,11 @@
-import {
-  NavigationProp,
-  RouteProp,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
+import {RouteProp, useRoute} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {Alert, Modal, StyleSheet, Pressable} from 'react-native';
-
 import {Colors, Image, View, Text} from 'react-native-ui-lib';
 import {useDispatch, useSelector} from 'react-redux';
 import URL from '../../../config/Api';
-import {MainTabParamList} from '../../../nav/MainTab';
 import {RootStackParamList} from '../../../nav/RootStack';
-import {addToCart} from '../../../redux/authCartSlice';
-import {onGetProduct} from '../../../redux/authProductSlice';
+import {onAddToCart} from '../../../redux/authCartSlice';
 import {IAuthRegister} from '../../../redux/authRegisterSlice';
 import {getAuthAsync, IAuth} from '../../../redux/authSlice';
 import {RootState} from '../../../redux/store';
@@ -29,9 +21,8 @@ const ShowModal = ({item}: {item: IProduct}) => {
   );
   const product = route.params.item;
   const id = product._id;
-  const cart = useSelector<RootState>(state => state.cart);
   const dispatch = useDispatch();
-
+ 
   const addItemCart = React.useCallback(async () => {
     const auth: IAuth | null = await getAuthAsync();
     const registerAuth: IAuthRegister | null = await getAuthAsync();
@@ -52,7 +43,7 @@ const ShowModal = ({item}: {item: IProduct}) => {
       .then(response => response.json())
       .then(json => {
         Alert.alert(json.message);
-        dispatch(addToCart(json));
+        dispatch(onAddToCart(json));
       })
       .catch(err => {
         console.error(err);
