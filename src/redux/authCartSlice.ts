@@ -85,12 +85,12 @@ export const CartSlice = createSlice({
       console.log(itemIndex);
       if (itemIndex >= 0) {
         state.items[itemIndex].quantity += 1;
-        state.numberCart++
+        state.numberCart++;
       } else {
         const tempProduct = {...action.payload, quantity: 1};
         state.items.push(tempProduct);
         console.log(tempProduct);
-        state.numberCart++
+        state.numberCart++;
       }
       AsyncStorage.setItem('CartItems', JSON.stringify(state.items));
     },
@@ -110,7 +110,7 @@ export const CartSlice = createSlice({
       if (state.items[itemIndex].quantity > 1) {
         state.items[itemIndex].quantity -= 1;
       } else if (state.items[itemIndex].quantity === 1) {
-        state.items[itemIndex].quantity = 0;         // state.items. = nextItems
+        state.items[itemIndex].quantity = 0; // state.items. = nextItems
       }
     },
     onGetCartNumber: (state, action: PayloadAction<IAuth>) => {

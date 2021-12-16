@@ -13,7 +13,7 @@ import ShowModal from './components/ShowModal';
 import LikeProductModal from './components/LikeProductModal';
 
 const widthBanner = Dimensions.get('screen').width;
-const heightBanner = (widthBanner / 1600) * 1000;
+const heightBanner = (widthBanner / 1200) * 1000;
 
 const ItemBanner = ({image}: {image: string}) => {
   return (
@@ -45,7 +45,7 @@ const DetailItems = () => {
   }, []);
 
   return (
-    <View style={{flex: 1, backgroundColor: '#FFF',marginTop:10}}>
+    <View style={{flex: 1, backgroundColor: '#FFF'}}>
       <HeaderDetail scrollY={scrollY} title={product.name} />
 
       <Animated.ScrollView
@@ -146,10 +146,10 @@ const DetailItems = () => {
             </Text>
           ) : null}
         </View>
-        <View row spread bottom backgroundColor={'#fff'}>
-          <ShowModal item={product} />
-        </View>
       </Animated.ScrollView>
+      <View row spread bottom backgroundColor={'#fff'}>
+        <ShowModal item={product} />
+      </View>
     </View>
   );
 };
