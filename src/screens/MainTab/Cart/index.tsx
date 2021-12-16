@@ -1,14 +1,14 @@
 import React from 'react';
-import {FlatList, SafeAreaView, ScrollView, StyleSheet} from 'react-native';
-import {View, Text, Colors, Button, Image} from 'react-native-ui-lib';
-import {RootState} from '../../../redux/store';
-import {useDispatch, useSelector} from 'react-redux';
+import { FlatList, SafeAreaView, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, Colors, Button, Image } from 'react-native-ui-lib';
+import { RootState } from '../../../redux/store';
+import { useDispatch, useSelector } from 'react-redux';
 import URL from '../../../config/Api';
-import {IItemCart} from '../../../types/ItemCart';
-import {Header} from 'react-native-elements';
+import { IItemCart } from '../../../types/ItemCart';
+import { Header } from 'react-native-elements';
 import CartCard from './components/CartCard';
-import {IProduct} from '../../../types/IProduct';
-import {numberFormat} from '../../../config/formatCurrency';
+import { IProduct } from '../../../types/IProduct';
+import { numberFormat } from '../../../config/formatCurrency';
 
 export interface IResCart {
   cart: {
@@ -58,14 +58,14 @@ const Cart = () => {
         placement="center"
         centerComponent={{
           text: 'Shopping',
-          style: {color: Colors.primary, fontSize: 20},
+          style: { color: Colors.primary, fontSize: 20 },
         }}
         containerStyle={{
           backgroundColor: 'white',
           justifyContent: 'space-around',
         }}
         barStyle="light-content"
-        statusBarProps={{barStyle: 'light-content'}}
+        statusBarProps={{ barStyle: 'light-content' }}
       />
       <ScrollView contentContainerStyle={styles.content}>
         {itemCart.map((product_id, _id) => {
@@ -97,7 +97,7 @@ const Cart = () => {
             {' '}
             Thanh toán
           </Text>
-          <View row center style={{justifyContent: 'space-between'}}>
+          <View row center style={{ justifyContent: 'space-between' }}>
             <Text h24 color={Colors.primary}>
               Thành tiền
             </Text>
@@ -105,18 +105,16 @@ const Cart = () => {
             <Text h17 color={Colors.black} marginR-15>
               {numberFormat.format(
                 itemCart
-                  .map(item => item.product_id.discountPrice  )
+                  .map(item => item.product_id.discountPrice)
                   .reduceRight((a, b) => (a + b))   ,
               )}
             </Text>
           </View>
-          <View flex marginH-60 marginT-100>
-            <Button label={'CheckOut'} />
-          </View>
+
         </View>
       </ScrollView>
-      <View flex>
-        <Text h20 black></Text>
+      <View flex marginH-60 marginT-100>
+        <Button label={'CheckOut'} />
       </View>
     </SafeAreaView>
 
