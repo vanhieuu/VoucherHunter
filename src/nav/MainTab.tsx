@@ -12,8 +12,8 @@ import Profile from '../screens/MainTab/Profile';
 import { NavigationProp, useNavigation } from '@react-navigation/core';
 import { RootStackParamList } from './RootStack';
 import { IProduct } from '../types/IProduct';
-import { IAuth } from '../redux/authCartSlice';
-import { useSelector } from 'react-redux';
+import { IAuth, onGetCartNumber } from '../redux/authCartSlice';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 
 
@@ -31,9 +31,9 @@ const MainTab = () => {
 
 
   // const [numberCart,setNumberCart] = React.useState<IAuth>()
+const numberCart = useSelector<RootState, number>(state=> state.cart.numberCart)
+const dispatch = useDispatch();
 
-  
-   
   const {navigate} = useNavigation<NavigationProp<RootStackParamList>>()
   return (
     <Tab.Navigator
@@ -112,7 +112,7 @@ const MainTab = () => {
           ),
           tabBarLabel: 'Giỏ hàng',
           headerShown: false,
-          tabBarBadge:1
+          tabBarBadge:numberCart
         }}
       />
       <Tab.Screen

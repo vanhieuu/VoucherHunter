@@ -1,5 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export interface IProduct {
   _id: string;
   name: string;
@@ -24,16 +26,6 @@ export enum EStatusAuth {
   unauth = 2,
   auth = 3,
 }
-export interface IItemCart {
-  items: [
-    {
-      product_id: IProduct;
-      quantity: number;
-      totalPrice: number;
-      _id: string;
-    },
-  ];
-}
 export interface IAuth {
   items: [
     {
@@ -55,7 +47,7 @@ export interface IResProduct {
 
 const initValue: IAuth = {
   numberCart: 0,
-  quantity: 1,
+  quantity: 0,
   items: [
     {
       product_id: {
@@ -88,29 +80,70 @@ export const CartSlice = createSlice({
   reducers: {
     onAddToCart: (state, action) => {
       const itemIndex = state.items.findIndex(
-        item => item._id === action.payload.id,
+        item => item._id === action.payload._id,
       );
       console.log(itemIndex);
       if (itemIndex >= 0) {
         state.items[itemIndex].quantity += 1;
+        state.numberCart++
       } else {
         const tempProduct = {...action.payload, quantity: 1};
         state.items.push(tempProduct);
+        console.log(tempProduct);
+        state.numberCart++
+      }
+      AsyncStorage.setItem('CartItems', JSON.stringify(state.items));
+    },
+    onIncreaseQuantity: (state, action: PayloadAction<IProduct>) => {
+      state.numberCart++;
+      const itemIndex = state.items.findIndex(
+        item => item._id === action.payload._id,
+      );
+      state.items[itemIndex].quantity += 1;
+    },
+    onDecreaseQuantity: (state, action: PayloadAction<IProduct>) => {
+      state.numberCart--;
+      const itemIndex = state.items.findIndex(
+        item => item._id === action.payload._id,
+      );
+      console.log(itemIndex);
+      if (state.items[itemIndex].quantity > 1) {
+        state.items[itemIndex].quantity -= 1;
+      } else if (state.items[itemIndex].quantity === 1) {
+        state.items[itemIndex].quantity = 0;         // state.items. = nextItems
       }
     },
-    onIncreaseQuantity: (state, action: PayloadAction<IAuth>) => {
-      state.numberCart++;
-      state.items.length;
+    onGetCartNumber: (state, action: PayloadAction<IAuth>) => {
+      state.numberCart = action.payload.numberCart;
     },
-    onDecreaseQuantity: (state, action: PayloadAction<IAuth>) => {
-      state.numberCart--;
-      state.items = action.payload.items;
-    },
-    onGetCartNumber: (state, action: PayloadAction<{cart: number}>) => {
-      state.numberCart = action.payload.cart;
+    removeFromCar: (state, action: PayloadAction<IProduct>) => {
+      const nextCartItem = state.items.filter(
+        item => item.product_id._id !== action.payload._id,
+      );
+      console.log(nextCartItem);
     },
   },
 });
+
+export const saveCartAsync = (Cart: IAuth) => {
+  try {
+    AsyncStorage.setItem('CartItems', JSON.stringify(Cart.items));
+  } catch (e) {
+    // saving error
+  }
+};
+export const getCartAsync = async () => {
+  try {
+    const Cart = await AsyncStorage.getItem('CartItems');
+    if (Cart) {
+      return JSON.parse(Cart);
+    }
+    return null;
+  } catch (e) {
+    // error reading value
+    return null;
+  }
+};
 
 export const {
   onAddToCart,

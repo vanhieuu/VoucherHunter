@@ -1,17 +1,30 @@
 import React from 'react';
-import {SafeAreaView, ScrollView, StyleSheet} from 'react-native';
-import {View, Text, Colors, Button} from 'react-native-ui-lib';
+import {FlatList, SafeAreaView, ScrollView, StyleSheet} from 'react-native';
+import {View, Text, Colors, Button, Image} from 'react-native-ui-lib';
 import {RootState} from '../../../redux/store';
 import {useDispatch, useSelector} from 'react-redux';
 import URL from '../../../config/Api';
 import {IItemCart} from '../../../types/ItemCart';
 import {Header} from 'react-native-elements';
 import CartCard from './components/CartCard';
+import {IProduct} from '../../../types/IProduct';
 import {numberFormat} from '../../../config/formatCurrency';
+
+export interface IResCart {
+  cart: {
+    items: ICart;
+  };
+}
+export interface ICart {
+  id: string;
+  product_id: IProduct;
+  quantity: number;
+  totalPrice: number;
+}
 
 const Cart = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
-  const [itemCart, setItemCart] = React.useState<IItemCart>();
+  const [itemCart, setItemCart] = React.useState<ICart[]>([]);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const quantity = useSelector<RootState, number>(
     state => state.product.quantity,
@@ -29,9 +42,9 @@ const Cart = () => {
     })
       .then(response => response.json())
       .then(json => {
-        setItemCart(json);
+        setItemCart(json.cart.items);
         setLoading(false);
-
+        // console.log(json.cart.items)
         return json;
       })
       .catch(err => {
@@ -55,26 +68,26 @@ const Cart = () => {
         statusBarProps={{barStyle: 'light-content'}}
       />
       <ScrollView contentContainerStyle={styles.content}>
-        {itemCart?.cart.items.map((product_id, index) => {
+        {itemCart.map((product_id, _id) => {
           return (
             <CartCard
-              key={index}
-              _id={product_id._id}
+              key={_id}
+              _id={product_id.id}
               name={product_id.product_id.name}
+              listedPrice={product_id.product_id.discountPrice}
               discountPrice={product_id.product_id.discountPrice}
               is_hot={false}
               listphotos={[]}
               createdAt={''}
               updateAt={''}
               deletedAt={''}
-              quantity={quantity}
+              quantity={product_id.quantity}
               img={product_id.product_id.img}
               tags={[]}
               description={''}
               sold={0}
               vote={0}
               supplier={''}
-              listedPrice={0}
             />
           );
         })}
@@ -89,8 +102,12 @@ const Cart = () => {
               Thành tiền
             </Text>
             <View style={styles.divider} />
-            <Text h18 color={Colors.black}>
-              {0}
+            <Text h17 color={Colors.black} marginR-15>
+              {numberFormat.format(
+                itemCart
+                  .map(item => item.product_id.discountPrice  )
+                  .reduceRight((a, b) => (a + b))   ,
+              )}
             </Text>
           </View>
           <View flex marginH-60 marginT-100>

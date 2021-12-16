@@ -6,7 +6,6 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {IProduct} from '../../../../types/IProduct';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../../../redux/store';
-import {onUpdateQuantity} from '../../../../redux/authProductSlice';
 import {numberFormat} from '../../../../config/formatCurrency';
 import {
   onDecreaseQuantity,
@@ -15,15 +14,15 @@ import {
 
 interface Props extends IProduct {}
 const CartCard = ({name, img, discountPrice, _id}: Props) => {
-  const [quantity, setQuantity] = React.useState(0);
-
+  const [quantity, setQuantity] = React.useState(1);
+  const cart = useSelector<RootState>(state => state.cart)
   const dispatch = useDispatch();
-  const handleIncrease = React.useCallback(quantity => {
-    dispatch(onIncreaseQuantity(quantity));
+  const handleIncrease = React.useCallback(items => {
+    dispatch(onIncreaseQuantity(items));
     console.log(quantity)
   }, []);
-  const handleDecrease = React.useCallback(quantity => {
-    dispatch(onDecreaseQuantity(quantity));
+  const handleDecrease = React.useCallback(items => {
+    dispatch(onDecreaseQuantity(items));
     console.log(_id)
   }, []);
 
@@ -38,21 +37,21 @@ const CartCard = ({name, img, discountPrice, _id}: Props) => {
             {name}
           </Text>
           <View row center style={styles.action}>
-            <Text style={styles.quantityUpdate} onPress={handleDecrease}>
+            <Text style={styles.quantityUpdate} onPress={()=>{setQuantity(quantity -1)}}>
               -
             </Text>
             <Text style={{fontWeight: 'bold'}} h17>
               {quantity}
             </Text>
-            <Text style={styles.quantityUpdate} onPress={handleIncrease}>
+            <Text style={styles.quantityUpdate} onPress={()=>{setQuantity(quantity+1)}}>
               +
             </Text>
           </View>
         </View>
       </View>
       <View style={{justifyContent: 'space-between'}}>
-        <Text h18 color={Colors.primary} marginB-20 marginL-20>
-          {numberFormat.format(discountPrice)}
+        <Text h18 color={Colors.primary} marginB-20 marginL-21>
+          {numberFormat.format(discountPrice*quantity)}
         </Text>
         <View center style={styles.delete}>
           <Icon
