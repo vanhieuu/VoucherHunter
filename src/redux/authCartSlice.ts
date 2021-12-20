@@ -84,23 +84,20 @@ export const CartSlice = createSlice({
       );
       console.log(itemIndex);
       if (itemIndex >= 0) {
-        state.items[itemIndex].quantity += 1;
+        state.quantity += 1;
         state.numberCart++;
       } else {
         const tempProduct = {...action.payload, quantity: 1};
         state.items.push(tempProduct);
-        console.log(tempProduct);
         state.numberCart++;
       }
       AsyncStorage.setItem('CartItems', JSON.stringify(state.items));
     },
     onIncreaseQuantity: (state, action) => {
       
-      const itemIndex = state.items.findIndex(
-        item => item.product_id._id = action.payload._id,
-      );
+  
       // console.log(itemIndex)
-      state.items[itemIndex].quantity += 1;
+      state.quantity += 1;
       state.numberCart++;
       
     },

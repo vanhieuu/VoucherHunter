@@ -29,6 +29,7 @@ export interface IAuth {
   accessToken: string;
   message: string;
   statusAuth: EStatusAuth;
+  success:boolean
 }
 
 export enum EStatusAuth {
@@ -57,6 +58,7 @@ const initValue: IAuth = {
   accessToken: '',
   message: '',
   statusAuth: EStatusAuth.check,
+  success:false
 };
 export interface IResUser {
   success:boolean,
@@ -74,6 +76,7 @@ export const authSlice = createSlice({
       state.accessToken = action.payload.accessToken;
       state.statusAuth = EStatusAuth.auth;
       state.createdAt = action.payload.createdAt;
+      state.success = action.payload.success
     },
     updateStatusAuth: (
       state,

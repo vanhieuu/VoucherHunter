@@ -72,7 +72,7 @@ const RootStack = () => {
           console.log(json.success);
           console.log(error)
           //token fail
-          if (error==='Unauthorized') {
+          if (!success) {
             Alert.alert('Đã hết phiên đăng nhập', 'vui lòng đăng nhập lại ');
             dispatch(updateStatusAuth({ statusAuth: EStatusAuth.unauth }));
             return;
@@ -107,7 +107,7 @@ const RootStack = () => {
               name="Onboarding"
               component={OnboardingScreen}
               options={{ headerShown: false }}
-            />
+            />  
             <Stack.Screen
               name="SignIn"
               component={SignIn}

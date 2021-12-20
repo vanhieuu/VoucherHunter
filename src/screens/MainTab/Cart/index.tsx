@@ -18,11 +18,14 @@ export interface IResCart {
   };
 }
 export interface ICart {
-  id: string;
+  _id: string;
   product_id: IProduct;
   quantity: number;
   totalPrice: number;
 }
+
+
+
 
 const Cart = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
@@ -32,6 +35,11 @@ const Cart = () => {
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   // const quantity = useSelector<RootState, number>(state => state.cart.quantity);
   // console.log(quantity)
+
+
+
+
+
   const dispatch = useDispatch()
   React.useEffect(() => {
     if (!token) return;
@@ -42,6 +50,7 @@ const Cart = () => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
+
     })
       .then(response => response.json())
       .then(json => {
@@ -56,6 +65,42 @@ const Cart = () => {
       });
   }, []);
 
+
+  const removeItem = React.useCallback(() => {
+    fetch(URL.removeItem, {
+      method: 'DELETE',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(cart?._id)
+    })
+    .then(response => response.json())
+    .then(json=>{
+      setItemCart(()=>{
+        return {
+          ...itemCart,
+          json
+        }
+      });
+      // setCart(json.cart)
+      console.log(json)
+      return json;
+    })
+    .catch(er=>{
+      console.error(er)
+    })
+  }, [])
+
+
+React.useEffect(()=>{
+  removeItem
+})
+
+
+
+
   const onHandleDecreseQuantity = React.useCallback(() => {
     dispatch(onDecreaseQuantity(quantity))
     console.log(quantity)
@@ -65,11 +110,13 @@ const Cart = () => {
   const onHandleIncreseQuantity = React.useCallback(() => {
     dispatch(onIncreaseQuantity(quantity))
     setQuantity(quantity + 1)
-    console.log(quantity)
+    console.log(cart?._id)
 
   }, [])
 
 
+  const itemIndex = itemCart.findIndex((item) => item.product_id._id)
+  console.log(itemIndex)
 
 
   return (
@@ -128,7 +175,7 @@ const Cart = () => {
                     color={'white'}
                     size={15}
                     name="trash"
-                  // onPress={handleRemoveFromCart}
+                    onPress={removeItem}
                   />
                 </View>
               </View>
