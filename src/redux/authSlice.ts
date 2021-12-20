@@ -55,9 +55,7 @@ const initValue: IAuth = {
   },
   createdAt: '',
   accessToken: '',
-
   message: '',
-
   statusAuth: EStatusAuth.check,
 };
 export interface IResUser {
@@ -75,6 +73,7 @@ export const authSlice = createSlice({
       state.message = action.payload.message;
       state.accessToken = action.payload.accessToken;
       state.statusAuth = EStatusAuth.auth;
+      state.createdAt = action.payload.createdAt;
     },
     updateStatusAuth: (
       state,

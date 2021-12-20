@@ -123,7 +123,7 @@ const ShowModal = ({item}: {item: IProduct}) => {
         </View>
       </Modal>
       <Pressable
-        style={[styles.button, styles.buttonOpen]}
+        style={[ styles.buttonOpen]}
         onPress={() => setModalVisible(true)}>
         <Text style={styles.textStyle}>Thêm vào giỏ hàng</Text>
       </Pressable>
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    marginTop: 22,
+    
   },
   modalView: {
     backgroundColor: Colors.white,
@@ -156,6 +156,10 @@ const styles = StyleSheet.create({
   },
   buttonOpen: {
     backgroundColor: Colors.primary,
+    marginHorizontal:20,
+    height:45,
+    width: '100%',
+
   },
   buttonClose: {
     backgroundColor: Colors.primary,

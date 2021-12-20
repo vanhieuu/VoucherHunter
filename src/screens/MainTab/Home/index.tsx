@@ -35,7 +35,7 @@ const Home = () => {
 
 
   return (
-    <View flex backgroundColor={Colors.primary}>
+    <View flex backgroundColor={Colors.primary} marginT-50>
       <Image
         assetGroup="imgNewScreen"
         assetName="ic_bg"

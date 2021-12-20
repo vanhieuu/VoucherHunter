@@ -20,7 +20,7 @@ const IMAGES = [
 
 const ItemBanner = ({image}: {image: string}) => {
   return (
-    <View flex centerV>
+    <View flex centerV >
       <Image
         overlayType={Image.overlayTypes.BOTTOM}
         style={{flex: 1}}

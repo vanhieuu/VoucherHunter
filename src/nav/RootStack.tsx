@@ -1,13 +1,13 @@
 import React from 'react';
-import {ActivityIndicator, Alert} from 'react-native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {NavigationContainer} from '@react-navigation/native';
+import { ActivityIndicator, Alert } from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
 import OnboardingScreen from '../screens/Onboarding';
 import SignUp from '../screens/SignUp';
 import MainTab from './MainTab';
-import {IProduct} from '../types/IProduct';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../redux/store';
+import { IProduct } from '../types/IProduct';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
 import {
   EStatusAuth,
   getAuthAsync,
@@ -17,13 +17,12 @@ import {
 } from '../redux/authSlice';
 import DetailItems from '../screens/DetailItems';
 
-import {INewsData} from '../redux/newSlice';
+import { INewsData } from '../redux/newSlice';
 import DetailNews from '../screens/DetailNews';
 import SignIn from '../screens/SignIn';
 import URL from '../config/Api';
 import Search from '../screens/Search';
-
-import {Colors, View} from 'react-native-ui-lib';
+import { Colors, View } from 'react-native-ui-lib';
 
 
 export type RootStackParamList = {
@@ -38,7 +37,7 @@ export type RootStackParamList = {
     item: INewsData;
   };
   Search: undefined;
- 
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -47,13 +46,12 @@ const RootStack = () => {
   const statusAuth = useSelector<RootState, EStatusAuth>(
     state => state.auth.statusAuth,
   );
-  const [didMount, setDidMount] = React.useState(false);
+  console.log(statusAuth)
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
-
   const dispatch = useDispatch();
   const checkLogin = React.useCallback(async () => {
     const auth: IAuth | null = await getAuthAsync();
-
+    console.log(auth)
     if (auth) {
       fetch(URL.CheckToken, {
         method: 'POST',
@@ -67,39 +65,35 @@ const RootStack = () => {
         }),
       })
         .then(response => response.json())
-        .then((json: {error: string}) => {
-          const error = json.error;
-          console.log(json.error);
+        .then((json: { error: string, success: boolean }) => {
+          const error = json.error; 
+          const success = json.success;
+          console.log(json)
+          console.log(json.success);
+          console.log(error)
           //token fail
-          if (error === 'Unauthorized') {
+          if (error==='Unauthorized') {
             Alert.alert('Đã hết phiên đăng nhập', 'vui lòng đăng nhập lại ');
-            dispatch(updateStatusAuth({statusAuth: EStatusAuth.unauth}));
-            console.log(statusAuth);
-            console.log(EStatusAuth);
+            dispatch(updateStatusAuth({ statusAuth: EStatusAuth.unauth }));
             return;
           }
           //token success
           dispatch(onLogin(auth));
-
-          dispatch(updateStatusAuth({statusAuth: EStatusAuth.auth}));
-          console.log(statusAuth);
           return json;
         });
     } else {
-      dispatch(updateStatusAuth({statusAuth: EStatusAuth.unauth}));
+      dispatch(updateStatusAuth({ statusAuth: EStatusAuth.unauth }));
     }
   }, []);
 
   React.useEffect(() => {
-    
     checkLogin();
-    
   }, []);
 
   if (statusAuth === EStatusAuth.check) {
     return (
       <View flex center>
-        <ActivityIndicator color={Colors.primary} />
+        <ActivityIndicator size='large' color={Colors.primary} />
       </View>
     );
   }
@@ -107,17 +101,27 @@ const RootStack = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="SignIn">
-        {statusAuth !== EStatusAuth.auth ? (
+        {statusAuth === EStatusAuth.unauth ? (
           <>
             <Stack.Screen
               name="Onboarding"
               component={OnboardingScreen}
-              options={{headerShown: false}}
+              options={{ headerShown: false }}
             />
             <Stack.Screen
               name="SignIn"
               component={SignIn}
-              options={{headerShown: false}}
+              options={{ headerShown: false }}
+            />
+
+          </>
+        ) : (
+          <>
+            <Stack.Screen
+              name='MainTab'
+              component={MainTab}
+              options={{ headerShown: false }}
+
             />
             <Stack.Screen
               name="SignUp"
@@ -126,25 +130,16 @@ const RootStack = () => {
                 headerShown: true,
               }}
             />
-          </>
-        ) : (
-          <>
-            <Stack.Screen
-              name="MainTab"
-              component={MainTab}
-              options={{headerShown: false}}
-            />
-
             <Stack.Screen
               name="DetailItems"
               component={DetailItems}
-              options={{headerShown: false}}
+              options={{ headerShown: false }}
             />
 
             <Stack.Screen
               name="Search"
               component={Search}
-              options={{headerShown: true}}
+              options={{ headerShown: true }}
             />
 
             <Stack.Screen
@@ -154,7 +149,7 @@ const RootStack = () => {
                 headerShown: true,
               }}
             />
-          
+
           </>
         )}
       </Stack.Navigator>

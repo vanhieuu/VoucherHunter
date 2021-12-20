@@ -80,7 +80,7 @@ export const CartSlice = createSlice({
   reducers: {
     onAddToCart: (state, action) => {
       const itemIndex = state.items.findIndex(
-        item => item._id === action.payload._id,
+        item => item.product_id._id === action.payload._id,
       );
       console.log(itemIndex);
       if (itemIndex >= 0) {
@@ -94,26 +94,38 @@ export const CartSlice = createSlice({
       }
       AsyncStorage.setItem('CartItems', JSON.stringify(state.items));
     },
-    onIncreaseQuantity: (state, action: PayloadAction<IProduct>) => {
-      state.numberCart++;
+    onIncreaseQuantity: (state, action) => {
+      
       const itemIndex = state.items.findIndex(
-        item => item._id === action.payload._id,
+        item => item.product_id._id = action.payload._id,
       );
+      // console.log(itemIndex)
       state.items[itemIndex].quantity += 1;
+      state.numberCart++;
+      
     },
-    onDecreaseQuantity: (state, action: PayloadAction<IProduct>) => {
-      state.numberCart--;
+    onDecreaseQuantity: (state, action) => {
+      
       const itemIndex = state.items.findIndex(
-        item => item._id === action.payload._id,
+        item => item.product_id._id === action.payload._id,
+        
       );
+      const nextCartItem = state.items.filter(
+        item => item.product_id._id !== action.payload._id,
+      );
+      
       console.log(itemIndex);
-      if (state.items[itemIndex].quantity > 1) {
-        state.items[itemIndex].quantity -= 1;
-      } else if (state.items[itemIndex].quantity === 1) {
-        state.items[itemIndex].quantity = 0; // state.items. = nextItems
+      if (state.quantity > 1) {
+        state.quantity -= 1;
+        state.numberCart--;
+      } else if (state.quantity === 1) {
+        state.quantity = 0; 
+        // state.items = nextCartItem
+        // state.items. = nextItems
+        state.numberCart--;
       }
     },
-    onGetCartNumber: (state, action: PayloadAction<IAuth>) => {
+    onGetCartNumber: (state, action) => {
       state.numberCart = action.payload.numberCart;
     },
     removeFromCar: (state, action: PayloadAction<IProduct>) => {

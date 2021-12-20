@@ -1,67 +1,97 @@
 import React from 'react';
-import {Image, StyleSheet} from 'react-native';
+import { Image, StyleSheet } from 'react-native';
 
-import {Text, View, Colors} from 'react-native-ui-lib';
+import { Text, View, Colors } from 'react-native-ui-lib';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {IProduct} from '../../../../types/IProduct';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../../../../redux/store';
-import {numberFormat} from '../../../../config/formatCurrency';
-import {
-  onDecreaseQuantity,
-  onIncreaseQuantity,
-} from '../../../../redux/authCartSlice';
+import { IProduct } from '../../../../types/IProduct';
 
-interface Props extends IProduct {}
-const CartCard = ({name, img, discountPrice, _id}: Props) => {
+import { numberFormat } from '../../../../config/formatCurrency';
+import { useSelector } from 'react-redux';
+import URL from '../../../../config/Api';
+import { RootState } from '../../../../redux/store';
+
+export interface ICart {
+  id: string;
+  product_id: IProduct;
+  quantity: number;
+  totalPrice: number;
+}
+interface Props extends IProduct { }
+const CartCard = () => {
   const [quantity, setQuantity] = React.useState(1);
-  const cart = useSelector<RootState>(state => state.cart)
-  const dispatch = useDispatch();
-  const handleIncrease = React.useCallback(items => {
-    dispatch(onIncreaseQuantity(items));
-    console.log(quantity)
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const [itemCart, setItemCart] = React.useState<ICart[]>([]);
+  const [cart, setCart] = React.useState<ICart>();
+  const token = useSelector<RootState, string>(state => state.auth.accessToken);
+
+
+  React.useEffect(() => {
+    if (!token) return;
+    fetch(URL.getItemCart, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(response => response.json())
+      .then(json => {
+        setItemCart(json.cart.items);
+        setLoading(false);
+        setCart(json.cart)
+        
+        return json;
+      })
+      .catch(err => {
+        console.error(err);
+      });
   }, []);
-  const handleDecrease = React.useCallback(items => {
-    dispatch(onDecreaseQuantity(items));
-    console.log(_id)
-  }, []);
+
 
   return (
-    <View row center>
-      <View row center>
-        <View style={styles.image}>
-          <Image source={{uri: img}} style={styles.image} resizeMode="cover" />
-        </View>
-        <View style={styles.titleSection}>
-          <Text h17 numberOfLines={name.length} style={{maxWidth: 120}}>
-            {name}
-          </Text>
-          <View row center style={styles.action}>
-            <Text style={styles.quantityUpdate} onPress={()=>{setQuantity(quantity -1)}}>
-              -
-            </Text>
-            <Text style={{fontWeight: 'bold'}} h17>
-              {quantity}
-            </Text>
-            <Text style={styles.quantityUpdate} onPress={()=>{setQuantity(quantity+1)}}>
-              +
-            </Text>
-          </View>
-        </View>
-      </View>
-      <View style={{justifyContent: 'space-between'}}>
-        <Text h18 color={Colors.primary} marginB-20 marginL-21>
-          {numberFormat.format(discountPrice*quantity)}
-        </Text>
-        <View center style={styles.delete}>
-          <Icon
-            color={'white'}
-            size={15}
-            name="trash"
-            // onPress={handleRemoveFromCart}
-          />
-        </View>
-      </View>
+    <View center>
+      {itemCart.map((item, index) => {
+        return (
+          <>
+            <View row center key={index}>
+              <View style={styles.image}>
+                <Image source={{ uri: item.product_id.img }} style={styles.image} resizeMode="cover" />
+              </View>
+              <View style={styles.titleSection}>
+                <Text h17 numberOfLines={item.product_id.name.length} style={{ maxWidth: 120 }}>
+                  {item.product_id.name}
+                </Text>
+                <View row center style={styles.action}>
+                  <Text style={styles.quantityUpdate} onPress={() => { setQuantity(quantity - 1) }}>
+                    -
+                  </Text>
+                  <Text style={{ fontWeight: 'bold' }} h17>
+                    {quantity}
+                  </Text>
+                  <Text style={styles.quantityUpdate} onPress={() => { setQuantity(quantity + 1) }}>
+                    +
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View style={{ justifyContent: 'space-between' }}>
+              <Text h18 color={Colors.primary} marginB-20 marginL-21>
+                {numberFormat.format(item.product_id.discountPrice * quantity)}
+              </Text>
+              <View center style={styles.delete}>
+                <Icon
+                  color={'white'}
+                  size={15}
+                  name="trash"
+                // onPress={handleRemoveFromCart}
+                />
+              </View>
+            </View>
+          </>
+        )
+      })}
+
     </View>
   );
 };
