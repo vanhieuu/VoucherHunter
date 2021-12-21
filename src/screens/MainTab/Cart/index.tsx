@@ -1,20 +1,21 @@
 import React from 'react';
-import { FlatList, SafeAreaView, ScrollView, StyleSheet } from 'react-native';
-import { View, Text, Colors, Button, Image } from 'react-native-ui-lib';
-import { RootState } from '../../../redux/store';
-import { useDispatch, useSelector } from 'react-redux';
+import {FlatList, SafeAreaView, ScrollView, StyleSheet} from 'react-native';
+import {View, Text, Colors, Button, Image} from 'react-native-ui-lib';
+import {RootState} from '../../../redux/store';
+import {useDispatch, useSelector} from 'react-redux';
 import URL from '../../../config/Api';
-import { IItemCart } from '../../../types/ItemCart';
-import { Header } from 'react-native-elements';
-import CartCard from './components/CartCard';
-import { IProduct } from '../../../types/IProduct';
-import { numberFormat } from '../../../config/formatCurrency';
-import { onDecreaseQuantity, onIncreaseQuantity } from '../../../redux/authCartSlice';
+import {IItemCart} from '../../../types/ItemCart';
+import {Header} from 'react-native-elements';
+
+import {IProduct} from '../../../types/IProduct';
+import {numberFormat} from '../../../config/formatCurrency';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import CartCard from './components/CartCard';
 
 export interface IResCart {
   cart: {
-    items: ICart;
+    items: ICart[];
+    quantity: number;
   };
 }
 export interface ICart {
@@ -24,23 +25,19 @@ export interface ICart {
   totalPrice: number;
 }
 
-
-
-
 const Cart = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
-  const [itemCart, setItemCart] = React.useState<ICart[]>([]);
-  const [cart, setCart] = React.useState<ICart>();
-  const [quantity, setQuantity] = React.useState(1)
+  const [itemCart, setItemCart] = React.useState<ICart[]>();
+  const [cart, setCart] = React.useState({
+    cart: {
+      items: [],
+      quantity: 0,
+    },
+  });
+  const [quantity, setQuantity] = React.useState(1);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
-  // const quantity = useSelector<RootState, number>(state => state.cart.quantity);
-  // console.log(quantity)
+  const dispatch = useDispatch();
 
-
-
-
-
-  const dispatch = useDispatch()
   React.useEffect(() => {
     if (!token) return;
     fetch(URL.getItemCart, {
@@ -50,14 +47,13 @@ const Cart = () => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-
     })
       .then(response => response.json())
       .then(json => {
         setItemCart(json.cart.items);
         setLoading(false);
-        setCart(json.cart)
-        console.log(json.cart)
+        setCart(json.cart);
+        console.log(json.cart, 'aa');
         return json;
       })
       .catch(err => {
@@ -66,83 +62,26 @@ const Cart = () => {
   }, []);
 
 
-  const removeItem = React.useCallback(() => {
-    fetch(URL.removeItem, {
-      method: 'DELETE',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(cart?._id)
-    })
-    .then(response => response.json())
-    .then(json=>{
-      setItemCart(()=>{
-        return {
-          ...itemCart,
-          json
-        }
-      });
-      // setCart(json.cart)
-      console.log(json)
-      return json;
-    })
-    .catch(er=>{
-      console.error(er)
-    })
-  }, [])
-
-
-React.useEffect(()=>{
-  removeItem
-})
-
-
-
-
-  const onHandleDecreseQuantity = React.useCallback(() => {
-    dispatch(onDecreaseQuantity(quantity))
-    console.log(quantity)
-
-  }, [])
-
-  const onHandleIncreseQuantity = React.useCallback(() => {
-    dispatch(onIncreaseQuantity(quantity))
-    setQuantity(quantity + 1)
-    console.log(cart?._id)
-
-  }, [])
-
-
-  const itemIndex = itemCart.findIndex((item) => item.product_id._id)
-  console.log(itemIndex)
 
 
   return (
     <SafeAreaView style={styles.container}>
-
       <Header
         placement="center"
         centerComponent={{
           text: 'Shopping',
-          style: { color: Colors.primary, fontSize: 20 },
+          style: {color: Colors.primary, fontSize: 20},
         }}
         containerStyle={{
           backgroundColor: 'white',
           justifyContent: 'space-around',
         }}
         barStyle="light-content"
-        statusBarProps={{ barStyle: 'light-content' }}
+        statusBarProps={{barStyle: 'light-content'}}
       />
 
-
-
-      <ScrollView
-
-
-      >
-        {itemCart.map((item, index) => {
+      <ScrollView>
+        {/* {itemCart.map((item, index) => {
           return (
             <View row center key={index}>
               <View row center>
@@ -182,32 +121,47 @@ React.useEffect(()=>{
             </View>
 
           )
-        })}
-
-
-        <View style={styles.totalSection}>
-          <Text h28 black>
-            {' '}
-            Thanh toán
-          </Text>
-          <View row center style={{ justifyContent: 'space-between' }}>
-            <Text h24 color={Colors.primary}>
-              Thành tiền
-            </Text>
-            <View style={styles.divider} />
-            <Text h17 color={Colors.black} marginR-15>
-              {numberFormat.format(cart?.totalPrice!)}
-
-            </Text>
-          </View>
-        </View>
+        })} */}
       </ScrollView>
-      <View >
+
+      {cart.cart.items.length === 0 ? (
+        <View>
+          <Text>Khum có gì hết</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={itemCart} 
+          renderItem={({item}) => {
+            return (
+              <CartCard _id={item._id} product_id={item.product_id} quantity={item.quantity} totalPrice={item.totalPrice  }  />
+              
+              
+            );
+          }}
+          keyExtractor={(item, index) => index.toString()}
+          horizontal={false}
+        />
+      )}
+
+      <View style={styles.totalSection}>
+        <Text h28 black>
+          {' '}
+          Thanh toán
+        </Text>
+        <View row center style={{justifyContent: 'space-between'}}>
+          <Text h24 color={Colors.primary}>
+            Thành tiền
+          </Text>
+          <View style={styles.divider} />
+          <Text h17 color={Colors.black} marginR-15>
+            {}
+          </Text>
+        </View>
+      </View>
+      <View>
         <Button label={'Thanh toán'} />
       </View>
     </SafeAreaView>
-
-
   );
 };
 
@@ -243,7 +197,6 @@ const styles = StyleSheet.create({
     height: 100,
     backgroundColor: Colors.primary,
     marginBottom: 10,
-
   },
   titleSection: {
     paddingLeft: 30,

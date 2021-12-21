@@ -6,7 +6,8 @@ import Banner from './components/Banner';
 import ListHorizontal from './components/ListHorizontal';
 import ListProduct from './components/ListProduct';
 
-const widthScreen = Dimensions.get('window').width;
+const widthScreen = Dimensions.get('screen').width;
+const heightScreen = Dimensions.get('screen').height;
 const widthImg = widthScreen;
 const heightImg = (widthImg / 375) * 256;
 

@@ -1,97 +1,107 @@
 import React from 'react';
-import { Image, StyleSheet } from 'react-native';
+import {Alert, Image, StyleSheet} from 'react-native';
 
-import { Text, View, Colors } from 'react-native-ui-lib';
+import {Text, View, Colors} from 'react-native-ui-lib';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { IProduct } from '../../../../types/IProduct';
+import {IProduct} from '../../../../types/IProduct';
 
-import { numberFormat } from '../../../../config/formatCurrency';
-import { useSelector } from 'react-redux';
+import {numberFormat} from '../../../../config/formatCurrency';
+import {useSelector} from 'react-redux';
 import URL from '../../../../config/Api';
-import { RootState } from '../../../../redux/store';
+import {RootState} from '../../../../redux/store';
 
 export interface ICart {
-  id: string;
+  _id: string;
   product_id: IProduct;
   quantity: number;
   totalPrice: number;
 }
-interface Props extends IProduct { }
-const CartCard = () => {
-  const [quantity, setQuantity] = React.useState(1);
+interface Props extends ICart {}
+const CartCard = ({_id,product_id,quantity,totalPrice}:Props) => {
+  // const [quantity, setQuantity] = React.useState(1);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
-  const [cart, setCart] = React.useState<ICart>();
+  const [cart, setCart] = React.useState({
+    cart: {
+      items: [],
+      quantity: 0,
+    },
+  });
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
 
+ 
 
-  React.useEffect(() => {
-    if (!token) return;
-    fetch(URL.getItemCart, {
-      method: 'GET',
+  const removeItem = async () => {
+    await fetch(URL.removeItem, {
+      method: 'DELETE',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
+      body: JSON.stringify({id:_id}),
     })
       .then(response => response.json())
       .then(json => {
-        setItemCart(json.cart.items);
+        Alert.alert(json.message);
+        setItemCart(json);
+        setCart(json.cart);
         setLoading(false);
-        setCart(json.cart)
-        
         return json;
       })
-      .catch(err => {
-        console.error(err);
+      .catch(er => {
+        console.error(er);
       });
-  }, []);
-
+  };
 
   return (
-    <View center>
-      {itemCart.map((item, index) => {
-        return (
-          <>
-            <View row center key={index}>
+    <View center row style={styles.container}>
+      <View row center>
+        {itemCart.map((item, index) => {
+          return (
+            <>
               <View style={styles.image}>
-                <Image source={{ uri: item.product_id.img }} style={styles.image} resizeMode="cover" />
+                <Image
+                  source={{uri: product_id.img}}
+                  style={styles.image}
+                  resizeMode="cover"
+                />
               </View>
               <View style={styles.titleSection}>
-                <Text h17 numberOfLines={item.product_id.name.length} style={{ maxWidth: 120 }}>
-                  {item.product_id.name}
+                <Text
+                  h17
+                  numberOfLines={product_id.name.length}
+                  style={{maxWidth: 120}}>
+                  {product_id.name}
                 </Text>
                 <View row center style={styles.action}>
-                  <Text style={styles.quantityUpdate} onPress={() => { setQuantity(quantity - 1) }}>
+                  <Text
+                    style={styles.quantityUpdate}
+                    onPress={() => console.log(quantity)}>
                     -
                   </Text>
-                  <Text style={{ fontWeight: 'bold' }} h17>
+                  <Text style={{fontWeight: 'bold'}} h17>
                     {quantity}
                   </Text>
-                  <Text style={styles.quantityUpdate} onPress={() => { setQuantity(quantity + 1) }}>
+                  <Text
+                    style={styles.quantityUpdate}
+                    onPress={() => console.log(quantity)}>
                     +
                   </Text>
                 </View>
               </View>
-            </View>
-            <View style={{ justifyContent: 'space-between' }}>
-              <Text h18 color={Colors.primary} marginB-20 marginL-21>
-                {numberFormat.format(item.product_id.discountPrice * quantity)}
-              </Text>
-              <View center style={styles.delete}>
-                <Icon
-                  color={'white'}
-                  size={15}
-                  name="trash"
-                // onPress={handleRemoveFromCart}
-                />
-              </View>
-            </View>
-          </>
-        )
-      })}
-
+            </>
+          );
+        })}
+      </View>
+      <View style={{justifyContent: 'space-between'}}>
+        <Text h18 color={Colors.primary} marginB-20 marginL-21>
+          {numberFormat.format(product_id.discountPrice * quantity)}
+        </Text>
+        <View center style={styles.delete}>
+          <Icon color={'white'} size={15} name="trash" onPress={removeItem} />
+        </View>
+      </View>
     </View>
   );
 };

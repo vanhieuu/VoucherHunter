@@ -39,10 +39,10 @@ const ItemProduct = ({item}: {item: IProduct}) => {
         <View>
           <View>
             <View paddingL-5 paddingR-20 marginB-11>
-              <Text style={{fontSize:17}} marginT-10 numberOfLines={2} color={'#6f6f6f'} marginL-15>
+              <Text style={{fontSize:12}} marginT-10 numberOfLines={2} color={'#6f6f6f'} marginL-15>
                 {item.name}
               </Text>
-              <Text style={{fontSize:17}} color={'#7e7d7d'} marginL-20>
+              <Text style={{fontSize:12}} color={'#7e7d7d'} marginL-20>
                 {numberFormat.format(item.listedPrice)}
               </Text>
             </View>

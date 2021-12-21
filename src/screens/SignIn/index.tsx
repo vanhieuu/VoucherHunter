@@ -6,14 +6,14 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import { Text, Colors, Image, View } from 'react-native-ui-lib';
+import {Text, Colors, Image, View} from 'react-native-ui-lib';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { NavigationProp, useNavigation } from '@react-navigation/core';
-import { IAuth, onLogin, saveAuthAsync } from '../../redux/authSlice';
-import { useDispatch } from 'react-redux';
+import {NavigationProp, useNavigation} from '@react-navigation/core';
+import {IAuth, onLogin, saveAuthAsync} from '../../redux/authSlice';
+import {useDispatch} from 'react-redux';
 import URL from '../../config/Api';
-import { RootStackParamList } from '../../nav/RootStack';
-import { Input } from 'react-native-elements';
+import {RootStackParamList} from '../../nav/RootStack';
+import {Input} from 'react-native-elements';
 
 const SignIn = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -27,7 +27,7 @@ const SignIn = () => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [errorText, setErrorText] = React.useState('');
   const componentMounted = React.useRef(true);
-  const onPressLogin = async () => {
+  const onPressLogin =  () => {
     setErrorText('');
     if (!username) {
       Alert.alert('Tên đăng nhập không được để trống');
@@ -38,9 +38,8 @@ const SignIn = () => {
       return;
     }
     setLoading(true);
-    let dataToSend = { username: username, password: password };
-
-    await fetch(URL.Login, {
+    let dataToSend = {username: username, password: password};
+    fetch(URL.Login, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -66,14 +65,12 @@ const SignIn = () => {
         if (componentMounted.current) {
           // (5) is component still mounted?
           dispatch(onLogin(json));
-          setLoading(false);
           saveAuthAsync(json);
+          setLoading(false);
           // navigation.navigate('MainTab')
           // (1) write data to state
         }
-        return () => {
-          componentMounted.current = false;
-        };
+        return (componentMounted.current = false);
       })
       .catch(error => {
         console.error(error);
@@ -81,7 +78,7 @@ const SignIn = () => {
   };
 
   return (
-    <ScrollView style={{ backgroundColor: 'white', marginTop: 50 }}>
+    <ScrollView style={{backgroundColor: 'white', marginTop: 50}}>
       <View style={styles.container}>
         <Image
           assetGroup="signUp"
@@ -95,7 +92,7 @@ const SignIn = () => {
         <View
           style={[
             styles.containerInput,
-            { borderColor: isFocus ? '#E9707D' : '#eee' },
+            {borderColor: isFocus ? '#E9707D' : '#eee'},
           ]}>
           <Input
             placeholder="Tên đăng nhập"
@@ -118,7 +115,7 @@ const SignIn = () => {
         <View
           style={[
             styles.containerInput,
-            { borderColor: isFocus ? '#E9707D' : '#eee' },
+            {borderColor: isFocus ? '#E9707D' : '#eee'},
           ]}>
           <Input
             placeholder="Mật khẩu"
@@ -138,7 +135,7 @@ const SignIn = () => {
             autoCompleteType={undefined}
           />
         </View>
-        <View style={{ width: '90%' }}>
+        <View style={{width: '90%'}}>
           {/* <Text
             b13
             black
@@ -172,7 +169,7 @@ const SignIn = () => {
           </Text>
           <Text
             b13
-            style={{ color: Colors.primary }}
+            style={{color: Colors.primary}}
             centerH
             onPress={() => {
               navigation.navigate('SignUp');
