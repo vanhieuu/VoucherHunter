@@ -97,8 +97,11 @@ export const CartSlice = createSlice({
       }
     },
 
-    removeFromCart: (state, action: PayloadAction<{id: string}>) => {
+    removeFromCart: (state, action: PayloadAction<IAuth>) => {
       //  state.items =   {...state, item:state.items.filter((id)=> id._id === action.payload.id)}
+      const findIndex = state.items.findIndex(item => item._id);
+      const spilceCart = state.items.splice(findIndex, 1);
+      state.items = action.payload.items;
     },
   },
 });

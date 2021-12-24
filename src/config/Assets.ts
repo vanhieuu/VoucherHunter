@@ -23,5 +23,8 @@ Assets.loadAssetsGroup('imgNewScreen', {
 });
 Assets.loadAssetsGroup('icons',{
   ic_ticket:require('../assets/Ticket.png'),
-  ic_back:require('../assets/arrowBack.png')
+  ic_back:require('../assets/arrowBack.png'),
+  plus: require('../assets/plus.png'),
+  minus: require('../assets/minus.png'),
+
 })

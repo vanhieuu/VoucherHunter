@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   btnLogin: {
-    backgroundColor: Colors.primary,
+    backgroundColor: '#E9707D',
     justifyContent: 'center',
     alignItems: 'center',
     height: 48,

@@ -1,4 +1,7 @@
 import {createTheme} from '@shopify/restyle';
+import { Dimensions } from 'react-native';
+
+const {width} = Dimensions.get('window');
 
 const theme = createTheme({
   colors: {
@@ -50,6 +53,6 @@ const theme = createTheme({
 });
 
 
-
+export const aspectRatio = width/375
 export type Theme = typeof theme;
 export default theme;

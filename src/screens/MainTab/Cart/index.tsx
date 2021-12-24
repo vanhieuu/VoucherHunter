@@ -1,30 +1,23 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {useTheme} from '@shopify/restyle';
-import {debounce} from 'lodash';
 import React from 'react';
-import {Dimensions, FlatList, ScrollView, StyleSheet} from 'react-native';
+import {Dimensions, ScrollView, StyleSheet} from 'react-native';
 import {Header} from 'react-native-elements';
-import {Card, Colors, Text, View} from 'react-native-ui-lib';
-import {useDispatch, useSelector} from 'react-redux';
+import Animated from 'react-native-reanimated';
+import {Colors, Text} from 'react-native-ui-lib';
+import { useSelector } from 'react-redux';
 import Box from '../../../components/Box';
 import theme, {Theme} from '../../../components/theme';
 import URL from '../../../config/Api';
 import {RootStackParamList} from '../../../nav/RootStack';
-import {
-  onAddToCart,
-  removeFromCart,
-  saveCartAsync,
-} from '../../../redux/authCartSlice';
+import {saveCartAsync} from '../../../redux/authCartSlice';
 import {RootState} from '../../../redux/store';
 import {IProduct} from '../../../types/IProduct';
-
 import CartContainer from './components/CartContainer';
-import Footer, {RefFooter} from './components/Footer';
 import Items from './components/Items';
-const {width} = Dimensions.get('window');
-const height = (682 * width) / 375;
-const minHeigt = (282 * width) / 375;
 
+const {width} = Dimensions.get('window');
+const height = 100 * (width / 375);
 interface ICart {
   _id: string;
   product_id: IProduct;
@@ -35,68 +28,14 @@ interface Props {
   items: ICart;
 }
 
-
-
 const Cart = ({items}: Props) => {
-  const [refreshing, setRefreshing] = React.useState<boolean>(false);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const theme = useTheme<Theme>();
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
-  const refListOrder = React.useRef<FlatList>(null);
-  const refFooter = React.useRef<RefFooter>(null);
+
   const [mounted, setMounted] = React.useState<boolean>(false);
-  const onEndReached = React.useCallback(() => {
-    refFooter.current?.setIsLoadmore(true);
-    setTimeout(() => {
-      setItemCart(prev => prev.concat());
-      refFooter.current?.setIsLoadmore(false);
-    }, 500);
-  }, []);
-
-  const renderListFooter = React.useCallback(() => {
-    return <Footer ref={refFooter} />;
-  }, []);
-
-  const renderItem = React.useCallback(({item,index}) => {
-    return (
-      <Items
-        items={item}
-        onDelete={debounce(() => {
-          itemCart.splice(index,1)
-          itemCart.concat()
-        }, 1000)}
-      />
-    );
-  }, []);
-
-  const keyExtractor = React.useCallback(
-    (items, index) => index.toString(),
-    [],
-  );
-
-  const onDelete = React.useCallback(debounce(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-    if (!token) return;
-    setMounted(true);
-    fetch(URL.removeItem, {
-      signal: signal,
-      method: 'DELETE',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer${token}`,
-      },
-      body: JSON.stringify({id: items._id}),
-    })
-      .then(response => response.json())
-      .then(json => {
-        setItemCart(json);
-        setLoading(false);
-      });
-  },2000), []);
 
   React.useEffect(() => {
     const controller = new AbortController();
@@ -130,73 +69,95 @@ const Cart = ({items}: Props) => {
       controller.abort();
     };
   }, []);
-
+  const onDelete = React.useCallback((item) => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+    if (!token) return;
+    setMounted(true);
+    fetch(URL.removeItem, {
+      signal: signal,
+      method: 'DELETE',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer${token}`,
+      },
+      body: JSON.stringify({id: item._id}),
+    })
+      .then(response => response.json())
+      .then(json => {
+        setItemCart(json);
+        console.log(json, 'aaa');
+        // itemCart.splice(,1);
+        // setItemCart(itemCart.concat());
+        setLoading(false);
+      });
+  }, []);
   return (
     <CartContainer>
-      <Box backgroundColor="primary">
-        <Header
-          placement="center"
-          centerComponent={{
-            text: 'Shopping',
-            style: {color: Colors.primary, fontSize: 20},
-          }}
-          containerStyle={{
-            backgroundColor: 'white',
-            justifyContent: 'space-around',
-          }}
-          barStyle="light-content"
-          statusBarProps={{barStyle: 'light-content'}}
-          leftComponent={{
-            icon: 'arrow-left',
-            onPress: () => navigation.goBack(),
-          }}
-        />
+      <Box>
+        <Box backgroundColor="primary">
+          <Header
+            placement="center"
+            centerComponent={{
+              text: 'Shopping',
+              style: {color: Colors.primary, fontSize: 20},
+            }}
+            containerStyle={{
+              backgroundColor: 'white',
+              justifyContent: 'space-around',
+            }}
+            barStyle="light-content"
+            statusBarProps={{barStyle: 'light-content'}}
+            leftComponent={{
+              icon: 'arrow-left',
+              onPress: () => navigation.goBack(),
+            }}
+          />
+        </Box>
       </Box>
       <Box flex={1}>
-        <View
+        <ScrollView
           style={{
             borderBottomRightRadius: theme.borderRadii.xl,
             borderBottomLeftRadius: theme.borderRadii.xl,
-          }}>
-          {loading ? (
-            <View row paddingH-16 paddingV-12>
-              <Card
-                style={[
-                  styles.containerItem,
-                  {height: 251, backgroundColor: Colors.dark40},
-                ]}
-              />
-              <Card
-                style={[
-                  styles.containerItem,
-                  {height: 251, backgroundColor: Colors.dark40},
-                ]}
-              />
-              <Card
-                style={[
-                  styles.containerItem,
-                  {height: 210, backgroundColor: Colors.dark40},
-                ]}
-              />
-            </View>
-          ) : (
-            <FlatList
-              ref={refListOrder}
-              horizontal={false}
-              showsHorizontalScrollIndicator={true}
-              data={itemCart}
-              keyExtractor={(item, index) => index.toString()}
-              contentContainerStyle={{
-                paddingHorizontal: 16,
-                paddingVertical: 12,
+          }}
+          contentContainerStyle={{paddingVertical: 50 * (width / 375)}}
+          showsVerticalScrollIndicator={false}>
+          {itemCart.map((item, index) => (
+            <Items
+              key={item._id}
+              items={item}
+              onDelete={() => {
+                itemCart.splice(index, 1);
+                setItemCart(itemCart.concat());
+                console.log(item._id);
+                onDelete(item._id)
               }}
-              onEndReachedThreshold={0.5}
-              // onEndReached={onEndReached}
-              ListFooterComponent={renderListFooter}
-              renderItem={renderItem}
             />
-          )}
-        </View>
+          ))}
+        </ScrollView>
+
+        <Box
+          width={width}
+          height={height}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height,
+          }}>
+          <Text
+            style={{
+              fontSize: 15,
+              color: Colors.primary,
+              textAlign: 'center',
+              fontWeight: 'bold',
+              lineHeight: 20,
+              marginTop: 5,
+            }}></Text>
+        </Box>
       </Box>
     </CartContainer>
   );

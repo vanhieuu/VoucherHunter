@@ -25,7 +25,7 @@ const height = (682 * width) / 375;
 const minHeight = (228 * width) / 375;
 const snapPoints = [-(height - minHeight), 0];
 
-const CartContainer =  gestureHandlerRootHOC(({children}: CartProps) => {
+const CartContainer = ({children}: CartProps) => {
   const theme = useTheme<Theme>();
   const translateY = useSharedValue(0);
   const onGestureEvent = useAnimatedGestureHandler<
@@ -44,7 +44,10 @@ const CartContainer =  gestureHandlerRootHOC(({children}: CartProps) => {
       );
     },
     onEnd: ({velocityY}) => {
-      const dest = snapPoint(translateY.value, velocityY, snapPoints);
+      const dest = snapPoint(translateY.value, velocityY, [
+        -(height - minHeight),
+        0,
+      ]);
       translateY.value = withSpring(dest, {overshootClamping: true});
     },
   });
@@ -52,7 +55,7 @@ const CartContainer =  gestureHandlerRootHOC(({children}: CartProps) => {
     return {
       transform: [
         {
-          translateX: translateY.value,
+          translateY: translateY.value,
         },
       ],
     };
@@ -69,10 +72,8 @@ const CartContainer =  gestureHandlerRootHOC(({children}: CartProps) => {
               right: 0,
               height,
               backgroundColor: 'white',
-              borderBottomLeftRadius: theme.borderRadii.m,
-              borderBottomRightRadius: theme.borderRadii.m,
-              borderTopLeftRadius: theme.borderRadii.m,
-              borderTopRightRadius: theme.borderRadii.m,
+              borderBottomLeftRadius: theme.borderRadii.l,
+              borderBottomRightRadius: theme.borderRadii.l,
             },
             style,
           ]}>
@@ -91,8 +92,9 @@ const CartContainer =  gestureHandlerRootHOC(({children}: CartProps) => {
               style={{
                 height: 5,
                 backgroundColor: Colors.grey,
-                width: 60,
-                marginBottom: Spacings.s4,
+                width: (60*width)/375,
+                borderRadius:(2.5*width)/375,
+                marginBottom: Spacings.s2,
               }}
             />
           </View>
@@ -100,7 +102,7 @@ const CartContainer =  gestureHandlerRootHOC(({children}: CartProps) => {
       </PanGestureHandler>
     </Box>
   );
-});
+};
 
 export default CartContainer;
 
