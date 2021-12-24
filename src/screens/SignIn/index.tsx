@@ -27,7 +27,7 @@ const SignIn = () => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [errorText, setErrorText] = React.useState('');
   const componentMounted = React.useRef(true);
-  const onPressLogin =  () => {
+  const onPressLogin = async () => {
     const controller = new AbortController();
     const signal = controller.signal;
     setErrorText('');
@@ -41,7 +41,7 @@ const SignIn = () => {
     }
     setLoading(true);
     let dataToSend = {username: username, password: password};
-    fetch(URL.Login, {
+   await fetch(URL.Login, {
       signal: signal,
       method: 'POST',
       headers: {
@@ -65,15 +65,10 @@ const SignIn = () => {
         }
         //login Success
 
-        if (componentMounted.current) {
-          // (5) is component still mounted?
-          dispatch(onLogin(json));
-          saveAuthAsync(json);
-          setLoading(false);
-          // navigation.navigate('MainTab')
-          // (1) write data to state
-        }
-        
+        // (5) is component still mounted?
+        dispatch(onLogin(json));
+        saveAuthAsync(json);
+        setLoading(false);
       })
       .catch(err => {
         if (err.name === 'AbortError') {
@@ -103,10 +98,8 @@ const SignIn = () => {
         <View
           style={[
             styles.containerInput,
-            {borderColor: isFocus ? '#E9707D' : '#eee' },
-            
+            {borderColor: isFocus ? '#E9707D' : '#eee'},
           ]}>
-            
           <Input
             placeholder="Tên đăng nhập"
             onFocus={onFocusChange}
@@ -128,7 +121,7 @@ const SignIn = () => {
         <View
           style={[
             styles.containerInput,
-            
+
             {borderColor: isFocus ? '#E9707D' : '#eee'},
           ]}>
           <Input
@@ -137,7 +130,6 @@ const SignIn = () => {
             inputContainerStyle={styles.inputContainer}
             inputStyle={styles.inputText}
             secureTextEntry
-          
             onChangeText={password => setPassword(password)}
             leftIcon={
               <Icon

@@ -46,12 +46,11 @@ const RootStack = () => {
   const statusAuth = useSelector<RootState, EStatusAuth>(
     state => state.auth.statusAuth,
   );
-  console.log(statusAuth)
+
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const dispatch = useDispatch();
   const checkLogin = React.useCallback(async () => {
     const auth: IAuth | null = await getAuthAsync();
-    console.log(auth)
     if (auth) {
       fetch(URL.CheckToken, {
         method: 'POST',
@@ -68,9 +67,6 @@ const RootStack = () => {
         .then((json: { error: string, success: boolean }) => {
           const error = json.error; 
           const success = json.success;
-          console.log(json)
-          console.log(json.success);
-          console.log(error)
           //token fail
           if (!success) {
             Alert.alert('Đã hết phiên đăng nhập', 'vui lòng đăng nhập lại ');
@@ -89,6 +85,8 @@ const RootStack = () => {
   React.useEffect(() => {
     checkLogin();
   }, []);
+
+
 
   if (statusAuth === EStatusAuth.check) {
     return (

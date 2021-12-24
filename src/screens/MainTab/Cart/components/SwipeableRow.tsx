@@ -23,6 +23,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
+  withTiming,
 } from 'react-native-reanimated';
 import {snapPoint} from 'react-native-redash';
 import {Colors} from 'react-native-ui-lib';
@@ -46,12 +47,13 @@ interface SwipeableRowProps {
   children: ReactNode;
   onDelete: () => void;
   items: ICart;
+  height: number;
 }
 
 const {width} = Dimensions.get('window');
 const aspectRatio = width / 375;
 const editWidth = 85 * aspectRatio;
-const finalDes = width;
+const finalDes = width/375;
 const snapPoints = [-85 * aspectRatio, 0, finalDes];
 
 const transition = (
@@ -61,10 +63,10 @@ const transition = (
   </Transition.Together>
 );
 
-const SwipeableRow = ({children, onDelete, items}: SwipeableRowProps) => {
+const SwipeableRow = ({children, onDelete, items,height:defaultHeight}: SwipeableRowProps) => {
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [loading, setLoading] = React.useState(false);
-
+  const height = useSharedValue(defaultHeight);
   const ref = React.useRef<TransitioningView>(null);
   const [quantity, setQuantity] = React.useState<number>(1);
   const deleteItem = React.useCallback(() => {
@@ -113,7 +115,10 @@ const SwipeableRow = ({children, onDelete, items}: SwipeableRowProps) => {
         },
         () => {
           if (dest === finalDes) {
-            onDelete();
+            height.value = withTiming(0,{duration:250},()=>{
+              deleteItem()
+            })
+            
           }
         },
       );
@@ -121,7 +126,9 @@ const SwipeableRow = ({children, onDelete, items}: SwipeableRowProps) => {
   });
   const style = useAnimatedStyle(() => {
     return {
-      backgroundColor: 'white',
+      height: height.value,
+      backgroundColor:'white',
+      borderRadius:10,
       transform: [
         {
           translateX: translateX.value,
@@ -130,27 +137,12 @@ const SwipeableRow = ({children, onDelete, items}: SwipeableRowProps) => {
     };
   });
 
-  const deleteStyle = useAnimatedStyle(() => {
-    return {
-      opacity: translateX.value > 0 ? 1 : 0,
-    };
-  });
-
+ 
 
   return (
     <Transitioning.View ref={ref} transition={transition}>
-      <Animated.View style={[StyleSheet.absoluteFill, , deleteStyle]}>
-        <Box
-          justifyContent="space-evenly"
-          flex={1}
-          width={editWidth}
-          alignItems="center">
-          <Text style={{fontSize: 20, fontWeight: 'bold',fontFamily: 'sans-serif'}}>Xoá</Text>
-        </Box>
-      </Animated.View>
       <PanGestureHandler onGestureEvent={onGestureEvent}>
         <Animated.View style={style}>
-          
           {children}
         </Animated.View>
       </PanGestureHandler>

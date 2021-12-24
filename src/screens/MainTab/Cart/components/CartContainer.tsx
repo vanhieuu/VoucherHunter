@@ -21,7 +21,7 @@ interface CartProps {
   children: ReactNode;
 }
 const {width} = Dimensions.get('window');
-const height = (682 * width) / 375;
+const height = (600 * width) / 375;
 const minHeight = (228 * width) / 375;
 const snapPoints = [-(height - minHeight), 0];
 
@@ -61,7 +61,7 @@ const CartContainer = ({children}: CartProps) => {
     };
   });
   return (
-    <Box flex={1} backgroundColor={'primary'}>
+    <Box flex={1} backgroundColor={'background'}>
       <PanGestureHandler onGestureEvent={onGestureEvent}>
         <Animated.View
           style={[
@@ -72,8 +72,8 @@ const CartContainer = ({children}: CartProps) => {
               right: 0,
               height,
               backgroundColor: 'white',
-              borderBottomLeftRadius: theme.borderRadii.l,
-              borderBottomRightRadius: theme.borderRadii.l,
+              borderBottomLeftRadius: theme.borderRadii.xl,
+              borderBottomRightRadius: theme.borderRadii.xl,
             },
             style,
           ]}>
@@ -90,7 +90,7 @@ const CartContainer = ({children}: CartProps) => {
             }}>
             <View
               style={{
-                height: 5,
+                height: 5 ,
                 backgroundColor: Colors.grey,
                 width: (60*width)/375,
                 borderRadius:(2.5*width)/375,

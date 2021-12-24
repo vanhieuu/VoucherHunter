@@ -9,6 +9,7 @@ const theme = createTheme({
     primary: '#E9707D',
     title: '#0c0d34',
     text: 'rgba(12,13,52,0.7)',
+    background:'black',
     white: '#fff',
     grey: 'grey',
     secondary:'#000',

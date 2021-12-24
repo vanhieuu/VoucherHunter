@@ -28,14 +28,10 @@ export enum EStatusAuth {
   auth = 3,
 }
 export interface IAuth {
-  items: [
-    {
-      product_id: IProduct;
-      quantity: number;
-      _id: string;
-      totalPrice: number;
-    },
-  ];
+  product_id: IProduct;
+  quantity: number;
+  _id: string;
+  totalPrice: number;
 }
 
 export interface IResProduct {
@@ -45,31 +41,27 @@ export interface IResProduct {
 }
 
 const initValue: IAuth = {
-  items: [
-    {
-      product_id: {
-        _id: '',
-        name: '',
-        listedPrice: 0,
-        discountPrice: 0,
-        is_hot: false,
-        listphotos: [],
-        createdAt: '',
-        updateAt: '',
-        deletedAt: '',
-        quantity: 0,
-        img: '',
-        tags: [],
-        description: '',
-        sold: 0,
-        vote: 0,
-        supplier: '',
-      },
-      quantity: 0,
-      _id: '',
-      totalPrice: 0,
-    },
-  ],
+  product_id: {
+    _id: '',
+    name: '',
+    listedPrice: 0,
+    discountPrice: 0,
+    is_hot: false,
+    listphotos: [],
+    createdAt: '',
+    updateAt: '',
+    deletedAt: '',
+    quantity: 0,
+    img: '',
+    tags: [],
+    description: '',
+    sold: 0,
+    vote: 0,
+    supplier: '',
+  },
+  quantity: 0,
+  _id: '',
+  totalPrice: 0,
 };
 
 export const CartSlice = createSlice({
@@ -77,59 +69,22 @@ export const CartSlice = createSlice({
   initialState: initValue,
   reducers: {
     onAddToCart: (state, action: PayloadAction<IAuth>) => {
-      const findIndex = state.items.findIndex(item => item.product_id._id);
-      if (findIndex < 0) {
-        state.items.push(...action.payload.items);
-      }
-      state.items = action.payload.items;
+      state.product_id = action.payload.product_id;
+      state._id = action.payload._id;
+      state.quantity = 1;
+      state.totalPrice = action.payload.totalPrice;
     },
-    onUpdateQuantity: (state, action) => {
-      const items = state.items.find(b => action.payload === b.product_id.name);
-      const item = state.items.filter(
-        b => action.payload !== b.product_id.name,
-      );
-      const findIndex = state.items.findIndex(item => item._id);
-      if (findIndex < 0) {
-        Alert.alert('Vui lòng chọn sản phẩm');
-      }
-      if (findIndex) {
-        state.items[findIndex].quantity = state.items[findIndex].quantity + 1;
-      }
-    },
+    onUpdateQuantity: (state, action) => {},
 
     removeFromCart: (state, action: PayloadAction<IAuth>) => {
+      state.product_id = action.payload.product_id;
+      state._id = action.payload._id;
+      state.quantity = 1;
+      state.totalPrice = action.payload.totalPrice;
       //  state.items =   {...state, item:state.items.filter((id)=> id._id === action.payload.id)}
-      const findIndex = state.items.findIndex(item => item._id);
-      const spilceCart = state.items.splice(findIndex, 1);
-      state.items = action.payload.items;
     },
   },
 });
-
-export const saveCartAsync = (Cart: IAuth) => {
-  try {
-    AsyncStorage.setItem(
-      'CartItems',
-      JSON.stringify({
-        items: Cart.items,
-      }),
-    );
-  } catch (e) {
-    // saving error
-  }
-};
-export const getCartAsync = async () => {
-  try {
-    const Cart = await AsyncStorage.getItem('CartItems');
-    if (Cart) {
-      return JSON.parse(Cart);
-    }
-    return null;
-  } catch (e) {
-    // error reading value
-    return null;
-  }
-};
 
 export const {onAddToCart, onUpdateQuantity, removeFromCart} =
   CartSlice.actions;

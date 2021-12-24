@@ -1,23 +1,28 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {useTheme} from '@shopify/restyle';
+import axios from 'axios';
+import {debounce} from 'lodash';
 import React from 'react';
-import {Dimensions, ScrollView, StyleSheet} from 'react-native';
+import {Alert, Dimensions, ScrollView, StyleSheet} from 'react-native';
 import {Header} from 'react-native-elements';
 import Animated from 'react-native-reanimated';
 import {Colors, Text} from 'react-native-ui-lib';
-import { useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import Box from '../../../components/Box';
 import theme, {Theme} from '../../../components/theme';
 import URL from '../../../config/Api';
 import {RootStackParamList} from '../../../nav/RootStack';
-import {saveCartAsync} from '../../../redux/authCartSlice';
+import { removeFromCart } from '../../../redux/authCartSlice';
+import { IAuthRegister } from '../../../redux/authRegisterSlice';
+import {getAuthAsync, IAuth} from '../../../redux/authSlice';
+
 import {RootState} from '../../../redux/store';
 import {IProduct} from '../../../types/IProduct';
 import CartContainer from './components/CartContainer';
 import Items from './components/Items';
 
 const {width} = Dimensions.get('window');
-const height = 100 * (width / 375);
+const height = 120 * (width / 375);
 interface ICart {
   _id: string;
   product_id: IProduct;
@@ -27,12 +32,25 @@ interface ICart {
 interface Props {
   items: ICart;
 }
+interface IResCart{
+  message: string,
+  cart: {
+      _id: string,
+      items:ICart[],
+      totalPrice: number
+  }
+}
 
-const Cart = ({items}: Props) => {
+const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const theme = useTheme<Theme>();
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
+  const id = useSelector<RootState, string>(state => state.cart._id);
+
+const dispatch = useDispatch();
+ 
+
   const [loading, setLoading] = React.useState<boolean>(true);
 
   const [mounted, setMounted] = React.useState<boolean>(false);
@@ -53,9 +71,10 @@ const Cart = ({items}: Props) => {
     })
       .then(response => response.json())
       .then(json => {
+      
         setItemCart(json.cart.items);
-        saveCartAsync(json);
         setLoading(false);
+        console.log(itemCart)
       })
       .catch(err => {
         if (err.name === 'AbortError') {
@@ -69,30 +88,47 @@ const Cart = ({items}: Props) => {
       controller.abort();
     };
   }, []);
-  const onDelete = React.useCallback((item) => {
+
+  const onDelete = React.useCallback(async (_id) => {
+    console.log(_id);
     const controller = new AbortController();
+    const auth: IAuth | null = await getAuthAsync();
+    const registerAuth: IAuthRegister | null = await getAuthAsync();
     const signal = controller.signal;
-    if (!token) return;
-    setMounted(true);
-    fetch(URL.removeItem, {
+    await fetch(URL.removeItem, {
       signal: signal,
       method: 'DELETE',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        Authorization: `Bearer${token}`,
+        Authorization: `Bearer ${
+          auth?.accessToken || registerAuth?.accessToken
+        }`,
       },
-      body: JSON.stringify({id: item._id}),
+      body: JSON.stringify({id: _id}),
     })
       .then(response => response.json())
       .then(json => {
-        setItemCart(json);
-        console.log(json, 'aaa');
-        // itemCart.splice(,1);
-        // setItemCart(itemCart.concat());
+        
+        console.log(json.cart.items,'aaaaaaa')
+        // setItemCart([...itemCart,json.cart.items])
+        setItemCart(json.cart.items)
+        // dispatch(removeFromCart(json.cart.items))
         setLoading(false);
+      })  
+      .catch(err => {
+        if (err.name === 'AbortError') {
+          console.log('Success Abort');
+        } else {
+          console.error(err);
+        }
       });
-  }, []);
+    return () => {
+      // cancel the request before component unmounts
+      controller.abort();
+    };
+  }, [_id]);
+
   return (
     <CartContainer>
       <Box>
@@ -124,15 +160,14 @@ const Cart = ({items}: Props) => {
           }}
           contentContainerStyle={{paddingVertical: 50 * (width / 375)}}
           showsVerticalScrollIndicator={false}>
-          {itemCart.map((item, index) => (
+          {itemCart.map((items, index) => (
             <Items
-              key={item._id}
-              items={item}
+              key={index}
+              items={items}
               onDelete={() => {
                 itemCart.splice(index, 1);
                 setItemCart(itemCart.concat());
-                console.log(item._id);
-                onDelete(item._id)
+                onDelete(items._id);
               }}
             />
           ))}
@@ -169,7 +204,7 @@ const styles = StyleSheet.create({
   containerItem: {
     width: 190,
     marginRight: 12,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.black,
     elevation: 2,
   },
 });

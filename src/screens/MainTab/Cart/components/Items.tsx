@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Box from '../../../../components/Box';
-import {Assets, Colors, Text, View} from 'react-native-ui-lib';
+import {Assets, Colors, Spacings, Text, View} from 'react-native-ui-lib';
 
 // import {useTheme} from '@shopify/restyle';
 // import SwipeableRow from './SwipeableRow';
@@ -18,6 +18,9 @@ import {IProduct} from '../../../../types/IProduct';
 import {numberFormat} from '../../../../config/formatCurrency';
 import SwipeableRow from './SwipeableRow';
 import Animated from 'react-native-reanimated';
+import {useTheme} from '@shopify/restyle';
+import {Theme} from 'react-toastify';
+import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
 
 interface ICart {
   _id: string;
@@ -31,71 +34,6 @@ interface Props {
   onDelete: () => void;
 }
 
-const widthScreen = Dimensions.get('window').width;
-
-// const Items = ({items, onDelete}: ItemProps) => {
-//   console.log(items,'aaaa');
-//   const theme = useTheme<Theme>();
-//   return (
-//     <SwipeableRow onDelete={onDelete} items={items}>
-//       <Box padding="s" flexDirection="row">
-//         <Box
-//           style={{backgroundColor: Colors.primary}}
-//           width={120}
-//           height={120}
-//           borderRadius="m">
-//           <Image
-//             source={{uri: items.product_id.img}}
-//             style={{width: 120, height: 120}}
-//             resizeMode="cover"
-//           />
-//         </Box>
-//         <Box flex={1} justifyContent="center">
-//           <Text
-//             marginH-5
-//             marginB-5
-//             style={{
-//               fontSize: 19,
-//               fontWeight: 'bold',
-//               color: '#000',
-//             }}>
-//             {items.product_id.name}
-//           </Text>
-
-//           <Text
-//             style={{
-//               fontSize: 15,
-//               lineHeight: 22,
-//               color: Colors.primary,
-//               fontWeight: 'bold',
-//             }}
-//             marginH-15>
-//             {numberFormat.format(items.product_id.discountPrice)}
-//           </Text>
-//         </Box>
-//         <Box justifyContent="center" padding="s">
-//           <Box
-//             backgroundColor="secondary"
-//             borderRadius="m"
-//             height={theme.borderRadii.m * 3}
-//             width={theme.borderRadii.m * 3}
-//             style={{
-//               justifyContent: 'center',
-//               alignItems: 'center',
-//               width: 24,
-//               height: 24,
-//               borderRadius: 12,
-//             }}>
-//             <Text style={{fontSize: 15, color: '#fff', fontWeight: 'bold'}}>
-//               {items.quantity}
-//             </Text>
-//           </Box>
-//         </Box>
-//       </Box>
-//     </SwipeableRow>
-//   );
-// };
-
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
@@ -104,6 +42,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     marginVertical: 20,
     backgroundColor: '#FFF',
+
     borderRadius: 8,
     alignItems: 'center',
     shadowColor: '#000',
@@ -167,12 +106,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+const widthScreen = Dimensions.get('window').width;
 
 const Items = ({items, onDelete}: Props) => {
+  const theme = useTheme<Theme>();
+  const height = 120 + Spacings.s2 * 2;
   const [quantity, setQuantity] = React.useState(1);
   return (
-    <ScrollView>
-      <View style={styles.container}>
+    <SwipeableRow onDelete={onDelete} items={items} height={height}>
+      <Box style={styles.container}>
         <Image
           source={{uri: items.product_id.img}}
           style={{width: 70, height: 70}}
@@ -203,18 +145,17 @@ const Items = ({items, onDelete}: Props) => {
             onPress={() => setQuantity(prevQuantity => prevQuantity + 1)}>
             <Image source={require('../../../../assets/plus.png')} />
           </TouchableOpacity>
-        
         </View>
-        <View style={{ justifyContent: 'flex-start',top:widthScreen/20}}>
-            <TouchableOpacity
-              style={styles.btnDelete}
-              //   onPress={() => setQuantity(quantity + 1)}
-              onPress={onDelete}>
-              <Image source={require('../../../../assets/plus.png')} />
-            </TouchableOpacity>
-          </View>
-      </View>
-    </ScrollView>
+        <View style={{justifyContent: 'flex-start', top: widthScreen / 20}}>
+          <TouchableOpacity
+            style={styles.btnDelete}
+            //   onPress={() => setQuantity(quantity + 1)}
+            onPress={onDelete}>
+            <Image source={require('../../../../assets/plus.png')} />
+          </TouchableOpacity>
+        </View>
+      </Box>
+    </SwipeableRow>
   );
 };
 

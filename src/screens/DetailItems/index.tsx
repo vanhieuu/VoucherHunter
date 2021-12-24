@@ -1,7 +1,13 @@
 import {RouteProp, useRoute} from '@react-navigation/core';
 import React from 'react';
-import {Animated, Dimensions, StyleSheet} from 'react-native';
-import {getBottomSpace} from 'react-native-iphone-x-helper';
+import {
+  Animated,
+  Dimensions,
+  Platform,
+  StyleSheet,
+  UIManager,
+} from 'react-native';
+
 import {RootStackParamList} from '../../nav/RootStack';
 import {Text, View, Colors, Image, Carousel} from 'react-native-ui-lib';
 import * as Icon from 'react-native-iconly';
@@ -10,8 +16,12 @@ import {numberFormat} from '../../config/formatCurrency';
 import HeaderDetail from './components/HeaderDetail';
 import {FONTS} from '../../config/Typo';
 import ShowModal from './components/ShowModal';
-import LikeProductModal from './components/LikeProductModal';
 
+// if (Platform.OS === 'android') {
+//   if (UIManager.setLayoutAnimationEnabledExperimental) {
+//     UIManager.setLayoutAnimationEnabledExperimental(true);
+//   }
+// }
 const widthBanner = Dimensions.get('screen').width;
 const heightBanner = (widthBanner / 1200) * 1000;
 

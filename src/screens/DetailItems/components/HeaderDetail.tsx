@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, Animated} from 'react-native';
 import {View, TouchableOpacity} from 'react-native';
-import {getStatusBarHeight} from 'react-native-iphone-x-helper';
+
 import * as Icon from 'react-native-iconly';
 import {Colors, Text} from 'react-native-ui-lib';
 import {NavigationProp, useNavigation} from '@react-navigation/core';
@@ -24,7 +24,6 @@ const HeaderDetail = ({scrollY, title}: Props) => {
   return (
     <View
       style={{
-        paddingTop: getStatusBarHeight(true),
         paddingBottom: 12,
         flexDirection: 'row',
         position: 'absolute',
@@ -46,7 +45,6 @@ const HeaderDetail = ({scrollY, title}: Props) => {
           opacity: opacity,
           borderBottomWidth: 1,
           borderBottomColor: Colors.grey60,
-          paddingTop: getStatusBarHeight(true),
           paddingBottom: 12,
           justifyContent: 'center',
           alignItems: 'center',

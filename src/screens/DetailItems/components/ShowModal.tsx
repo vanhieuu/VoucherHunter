@@ -19,6 +19,7 @@ const ShowModal = ({item}: {item: IProduct}) => {
   const registerToken = useSelector<RootState, string>(
     state => state.register.accessToken,
   );
+  const token = useSelector<RootState,string>(state => state.auth.accessToken)
   const product = route.params.item;
   const id = product._id;
   const dispatch = useDispatch();
@@ -37,7 +38,7 @@ const ShowModal = ({item}: {item: IProduct}) => {
         }`,
       },
       body: JSON.stringify({
-        product_id: product._id,
+        product_id: id,
       }),
     })
       .then(response => response.json())
