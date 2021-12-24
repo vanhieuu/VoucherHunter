@@ -21,6 +21,11 @@ import Animated from 'react-native-reanimated';
 import {useTheme} from '@shopify/restyle';
 import {Theme} from 'react-toastify';
 import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
+import {debounce} from 'lodash';
+import URL from '../../../../config/Api';
+import {useSelector} from 'react-redux';
+import {getAuthAsync, IAuth} from '../../../../redux/authSlice';
+import {IAuthRegister} from '../../../../redux/authRegisterSlice';
 
 interface ICart {
   _id: string;
@@ -111,7 +116,73 @@ const widthScreen = Dimensions.get('window').width;
 const Items = ({items, onDelete}: Props) => {
   const theme = useTheme<Theme>();
   const height = 120 + Spacings.s2 * 2;
-  const [quantity, setQuantity] = React.useState(1);
+  const [quantity, setQuantity] = React.useState(items.quantity);
+  const [loading, setLoading] = React.useState<boolean>(false);
+
+  const putQuantity = React.useCallback(
+    debounce(async () => {
+      const auth: IAuth | null = await getAuthAsync();
+      const registerAuth: IAuthRegister | null = await getAuthAsync();
+      setLoading(true);
+      fetch(URL.addQuantity, {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${
+            auth?.accessToken || registerAuth?.accessToken
+          }`,
+        },
+        body: JSON.stringify({
+          id: items._id,
+          quantity: quantity,
+        }),
+      });
+    }, 1000),
+
+    [],
+  );
+
+  const onChangeQuantity = React.useCallback(
+    async _id => {
+      const controller = new AbortController();
+      const auth: IAuth | null = await getAuthAsync();
+      const registerAuth: IAuthRegister | null = await getAuthAsync();
+      const signal = controller.signal;
+      await fetch(URL.addQuantity, {
+        signal: signal,
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${
+            auth?.accessToken || registerAuth?.accessToken
+          }`,
+        },
+        body: JSON.stringify({id: _id}),
+      })
+        .then(response => response.json())
+        .then(json => {
+          // setItemCart([...itemCart,json.cart.items])
+          setQuantity(json.cart.items);
+          // dispatch(removeFromCart(json.cart.items))
+          setLoading(false);
+        })
+        .catch(err => {
+          if (err.name === 'AbortError') {
+            console.log('Success Abort');
+          } else {
+            console.error(err);
+          }
+        });
+      return () => {
+        // cancel the request before component unmounts
+        controller.abort();
+      };
+    },
+    [quantity],
+  );
+
   return (
     <SwipeableRow onDelete={onDelete} items={items} height={height}>
       <Box style={styles.container}>
@@ -134,7 +205,11 @@ const Items = ({items, onDelete}: Props) => {
             style={styles.btnMinus}
             //   onPress={() => setQuantity(quantity - 1)}
             onPress={() => {
-              setQuantity(prevQuantity => prevQuantity - 1);
+              if (items.quantity === 0) {
+                onDelete;
+              } else if (items.quantity > 0)
+              setQuantity(prevQuantity => prevQuantity - 1)
+                putQuantity();
             }}>
             <Image source={require('../../../../assets/minus.png')} />
           </TouchableOpacity>

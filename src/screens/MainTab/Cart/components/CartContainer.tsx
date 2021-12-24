@@ -21,11 +21,11 @@ interface CartProps {
   children: ReactNode;
 }
 const {width} = Dimensions.get('window');
-const height = (600 * width) / 375;
+const height = (700 * width) / 375;
 const minHeight = (228 * width) / 375;
 const snapPoints = [-(height - minHeight), 0];
 
-const CartContainer = ({children}: CartProps) => {
+const CartContainer = gestureHandlerRootHOC(({children}: CartProps) => {
   const theme = useTheme<Theme>();
   const translateY = useSharedValue(0);
   const onGestureEvent = useAnimatedGestureHandler<
@@ -72,8 +72,8 @@ const CartContainer = ({children}: CartProps) => {
               right: 0,
               height,
               backgroundColor: 'white',
-              borderBottomLeftRadius: theme.borderRadii.xl,
-              borderBottomRightRadius: theme.borderRadii.xl,
+              borderBottomLeftRadius: theme.borderRadii.l,
+              borderBottomRightRadius: theme.borderRadii.l,
             },
             style,
           ]}>
@@ -102,7 +102,7 @@ const CartContainer = ({children}: CartProps) => {
       </PanGestureHandler>
     </Box>
   );
-};
+});
 
 export default CartContainer;
 

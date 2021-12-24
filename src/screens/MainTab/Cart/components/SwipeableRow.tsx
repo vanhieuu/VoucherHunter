@@ -53,7 +53,7 @@ interface SwipeableRowProps {
 const {width} = Dimensions.get('window');
 const aspectRatio = width / 375;
 const editWidth = 85 * aspectRatio;
-const finalDes = width/375;
+const finalDes = width / 375;
 const snapPoints = [-85 * aspectRatio, 0, finalDes];
 
 const transition = (
@@ -63,89 +63,14 @@ const transition = (
   </Transition.Together>
 );
 
-const SwipeableRow = ({children, onDelete, items,height:defaultHeight}: SwipeableRowProps) => {
-  const token = useSelector<RootState, string>(state => state.auth.accessToken);
-  const [loading, setLoading] = React.useState(false);
-  const height = useSharedValue(defaultHeight);
+const SwipeableRow = ({
+  children
+}: SwipeableRowProps) => {
   const ref = React.useRef<TransitioningView>(null);
-  const [quantity, setQuantity] = React.useState<number>(1);
-  const deleteItem = React.useCallback(() => {
-    ref.current?.animateNextTransition();
-    onDelete();
-  }, [onDelete]);
-  const theme = useTheme<Theme>();
-  //   const [translationX, setTranslationX] = React.useState(1);
-  const translateX = useSharedValue(0);
-  const putQuantity = React.useCallback(
-    debounce(() => {
-      setLoading(true);
-      fetch(URL.addQuantity, {
-        method: 'PUT',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          id: items._id,
-          quantity: quantity,
-        }),
-      });
-    }, 1000),
-    [],
-  );
-
-  const onGestureEvent = useAnimatedGestureHandler<
-    PanGestureHandlerGestureEvent,
-    {x: number}
-  >({
-    onStart: (_, ctx) => {
-      ctx.x = translateX.value;
-    },
-
-    onActive: ({translationX}, ctx) => {
-      translateX.value = ctx.x + translationX;
-    },
-    onEnd: ({velocityX}) => {
-      const dest = snapPoint(translateX.value, velocityX, snapPoints);
-      translateX.value = withSpring(
-        dest,
-        {
-          overshootClamping: true,
-        },
-        () => {
-          if (dest === finalDes) {
-            height.value = withTiming(0,{duration:250},()=>{
-              deleteItem()
-            })
-            
-          }
-        },
-      );
-    },
-  });
-  const style = useAnimatedStyle(() => {
-    return {
-      height: height.value,
-      backgroundColor:'white',
-      borderRadius:10,
-      transform: [
-        {
-          translateX: translateX.value,
-        },
-      ],
-    };
-  });
-
- 
 
   return (
     <Transitioning.View ref={ref} transition={transition}>
-      <PanGestureHandler onGestureEvent={onGestureEvent}>
-        <Animated.View style={style}>
-          {children}
-        </Animated.View>
-      </PanGestureHandler>
+      <Animated.View>{children}</Animated.View>
     </Transitioning.View>
   );
 };

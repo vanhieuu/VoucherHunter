@@ -23,6 +23,7 @@ import SignIn from '../screens/SignIn';
 import URL from '../config/Api';
 import Search from '../screens/Search';
 import { Colors, View } from 'react-native-ui-lib';
+import Payment from '../screens/Payment';
 
 
 export type RootStackParamList = {
@@ -37,6 +38,7 @@ export type RootStackParamList = {
     item: INewsData;
   };
   Search: undefined;
+  Payment:undefined;
 
 };
 
@@ -143,6 +145,13 @@ const RootStack = () => {
             <Stack.Screen
               name="DetailNews"
               component={DetailNews}
+              options={{
+                headerShown: true,
+              }}
+            />
+              <Stack.Screen
+              name="Payment"
+              component={Payment}
               options={{
                 headerShown: true,
               }}

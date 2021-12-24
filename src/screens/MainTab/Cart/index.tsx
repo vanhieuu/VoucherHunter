@@ -3,17 +3,24 @@ import {useTheme} from '@shopify/restyle';
 import axios from 'axios';
 import {debounce} from 'lodash';
 import React from 'react';
-import {Alert, Dimensions, ScrollView, StyleSheet} from 'react-native';
+import {
+  Alert,
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 import {Header} from 'react-native-elements';
 import Animated from 'react-native-reanimated';
-import {Colors, Text} from 'react-native-ui-lib';
+import {Colors, Text, View} from 'react-native-ui-lib';
 import {useDispatch, useSelector} from 'react-redux';
 import Box from '../../../components/Box';
 import theme, {Theme} from '../../../components/theme';
 import URL from '../../../config/Api';
 import {RootStackParamList} from '../../../nav/RootStack';
-import { removeFromCart } from '../../../redux/authCartSlice';
-import { IAuthRegister } from '../../../redux/authRegisterSlice';
+import {removeFromCart} from '../../../redux/authCartSlice';
+import {IAuthRegister} from '../../../redux/authRegisterSlice';
 import {getAuthAsync, IAuth} from '../../../redux/authSlice';
 
 import {RootState} from '../../../redux/store';
@@ -32,13 +39,13 @@ interface ICart {
 interface Props {
   items: ICart;
 }
-interface IResCart{
-  message: string,
+interface IResCart {
+  message: string;
   cart: {
-      _id: string,
-      items:ICart[],
-      totalPrice: number
-  }
+    _id: string;
+    items: ICart[];
+    totalPrice: number;
+  };
 }
 
 const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
@@ -46,14 +53,12 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
   const theme = useTheme<Theme>();
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
-  const id = useSelector<RootState, string>(state => state.cart._id);
-
-const dispatch = useDispatch();
- 
-
   const [loading, setLoading] = React.useState<boolean>(true);
-
   const [mounted, setMounted] = React.useState<boolean>(false);
+
+  const onPressCheckOut = React.useCallback(() => {
+    navigation.navigate('Payment');
+  }, []);
 
   React.useEffect(() => {
     const controller = new AbortController();
@@ -71,10 +76,8 @@ const dispatch = useDispatch();
     })
       .then(response => response.json())
       .then(json => {
-      
         setItemCart(json.cart.items);
         setLoading(false);
-        console.log(itemCart)
       })
       .catch(err => {
         if (err.name === 'AbortError') {
@@ -89,45 +92,46 @@ const dispatch = useDispatch();
     };
   }, []);
 
-  const onDelete = React.useCallback(async (_id) => {
-    console.log(_id);
-    const controller = new AbortController();
-    const auth: IAuth | null = await getAuthAsync();
-    const registerAuth: IAuthRegister | null = await getAuthAsync();
-    const signal = controller.signal;
-    await fetch(URL.removeItem, {
-      signal: signal,
-      method: 'DELETE',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${
-          auth?.accessToken || registerAuth?.accessToken
-        }`,
-      },
-      body: JSON.stringify({id: _id}),
-    })
-      .then(response => response.json())
-      .then(json => {
-        
-        console.log(json.cart.items,'aaaaaaa')
-        // setItemCart([...itemCart,json.cart.items])
-        setItemCart(json.cart.items)
-        // dispatch(removeFromCart(json.cart.items))
-        setLoading(false);
-      })  
-      .catch(err => {
-        if (err.name === 'AbortError') {
-          console.log('Success Abort');
-        } else {
-          console.error(err);
-        }
-      });
-    return () => {
-      // cancel the request before component unmounts
-      controller.abort();
-    };
-  }, [_id]);
+  const onDelete = React.useCallback(
+    async _id => {
+      
+      const controller = new AbortController();
+      const auth: IAuth | null = await getAuthAsync();
+      const registerAuth: IAuthRegister | null = await getAuthAsync();
+      const signal = controller.signal;
+      await fetch(URL.removeItem, {
+        signal: signal,
+        method: 'DELETE',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${
+            auth?.accessToken || registerAuth?.accessToken
+          }`,
+        },
+        body: JSON.stringify({id: _id}),
+      })
+        .then(response => response.json())
+        .then(json => {
+          // setItemCart([...itemCart,json.cart.items])
+          setItemCart(json.cart.items);
+          // dispatch(removeFromCart(json.cart.items))
+          setLoading(false);
+        })
+        .catch(err => {
+          if (err.name === 'AbortError') {
+            console.log('Success Abort');
+          } else {
+            console.error(err);
+          }
+        });
+      return () => {
+        // cancel the request before component unmounts
+        controller.abort();
+      };
+    },
+    [_id],
+  );
 
   return (
     <CartContainer>
@@ -194,6 +198,15 @@ const dispatch = useDispatch();
             }}></Text>
         </Box>
       </Box>
+      <Box></Box>
+      <View>
+        <TouchableOpacity
+          style={styles.btnDelete}
+          //   onPress={() => setQuantity(quantity + 1)}
+          onPress={() => {}}>
+          <Text style={{fontSize: 20, lineHeight: 22}}>Thanh toán</Text>
+        </TouchableOpacity>
+      </View>
     </CartContainer>
   );
 };
@@ -206,5 +219,17 @@ const styles = StyleSheet.create({
     marginRight: 12,
     backgroundColor: Colors.black,
     elevation: 2,
+  },
+
+  btnDelete: {
+    backgroundColor: '#E9707D',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 48,
+    borderRadius: 10,
+    width: '90%',
+    marginVertical: 10,
+    borderWidth: 0,
+    marginHorizontal: 20,
   },
 });
