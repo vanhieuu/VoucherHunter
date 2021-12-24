@@ -22,13 +22,13 @@ export type MainTabParamList = {
   };
   Profile: undefined;
 };
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<MainTabParamList>();
 
 const MainTab = () => {
 
 
   // const [numberCart,setNumberCart] = React.useState<IAuth>()
-  const numberCart = useSelector<RootState, number>(state => state.cart.numberCart)
+  // const numberCart = useSelector<RootState, number>(state => state.cart.numberCart)
 
   const { navigate } = useNavigation<NavigationProp<RootStackParamList>>()
   return (
@@ -38,7 +38,7 @@ const MainTab = () => {
         tabBarInactiveTintColor: Colors.dark50,
       }}>
       <Tab.Screen
-        name="Trang chủ"
+        name="Home"
         component={Home}
         options={{
           tabBarIcon: ({ color }) => (
@@ -81,7 +81,7 @@ const MainTab = () => {
         }}
       />
       <Tab.Screen
-        name="Tin tức"
+        name="News"
         component={News}
         options={{
           tabBarIcon: ({ color }) => (
@@ -93,7 +93,7 @@ const MainTab = () => {
         }}
       />
       <Tab.Screen
-        name="Giỏ hàng"
+        name="Cart"
         component={Cart}
         options={{
           tabBarIcon: ({ color }) => (
@@ -105,11 +105,11 @@ const MainTab = () => {
           ),
           tabBarLabel: 'Giỏ hàng',
           headerShown: false,
-          tabBarBadge: numberCart
+          tabBarBadge: 1
         }}
       />
       <Tab.Screen
-        name="Cá nhân"
+        name="Profile"
         component={Profile}
         options={{
           tabBarIcon: ({ color }) => (

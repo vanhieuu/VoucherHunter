@@ -20,7 +20,7 @@ const SignIn = () => {
   const [isFocus, setIsFocus] = React.useState<boolean>(false);
   const onFocusChange = React.useCallback(() => {
     setIsFocus(true);
-  }, [isFocus]);
+  }, []);
   const dispatch = useDispatch();
   const [username, setUserName] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -28,6 +28,8 @@ const SignIn = () => {
   const [errorText, setErrorText] = React.useState('');
   const componentMounted = React.useRef(true);
   const onPressLogin =  () => {
+    const controller = new AbortController();
+    const signal = controller.signal;
     setErrorText('');
     if (!username) {
       Alert.alert('Tên đăng nhập không được để trống');
@@ -40,6 +42,7 @@ const SignIn = () => {
     setLoading(true);
     let dataToSend = {username: username, password: password};
     fetch(URL.Login, {
+      signal: signal,
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -70,11 +73,19 @@ const SignIn = () => {
           // navigation.navigate('MainTab')
           // (1) write data to state
         }
-        return (componentMounted.current = false);
+        
       })
-      .catch(error => {
-        console.error(error);
+      .catch(err => {
+        if (err.name === 'AbortError') {
+          console.log('successfully aborted');
+        } else {
+          // handle error
+        }
       });
+    return () => {
+      // cancel the request before component unmounts
+      controller.abort();
+    };
   };
 
   return (
@@ -92,8 +103,10 @@ const SignIn = () => {
         <View
           style={[
             styles.containerInput,
-            {borderColor: isFocus ? '#E9707D' : '#eee'},
+            {borderColor: isFocus ? '#E9707D' : '#eee' },
+            
           ]}>
+            
           <Input
             placeholder="Tên đăng nhập"
             onFocus={onFocusChange}
@@ -115,6 +128,7 @@ const SignIn = () => {
         <View
           style={[
             styles.containerInput,
+            
             {borderColor: isFocus ? '#E9707D' : '#eee'},
           ]}>
           <Input
@@ -123,6 +137,7 @@ const SignIn = () => {
             inputContainerStyle={styles.inputContainer}
             inputStyle={styles.inputText}
             secureTextEntry
+          
             onChangeText={password => setPassword(password)}
             leftIcon={
               <Icon

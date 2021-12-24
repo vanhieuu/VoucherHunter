@@ -1,7 +1,14 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
-const ButtonDecreseQuantity = () => {
+
+
+
+
+
+
+
+const Payment = () => {
     return (
         <View>
             <Text></Text>
@@ -9,6 +16,13 @@ const ButtonDecreseQuantity = () => {
     )
 }
 
-export default ButtonDecreseQuantity
+
+
+
+
+
+
+
+export default Payment
 
 const styles = StyleSheet.create({})

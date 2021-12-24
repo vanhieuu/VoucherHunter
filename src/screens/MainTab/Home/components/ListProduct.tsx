@@ -21,11 +21,13 @@ const ListProduct = ({ListHeaderComponent}: Props) => {
   const [loading, setLoading] = React.useState(true);
   const [product, setProduct] = React.useState<IProduct[]>();
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
-
+  const componentMounted = React.useRef(true);
   React.useEffect(() => {
     if (!token) return;
-    
+    const controller = new AbortController();
+    const signal = controller.signal;
     fetch(URL.Products, {
+      signal: signal,
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -35,17 +37,24 @@ const ListProduct = ({ListHeaderComponent}: Props) => {
     })
       .then(response => response.json())
       .then(json => {
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
-        setProduct(json);
-        setLoading(false);
-        return () => {
-          json;
-          
-        };
+        if (componentMounted.current) {
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+          setProduct(json);
+          setLoading(false);
+        }
+        return (componentMounted.current = false);
       })
-      .catch(error => {
-        console.error(error);
+      .catch(err => {
+        if (err.name === 'AbortError') {
+          console.log('successfully aborted');
+        } else {
+          // handle error
+        }
       });
+    return () => {
+      // cancel the request before component unmounts
+      controller.abort();
+    };
   }, []);
 
   return (

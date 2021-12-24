@@ -38,7 +38,12 @@ const ListHorizontal = () => {
 
   const dispatch = useDispatch();
   const onEndReached = React.useCallback(() => {
-    dispatch(onUpdatePageNumber({page: page + 1}));
+    setLoading(true);
+    setTimeout(() => {
+      dispatch(onUpdatePageNumber({page: page + 1}));
+      setNews(prev => prev.concat())
+      setLoading(false)
+    },2000)
     console.log(page);
   }, []);
 

@@ -37,7 +37,7 @@ const ShowModal = ({item}: {item: IProduct}) => {
         }`,
       },
       body: JSON.stringify({
-        product_id: id,
+        product_id: product._id,
       }),
     })
       .then(response => response.json())

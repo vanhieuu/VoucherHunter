@@ -1,14 +1,18 @@
+
 import React from 'react';
 import RootStack from './src/nav/RootStack';
 import {Provider} from 'react-redux';
 import store from './src/redux/store';
-
-
+import {ThemeProvider} from '@shopify/restyle';
+import theme from './src/components/Theme';
 const App = () => {
   return (
-    <Provider store={store}>
-      <RootStack />
-    </Provider>
+    
+    <ThemeProvider {...{theme}}>
+      <Provider store={store}>
+        <RootStack />
+      </Provider>
+    </ThemeProvider>
   );
 };
 

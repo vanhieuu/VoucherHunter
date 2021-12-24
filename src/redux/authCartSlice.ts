@@ -1,6 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Alert} from 'react-native';
 
 export interface IProduct {
   _id: string;
@@ -35,8 +36,6 @@ export interface IAuth {
       totalPrice: number;
     },
   ];
-  quantity: number;
-  numberCart: number;
 }
 
 export interface IResProduct {
@@ -46,8 +45,6 @@ export interface IResProduct {
 }
 
 const initValue: IAuth = {
-  numberCart: 0,
-  quantity: 0,
   items: [
     {
       product_id: {
@@ -74,69 +71,46 @@ const initValue: IAuth = {
     },
   ],
 };
+
 export const CartSlice = createSlice({
   name: 'cart',
   initialState: initValue,
   reducers: {
-    onAddToCart: (state, action) => {
-      const itemIndex = state.items.findIndex(
-        item => item.product_id._id === action.payload._id,
-      );
-      console.log(itemIndex);
-      if (itemIndex >= 0) {
-        state.quantity += 1;
-        state.numberCart++;
-      } else {
-        const tempProduct = {...action.payload, quantity: 1};
-        state.items.push(tempProduct);
-        state.numberCart++;
+    onAddToCart: (state, action: PayloadAction<IAuth>) => {
+      const findIndex = state.items.findIndex(item => item.product_id._id);
+      if (findIndex < 0) {
+        state.items.push(...action.payload.items);
       }
-      AsyncStorage.setItem('CartItems', JSON.stringify(state.items));
+      state.items = action.payload.items;
     },
-    onIncreaseQuantity: (state, action) => {
-      
-  
-      // console.log(itemIndex)
-      state.quantity += 1;
-      state.numberCart++;
-      
-    },
-    onDecreaseQuantity: (state, action) => {
-      
-      const itemIndex = state.items.findIndex(
-        item => item.product_id._id === action.payload._id,
-        
+    onUpdateQuantity: (state, action) => {
+      const items = state.items.find(b => action.payload === b.product_id.name);
+      const item = state.items.filter(
+        b => action.payload !== b.product_id.name,
       );
-      const nextCartItem = state.items.filter(
-        item => item.product_id._id !== action.payload._id,
-      );
-      
-      console.log(itemIndex);
-      if (state.quantity > 1) {
-        state.quantity -= 1;
-        state.numberCart--;
-      } else if (state.quantity === 1) {
-        state.quantity = 0; 
-        // state.items = nextCartItem
-        // state.items. = nextItems
-        state.numberCart--;
+      const findIndex = state.items.findIndex(item => item._id);
+      if (findIndex < 0) {
+        Alert.alert('Vui lòng chọn sản phẩm');
+      }
+      if (findIndex) {
+        state.items[findIndex].quantity = state.items[findIndex].quantity + 1;
       }
     },
-    onGetCartNumber: (state, action) => {
-      state.numberCart = action.payload.numberCart;
-    },
-    removeFromCar: (state, action: PayloadAction<IProduct>) => {
-      const nextCartItem = state.items.filter(
-        item => item.product_id._id !== action.payload._id,
-      );
-      console.log(nextCartItem);
+
+    removeFromCart: (state, action: PayloadAction<{id: string}>) => {
+      //  state.items =   {...state, item:state.items.filter((id)=> id._id === action.payload.id)}
     },
   },
 });
 
 export const saveCartAsync = (Cart: IAuth) => {
   try {
-    AsyncStorage.setItem('CartItems', JSON.stringify(Cart.items));
+    AsyncStorage.setItem(
+      'CartItems',
+      JSON.stringify({
+        items: Cart.items,
+      }),
+    );
   } catch (e) {
     // saving error
   }
@@ -154,10 +128,6 @@ export const getCartAsync = async () => {
   }
 };
 
-export const {
-  onAddToCart,
-  onIncreaseQuantity,
-  onDecreaseQuantity,
-  onGetCartNumber,
-} = CartSlice.actions;
+export const {onAddToCart, onUpdateQuantity, removeFromCart} =
+  CartSlice.actions;
 export default CartSlice.reducer;

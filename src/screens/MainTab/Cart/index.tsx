@@ -1,46 +1,110 @@
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {useTheme} from '@shopify/restyle';
+import {debounce} from 'lodash';
 import React from 'react';
-import {FlatList, SafeAreaView, ScrollView, StyleSheet} from 'react-native';
-import {View, Text, Colors, Button, Image} from 'react-native-ui-lib';
-import {RootState} from '../../../redux/store';
-import {useDispatch, useSelector} from 'react-redux';
-import URL from '../../../config/Api';
-import {IItemCart} from '../../../types/ItemCart';
+import {Dimensions, FlatList, ScrollView, StyleSheet} from 'react-native';
 import {Header} from 'react-native-elements';
-
+import {Card, Colors, Text, View} from 'react-native-ui-lib';
+import {useDispatch, useSelector} from 'react-redux';
+import Box from '../../../components/Box';
+import theme, {Theme} from '../../../components/theme';
+import URL from '../../../config/Api';
+import {RootStackParamList} from '../../../nav/RootStack';
+import {
+  onAddToCart,
+  removeFromCart,
+  saveCartAsync,
+} from '../../../redux/authCartSlice';
+import {RootState} from '../../../redux/store';
 import {IProduct} from '../../../types/IProduct';
-import {numberFormat} from '../../../config/formatCurrency';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import CartCard from './components/CartCard';
 
-export interface IResCart {
-  cart: {
-    items: ICart[];
-    quantity: number;
-  };
-}
-export interface ICart {
+import CartContainer from './components/CartContainer';
+import Footer, {RefFooter} from './components/Footer';
+import Items from './components/Items';
+const {width} = Dimensions.get('window');
+const height = (682 * width) / 375;
+const minHeigt = (282 * width) / 375;
+
+interface ICart {
   _id: string;
   product_id: IProduct;
   quantity: number;
   totalPrice: number;
 }
+interface Props {
+  items: ICart;
+}
 
-const Cart = () => {
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [itemCart, setItemCart] = React.useState<ICart[]>();
-  const [cart, setCart] = React.useState({
-    cart: {
-      items: [],
-      quantity: 0,
-    },
-  });
-  const [quantity, setQuantity] = React.useState(1);
+
+
+const Cart = ({items}: Props) => {
+  const [refreshing, setRefreshing] = React.useState<boolean>(false);
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const theme = useTheme<Theme>();
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
-  const dispatch = useDispatch();
+  const [itemCart, setItemCart] = React.useState<ICart[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const refListOrder = React.useRef<FlatList>(null);
+  const refFooter = React.useRef<RefFooter>(null);
+  const [mounted, setMounted] = React.useState<boolean>(false);
+  const onEndReached = React.useCallback(() => {
+    refFooter.current?.setIsLoadmore(true);
+    setTimeout(() => {
+      setItemCart(prev => prev.concat());
+      refFooter.current?.setIsLoadmore(false);
+    }, 500);
+  }, []);
+
+  const renderListFooter = React.useCallback(() => {
+    return <Footer ref={refFooter} />;
+  }, []);
+
+  const renderItem = React.useCallback(({item,index}) => {
+    return (
+      <Items
+        items={item}
+        onDelete={debounce(() => {
+          itemCart.splice(index,1)
+          itemCart.concat()
+        }, 1000)}
+      />
+    );
+  }, []);
+
+  const keyExtractor = React.useCallback(
+    (items, index) => index.toString(),
+    [],
+  );
+
+  const onDelete = React.useCallback(debounce(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+    if (!token) return;
+    setMounted(true);
+    fetch(URL.removeItem, {
+      signal: signal,
+      method: 'DELETE',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer${token}`,
+      },
+      body: JSON.stringify({id: items._id}),
+    })
+      .then(response => response.json())
+      .then(json => {
+        setItemCart(json);
+        setLoading(false);
+      });
+  },2000), []);
 
   React.useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
     if (!token) return;
+
     fetch(URL.getItemCart, {
+      signal: signal,
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -51,179 +115,100 @@ const Cart = () => {
       .then(response => response.json())
       .then(json => {
         setItemCart(json.cart.items);
+        saveCartAsync(json);
         setLoading(false);
-        setCart(json.cart);
-        console.log(json.cart, 'aa');
-        return json;
       })
       .catch(err => {
-        console.error(err);
+        if (err.name === 'AbortError') {
+          console.log('Success Abort');
+        } else {
+          console.error(err);
+        }
       });
+    return () => {
+      // cancel the request before component unmounts
+      controller.abort();
+    };
   }, []);
 
-
-
-
   return (
-    <SafeAreaView style={styles.container}>
-      <Header
-        placement="center"
-        centerComponent={{
-          text: 'Shopping',
-          style: {color: Colors.primary, fontSize: 20},
-        }}
-        containerStyle={{
-          backgroundColor: 'white',
-          justifyContent: 'space-around',
-        }}
-        barStyle="light-content"
-        statusBarProps={{barStyle: 'light-content'}}
-      />
-
-      <ScrollView>
-        {/* {itemCart.map((item, index) => {
-          return (
-            <View row center key={index}>
-              <View row center>
-                <View >
-                  <Image source={{ uri: item.product_id.img }} style={[styles.image]} resizeMode="cover" />
-                </View>
-                <View style={styles.titleSection}>
-                  <Text h17 numberOfLines={item.product_id.name.length} style={{ maxWidth: 120 }}>
-                    {item.product_id.name}
-                  </Text>
-                  <View row center style={styles.action}>
-                    <Text style={styles.quantityUpdate} onPress={onHandleDecreseQuantity}>
-                      -
-                    </Text>
-                    <Text style={{ fontWeight: 'bold' }} h17>
-                      {item.quantity}
-                    </Text>
-                    <Text style={styles.quantityUpdate} onPress={onHandleIncreseQuantity}>
-                      +
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              <View style={{ justifyContent: 'space-between' }}>
-                <Text h18 color={Colors.primary} marginB-20 marginL-21>
-                  {numberFormat.format(item.product_id.discountPrice * item.quantity)}
-                </Text>
-                <View center style={styles.delete}>
-                  <Icon
-                    color={'white'}
-                    size={15}
-                    name="trash"
-                    onPress={removeItem}
-                  />
-                </View>
-              </View>
-            </View>
-
-          )
-        })} */}
-      </ScrollView>
-
-      {cart.cart.items.length === 0 ? (
-        <View>
-          <Text>Khum có gì hết</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={itemCart} 
-          renderItem={({item}) => {
-            return (
-              <CartCard _id={item._id} product_id={item.product_id} quantity={item.quantity} totalPrice={item.totalPrice  }  />
-              
-              
-            );
+    <CartContainer>
+      <Box backgroundColor="primary">
+        <Header
+          placement="center"
+          centerComponent={{
+            text: 'Shopping',
+            style: {color: Colors.primary, fontSize: 20},
           }}
-          keyExtractor={(item, index) => index.toString()}
-          horizontal={false}
+          containerStyle={{
+            backgroundColor: 'white',
+            justifyContent: 'space-around',
+          }}
+          barStyle="light-content"
+          statusBarProps={{barStyle: 'light-content'}}
+          leftComponent={{
+            icon: 'arrow-left',
+            onPress: () => navigation.goBack(),
+          }}
         />
-      )}
-
-      <View style={styles.totalSection}>
-        <Text h28 black>
-          {' '}
-          Thanh toán
-        </Text>
-        <View row center style={{justifyContent: 'space-between'}}>
-          <Text h24 color={Colors.primary}>
-            Thành tiền
-          </Text>
-          <View style={styles.divider} />
-          <Text h17 color={Colors.black} marginR-15>
-            {}
-          </Text>
+      </Box>
+      <Box flex={1}>
+        <View
+          style={{
+            borderBottomRightRadius: theme.borderRadii.xl,
+            borderBottomLeftRadius: theme.borderRadii.xl,
+          }}>
+          {loading ? (
+            <View row paddingH-16 paddingV-12>
+              <Card
+                style={[
+                  styles.containerItem,
+                  {height: 251, backgroundColor: Colors.dark40},
+                ]}
+              />
+              <Card
+                style={[
+                  styles.containerItem,
+                  {height: 251, backgroundColor: Colors.dark40},
+                ]}
+              />
+              <Card
+                style={[
+                  styles.containerItem,
+                  {height: 210, backgroundColor: Colors.dark40},
+                ]}
+              />
+            </View>
+          ) : (
+            <FlatList
+              ref={refListOrder}
+              horizontal={false}
+              showsHorizontalScrollIndicator={true}
+              data={itemCart}
+              keyExtractor={(item, index) => index.toString()}
+              contentContainerStyle={{
+                paddingHorizontal: 16,
+                paddingVertical: 12,
+              }}
+              onEndReachedThreshold={0.5}
+              // onEndReached={onEndReached}
+              ListFooterComponent={renderListFooter}
+              renderItem={renderItem}
+            />
+          )}
         </View>
-      </View>
-      <View>
-        <Button label={'Thanh toán'} />
-      </View>
-    </SafeAreaView>
+      </Box>
+    </CartContainer>
   );
 };
 
 export default Cart;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  content: {
-    marginHorizontal: 29,
-    paddingBottom: 32,
-  },
-  totalSection: {
-    marginTop: 32,
-  },
-  divider: {
-    height: 1,
-    borderColor: '#fdd',
-    borderWidth: StyleSheet.hairlineWidth,
-    flex: 1,
-    borderStyle: 'solid',
-    marginHorizontal: 16,
-    marginTop: 5,
-  },
-  container1: {
-    justifyContent: 'space-between',
-    marginTop: 20,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    backgroundColor: Colors.primary,
-    marginBottom: 10,
-  },
-  titleSection: {
-    paddingLeft: 30,
-  },
-  action: {
-    width: 100,
-    height: 35,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    alignSelf: 'center',
-  },
-  delete: {
-    width: 20,
-    height: 20,
-    borderRadius: 20,
-    borderColor: '#ffff',
-    borderWidth: 1,
-    backgroundColor: '#ff3d00',
-    marginHorizontal: 50,
-  },
-  quantityUpdate: {
-    fontWeight: 'bold',
-    backgroundColor: '#f5f5f5',
-    fontSize: 22,
-    borderRadius: 10,
-    alignSelf: 'center',
-    textAlign: 'center',
-    width: 20,
+  containerItem: {
+    width: 190,
+    marginRight: 12,
+    backgroundColor: Colors.white,
+    elevation: 2,
   },
 });

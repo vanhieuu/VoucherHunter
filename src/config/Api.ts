@@ -10,7 +10,7 @@ const URL = {
   CheckToken: MainURL + `/auth/checkToken`,
   addItemCart: MainURL + '/cart/auth/additem',
   getItemCart: MainURL + '/cart/auth',
-  addQuantity: MainURL + '/cart/auth/changqty',
+  addQuantity: MainURL + '/cart/auth/changeqty',
   removeItem: MainURL + '/cart/auth/removeitem',
   removeAll: MainURL + '/cart/auth/removeall',
 };
