@@ -16,16 +16,17 @@ import Animated from 'react-native-reanimated';
 import {Colors, Text, View} from 'react-native-ui-lib';
 import {useDispatch, useSelector} from 'react-redux';
 import Box from '../../../components/Box';
-import theme, {Theme} from '../../../components/theme';
+import  {Theme} from '../../../components/theme';
 import URL from '../../../config/Api';
 import {RootStackParamList} from '../../../nav/RootStack';
-import {removeFromCart} from '../../../redux/authCartSlice';
+
 import {IAuthRegister} from '../../../redux/authRegisterSlice';
 import {getAuthAsync, IAuth} from '../../../redux/authSlice';
 
 import {RootState} from '../../../redux/store';
 import {IProduct} from '../../../types/IProduct';
 import CartContainer from './components/CartContainer';
+import CheckOut from './components/CheckOut';
 import Items from './components/Items';
 
 const {width} = Dimensions.get('window');
@@ -39,14 +40,7 @@ interface ICart {
 interface Props {
   items: ICart;
 }
-interface IResCart {
-  message: string;
-  cart: {
-    _id: string;
-    items: ICart[];
-    totalPrice: number;
-  };
-}
+
 
 const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -134,7 +128,7 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
   );
 
   return (
-    <CartContainer>
+    <CartContainer CheckOutComponent={CheckOut}>
       <Box>
         <Box backgroundColor="primary">
           <Header
