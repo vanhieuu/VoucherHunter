@@ -19,6 +19,7 @@ import Box from '../../../components/Box';
 import  {Theme} from '../../../components/theme';
 import URL from '../../../config/Api';
 import {RootStackParamList} from '../../../nav/RootStack';
+import { onAddToCart } from '../../../redux/authCartSlice';
 
 import {IAuthRegister} from '../../../redux/authRegisterSlice';
 import {getAuthAsync, IAuth} from '../../../redux/authSlice';
@@ -49,7 +50,7 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [mounted, setMounted] = React.useState<boolean>(false);
-
+  const dispatch = useDispatch();
   const onPressCheckOut = React.useCallback(() => {
     navigation.navigate('Payment');
   }, []);
@@ -71,6 +72,7 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
       .then(response => response.json())
       .then(json => {
         setItemCart(json.cart.items);
+        dispatch(onAddToCart(json.cart.items))
         setLoading(false);
       })
       .catch(err => {
@@ -109,6 +111,7 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
         .then(json => {
           // setItemCart([...itemCart,json.cart.items])
           setItemCart(json.cart.items);
+          dispatch(onAddToCart(json.cart.items))
           // dispatch(removeFromCart(json.cart.items))
           setLoading(false);
         })
