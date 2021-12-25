@@ -44,14 +44,14 @@ const DetailItems = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'DetailItems'>>();
   const product = route.params.item;
   const scrollY = React.useRef(new Animated.Value(0)).current;
-  const [textShown, setTextShown] = React.useState(false); //Hiển thị phần text còn lại
-  const [lengthMore, setLengthMore] = React.useState(false); //Hiển thị dòng đọc thêm và thu gọn
+  const [textShown, setTextShown] = React.useState(false);
+  const [lengthMore, setLengthMore] = React.useState(false);
+
   const toggleNumberOfLines = () => {
-    //Toggle show hoặc hide phần text đi
     setTextShown(!textShown);
   };
   const onTextLayout = React.useCallback(e => {
-    setLengthMore(e.nativeEvent.lines.length >= 3); //kiểm tra xem phần text có nhiều hơn 4 dòng không
+    setLengthMore(e.nativeEvent.lines.length >= 3);
   }, []);
 
   return (

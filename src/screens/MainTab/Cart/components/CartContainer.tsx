@@ -15,8 +15,14 @@ import Animated, {
 import {clamp, snapPoint} from 'react-native-redash';
 import {Colors, Spacings} from 'react-native-ui-lib';
 import Box from '../../../../components/Box';
-import theme, {Theme} from '../../../../components/theme';
-
+import {Theme} from '../../../../components/theme';
+import {IProduct} from '../../../../types/IProduct';
+interface ICart {
+  _id: string;
+  product_id: IProduct;
+  quantity: number;
+  totalPrice: number;
+}
 interface CartProps {
   children: ReactNode;
   CheckOutComponent: FC<{minHeight: number}>;
@@ -28,6 +34,7 @@ const snapPoints = [-(height - minHeight), 0];
 
 const CartContainer = gestureHandlerRootHOC(
   ({children, CheckOutComponent}: CartProps) => {
+    const [items,setItems] = React.useState<ICart[]>([])
     const theme = useTheme<Theme>();
     const translateY = useSharedValue(0);
     const onGestureEvent = useAnimatedGestureHandler<

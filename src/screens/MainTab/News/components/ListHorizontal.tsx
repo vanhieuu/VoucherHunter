@@ -64,9 +64,6 @@ const ListHorizontal = () => {
           setNews([...news, ...json.data]);
           setLoading(false);
         }
-
-        // console.log(json.data)
-        // console.log(json.news);
         return () => {
           // This code runs when component is unmounted
           componentMounted.current = false; // (4) set it to false when we leave the page

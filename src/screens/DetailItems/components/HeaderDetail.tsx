@@ -6,7 +6,8 @@ import * as Icon from 'react-native-iconly';
 import {Colors, Text} from 'react-native-ui-lib';
 import {NavigationProp, useNavigation} from '@react-navigation/core';
 // import { MainTabParamList } from '../../../nav/MainTab';
-import { RootStackParamList } from '../../../nav/RootStack';
+import {RootStackParamList} from '../../../nav/RootStack';
+import {getStatusBarHeight} from 'react-native-iphone-x-helper';
 
 interface Props {
   scrollY: Animated.Value;
@@ -28,14 +29,21 @@ const HeaderDetail = ({scrollY, title}: Props) => {
         flexDirection: 'row',
         position: 'absolute',
         zIndex: 1,
+        height: getStatusBarHeight(true),
         width: '100%',
       }}>
       <TouchableOpacity
         style={{
           marginLeft: 12,
+          marginTop: 15,
         }}
-        onPress={()=>navigate('MainTab')}>
-        <Icon.ArrowLeft size={20} color={Colors.primary} />
+        onPress={() => navigate('MainTab')}>
+        <Icon.ArrowLeft
+          size={20}
+          color={Colors.primary}
+          set="bulk"
+          stroke="bold"
+        />
       </TouchableOpacity>
       <Animated.View
         style={{

@@ -1,31 +1,23 @@
 import React from 'react';
-import {
-  Dimensions,
-  Image,
-  ImageSourcePropType,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import {Dimensions, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import Box from '../../../../components/Box';
-import {Assets, Colors, Spacings, Text, View} from 'react-native-ui-lib';
+import {Spacings, Text, View} from 'react-native-ui-lib';
 
-// import {useTheme} from '@shopify/restyle';
-// import SwipeableRow from './SwipeableRow';
-// import {Theme} from '../../../../components/theme';
-// import {numberFormat} from '../../../../config/formatCurrency';
 import {IProduct} from '../../../../types/IProduct';
 import {numberFormat} from '../../../../config/formatCurrency';
 import SwipeableRow from './SwipeableRow';
-import Animated from 'react-native-reanimated';
+
 import {useTheme} from '@shopify/restyle';
 import {Theme} from 'react-toastify';
-import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
+
 import {debounce} from 'lodash';
 import URL from '../../../../config/Api';
-import {useSelector} from 'react-redux';
+
 import {getAuthAsync, IAuth} from '../../../../redux/authSlice';
 import {IAuthRegister} from '../../../../redux/authRegisterSlice';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../../../redux/store';
+import {onUpdateQuantity} from '../../../../redux/authCartSlice';
 
 interface ICart {
   _id: string;
@@ -116,11 +108,13 @@ const widthScreen = Dimensions.get('window').width;
 const Items = ({items, onDelete}: Props) => {
   const theme = useTheme<Theme>();
   const height = 120 + Spacings.s2 * 2;
-  const [quantity, setQuantity] = React.useState(items.quantity);
+  // const [quantity, setQuantity] = React.useState(items.quantity);
   const [loading, setLoading] = React.useState<boolean>(false);
-
+  const dispatch = useDispatch();
+  const quantity = useSelector<RootState, number>(state => state.cart.quantity);
   const putQuantity = React.useCallback(
     debounce(async () => {
+      const controller = new AbortController();
       const auth: IAuth | null = await getAuthAsync();
       const registerAuth: IAuthRegister | null = await getAuthAsync();
       setLoading(true);
@@ -137,10 +131,26 @@ const Items = ({items, onDelete}: Props) => {
           id: items._id,
           quantity: quantity,
         }),
-      });
+      })
+        .then(response => response.json())
+        .then(json => {
+          dispatch(onUpdateQuantity(json.cart.items));
+          setLoading(false);
+        })
+        .catch(err => {
+          if (err.name === 'AbortError') {
+            console.log('Success Abort');
+          } else {
+            console.error(err);
+          }
+        });
+      return () => {
+        // cancel the request before component unmounts
+        controller.abort();
+      };
     }, 1000),
 
-    [],
+    [quantity],
   );
 
   const onChangeQuantity = React.useCallback(
@@ -164,7 +174,7 @@ const Items = ({items, onDelete}: Props) => {
         .then(response => response.json())
         .then(json => {
           // setItemCart([...itemCart,json.cart.items])
-          setQuantity(json.cart.items);
+          dispatch(onUpdateQuantity(json.cart.items));
           // dispatch(removeFromCart(json.cart.items))
           setLoading(false);
         })
@@ -205,11 +215,11 @@ const Items = ({items, onDelete}: Props) => {
             style={styles.btnMinus}
             //   onPress={() => setQuantity(quantity - 1)}
             onPress={() => {
-              if (items.quantity === 0) {
+              if (quantity === 0) {
                 onDelete;
               } else if (items.quantity > 0)
-              setQuantity(prevQuantity => prevQuantity - 1)
-                putQuantity();
+                dispatch(onUpdateQuantity({quantity: quantity - 1}));
+              putQuantity();
             }}>
             <Image source={require('../../../../assets/minus.png')} />
           </TouchableOpacity>
@@ -217,7 +227,7 @@ const Items = ({items, onDelete}: Props) => {
           <TouchableOpacity
             style={styles.btnPlus}
             //   onPress={() => setQuantity(quantity + 1)}
-            onPress={() => setQuantity(prevQuantity => prevQuantity + 1)}>
+            onPress={() => dispatch(onUpdateQuantity({quantity: quantity}))}>
             <Image source={require('../../../../assets/plus.png')} />
           </TouchableOpacity>
         </View>

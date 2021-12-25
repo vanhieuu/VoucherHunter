@@ -156,14 +156,14 @@ const styles = StyleSheet.create({
     marginTop: 125,
   },
   buttonOpen: {
-    backgroundColor: Colors.primary,
+    backgroundColor: '#E9707D',
     marginHorizontal:20,
     height:45,
     width: '100%',
 
   },
   buttonClose: {
-    backgroundColor: Colors.primary,
+    backgroundColor: '#E9707D',
     alignItems: 'center',
   },
   textStyle: {

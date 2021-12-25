@@ -2,24 +2,19 @@ import {useTheme} from '@shopify/restyle';
 import React from 'react';
 import {ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
 import {Button} from 'react-native-elements';
-import {Text, View,Colors} from 'react-native-ui-lib';
+import {Text, View, Colors} from 'react-native-ui-lib';
 import {useSelector} from 'react-redux';
 import {Theme} from 'react-toastify';
 import Box from '../../../../components/Box';
 import {numberFormat} from '../../../../config/formatCurrency';
 import {IProduct} from '../../../../redux/authCartSlice';
-import {RootState} from '../../../../redux/store'
+import {RootState} from '../../../../redux/store';
 import AddCard from './AddCard';
 import Card, {CardType} from './Card';
 
 interface CheckOutProps {
   minHeight: number;
-  quantity: number;
-  label: string;
-  totalPrice: number;
 }
-
-interface Props extends CheckOutProps {}
 
 const cards = [
   {
@@ -69,11 +64,14 @@ const LineItem = ({totalPrice, label}: ICart) => {
   );
 };
 
-const CheckOut = ({minHeight,quantity,totalPrice,label}: CheckOutProps) => {
-
+const CheckOut = ({minHeight}: CheckOutProps) => {
   const [selectedCard, setSelectedCard] = React.useState(cards[0].id);
   const [address, setAddress] = React.useState<addressProps>(initStateAddress);
- 
+  const quantity = useSelector<RootState, number>(state => state.cart.quantity);
+  console.log(quantity);
+  const totalPrice = useSelector<RootState, number>(
+    state => state.cart.totalPrice,
+  );
   const theme = useTheme<Theme>();
   return (
     <Box
@@ -138,11 +136,12 @@ const CheckOut = ({minHeight,quantity,totalPrice,label}: CheckOutProps) => {
           paddingVertical="l"
           alignItems="center"
           flex={1}
-          justifyContent="flex-end"
-          >
-         
-            <Button title={`Nhấn để thanh toán ${totalPrice} `} type="solid"  onPress={()=> true}/>
-        
+          justifyContent="flex-end">
+          <Button
+            title={`Nhấn để thanh toán ${totalPrice} `}
+            type="solid"
+            onPress={() => true}
+          />
         </Box>
       </Box>
     </Box>

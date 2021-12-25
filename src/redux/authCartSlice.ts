@@ -32,6 +32,7 @@ export interface IAuth {
   quantity: number;
   _id: string;
   totalPrice: number;
+  numberItemsCart: number;
 }
 
 export interface IResProduct {
@@ -62,6 +63,7 @@ const initValue: IAuth = {
   quantity: 0,
   _id: '',
   totalPrice: 0,
+  numberItemsCart: 0,
 };
 
 export const CartSlice = createSlice({
@@ -73,9 +75,24 @@ export const CartSlice = createSlice({
       state._id = action.payload._id;
       state.quantity = 1;
       state.totalPrice = action.payload.totalPrice;
+      state.numberItemsCart = 1;
     },
     onUpdateQuantity: (state, action) => {
-      state.quantity = action.payload.quantity;
+      if (state.quantity === state.quantity - 1) {
+        state.quantity = action.payload.quantity;
+        state.product_id = action.payload.product_id;
+        state._id = action.payload._id;
+        state.totalPrice = action.payload.totalPrice;
+
+        state.numberItemsCart--;
+      }
+      if (state.quantity === state.quantity + 1) {
+        state.quantity = action.payload.quantity;
+        state.product_id = action.payload.product_id;
+        state._id = action.payload._id;
+        state.totalPrice = action.payload.totalPrice;
+        state.numberItemsCart++;
+      }
     },
 
     removeFromCart: (state, action: PayloadAction<IAuth>) => {
@@ -83,9 +100,9 @@ export const CartSlice = createSlice({
       state._id = action.payload._id;
       state.quantity = 1;
       state.totalPrice = action.payload.totalPrice;
+      state.numberItemsCart = 0;
       //  state.items =   {...state, item:state.items.filter((id)=> id._id === action.payload.id)}
     },
-    
   },
 });
 
