@@ -74,7 +74,9 @@ export const CartSlice = createSlice({
       state.quantity = 1;
       state.totalPrice = action.payload.totalPrice;
     },
-    onUpdateQuantity: (state, action) => {},
+    onUpdateQuantity: (state, action) => {
+      state.quantity = action.payload.quantity;
+    },
 
     removeFromCart: (state, action: PayloadAction<IAuth>) => {
       state.product_id = action.payload.product_id;
@@ -83,6 +85,7 @@ export const CartSlice = createSlice({
       state.totalPrice = action.payload.totalPrice;
       //  state.items =   {...state, item:state.items.filter((id)=> id._id === action.payload.id)}
     },
+    
   },
 });
 

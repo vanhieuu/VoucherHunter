@@ -64,7 +64,7 @@ const SignIn = () => {
           return setLoading(true);
         }
         //login Success
-
+        console.log(json.accessToken)
         // (5) is component still mounted?
         dispatch(onLogin(json));
         saveAuthAsync(json);
