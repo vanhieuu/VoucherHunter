@@ -43,7 +43,7 @@ const Card = ({card, selected, onSelected}: CardProps) => {
         marginB-10
         marginT-10
         style={{fontSize: 16, marginVertical: 15}}
-        color={selected ? '#0C0D34' : 'primary'}>
+       >
         ****{card.last4Digits}
       </Text>
       <Text opacity={true}>Expiration</Text>

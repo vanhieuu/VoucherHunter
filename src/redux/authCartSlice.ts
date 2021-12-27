@@ -28,11 +28,13 @@ export enum EStatusAuth {
   auth = 3,
 }
 export interface IAuth {
-  product_id: IProduct;
-  quantity: number;
-  _id: string;
-  totalPrice: number;
-  numberItemsCart: number;
+  
+      product_id: IProduct;
+      quantity: number;
+      _id: string;
+      totalPrice: number;
+      numberItemsCart: number;
+  
 }
 
 export interface IResProduct {
@@ -41,29 +43,35 @@ export interface IResProduct {
   product: IProduct[];
 }
 
+
+
+
+
 const initValue: IAuth = {
-  product_id: {
-    _id: '',
-    name: '',
-    listedPrice: 0,
-    discountPrice: 0,
-    is_hot: false,
-    listphotos: [],
-    createdAt: '',
-    updateAt: '',
-    deletedAt: '',
-    quantity: 0,
-    img: '',
-    tags: [],
-    description: '',
-    sold: 0,
-    vote: 0,
-    supplier: '',
-  },
-  quantity: 0,
-  _id: '',
-  totalPrice: 0,
-  numberItemsCart: 0,
+  
+      product_id: {
+        _id: '',
+        name: '',
+        listedPrice: 0,
+        discountPrice: 0,
+        is_hot: false,
+        listphotos: [],
+        createdAt: '',
+        updateAt: '', 
+        deletedAt: '',
+        quantity: 0,
+        img: '',
+        tags: [],
+        description: '',
+        sold: 0,
+        vote: 0,
+        supplier: '',
+      },
+      quantity: 0,
+      _id: '',
+      totalPrice: 0,
+      numberItemsCart: 0,
+  
 };
 
 export const CartSlice = createSlice({
@@ -71,41 +79,27 @@ export const CartSlice = createSlice({
   initialState: initValue,
   reducers: {
     onAddToCart: (state, action: PayloadAction<IAuth>) => {
-      state.product_id = action.payload.product_id;
-      state._id = action.payload._id;
-      state.quantity = 1;
-      state.totalPrice = action.payload.totalPrice;
-      state.numberItemsCart = 1;
-    },
-    onUpdateQuantity: (state, action) => {
-      if (state.quantity === state.quantity - 1) {
-        state.quantity = action.payload.quantity;
-        state.product_id = action.payload.product_id;
-        state._id = action.payload._id;
-        state.totalPrice = action.payload.totalPrice;
-
-        state.numberItemsCart--;
-      }
-      if (state.quantity === state.quantity + 1) {
-        state.quantity = action.payload.quantity;
-        state.product_id = action.payload.product_id;
-        state._id = action.payload._id;
-        state.totalPrice = action.payload.totalPrice;
+        state._id = action.payload._id
         state.numberItemsCart++;
-      }
+        state.product_id= action.payload.product_id;
+        state.quantity= action.payload.quantity;
+        state.totalPrice= action.payload.totalPrice
+    },
+    onUpdateQuantity: (state, action: PayloadAction<{quantity: number}>) => {
+        state.quantity = action.payload.quantity
+       
     },
 
     removeFromCart: (state, action: PayloadAction<IAuth>) => {
-      state.product_id = action.payload.product_id;
-      state._id = action.payload._id;
-      state.quantity = 1;
-      state.totalPrice = action.payload.totalPrice;
-      state.numberItemsCart = 0;
+    
       //  state.items =   {...state, item:state.items.filter((id)=> id._id === action.payload.id)}
     },
+    onGetTotalPrice:(state,action:PayloadAction<{totalPrice:number}>) =>{
+      state.totalPrice = action.payload.totalPrice
+    }
   },
 });
 
-export const {onAddToCart, onUpdateQuantity, removeFromCart} =
+export const {onAddToCart, onUpdateQuantity, removeFromCart, onGetTotalPrice} =
   CartSlice.actions;
 export default CartSlice.reducer;

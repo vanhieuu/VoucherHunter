@@ -55,7 +55,7 @@ const ListProduct = ({ListHeaderComponent}: Props) => {
       // cancel the request before component unmounts
       controller.abort();
     };
-  }, []);
+  }, [componentMounted]);
 
   return (
     <FlatList

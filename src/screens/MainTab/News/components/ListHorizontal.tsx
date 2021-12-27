@@ -39,13 +39,13 @@ const ListHorizontal = () => {
   const dispatch = useDispatch();
   const onEndReached = React.useCallback(() => {
     setLoading(true);
-    setTimeout(() => {
       dispatch(onUpdatePageNumber({page: page + 1}));
-      setNews(prev => prev.concat())
+      console.log(onUpdatePageNumber({page: page + 1}))
+      setNews(news.concat())
       setLoading(false)
-    },2000)
+    
     console.log(page);
-  }, []);
+  }, [page]);
 
   React.useEffect(() => {
     setLoading(true);
@@ -80,13 +80,10 @@ const ListHorizontal = () => {
         <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     ) : null;
-  }, [page]);
+  }, []);
 
   return (
     <View paddingV-20 style={{alignSelf: 'center'}}>
-      <View paddingH-16 centerV>
-        <Text h26>News</Text>
-      </View>
       <FlatList
         showsHorizontalScrollIndicator={true}
         data={news}

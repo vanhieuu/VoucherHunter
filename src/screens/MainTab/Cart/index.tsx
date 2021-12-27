@@ -16,10 +16,11 @@ import Animated from 'react-native-reanimated';
 import {Colors, Text, View} from 'react-native-ui-lib';
 import {useDispatch, useSelector} from 'react-redux';
 import Box from '../../../components/Box';
-import  {Theme} from '../../../components/theme';
+import {Theme} from '../../../components/theme';
 import URL from '../../../config/Api';
 import {RootStackParamList} from '../../../nav/RootStack';
-import { onAddToCart } from '../../../redux/authCartSlice';
+import {onAddToCart} from '../../../redux/authCartSlice';
+import {onUpdateQuantity} from '../../../redux/authProductSlice';
 
 import {IAuthRegister} from '../../../redux/authRegisterSlice';
 import {getAuthAsync, IAuth} from '../../../redux/authSlice';
@@ -42,7 +43,6 @@ interface Props {
   items: ICart;
 }
 
-
 const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const theme = useTheme<Theme>();
@@ -51,9 +51,8 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [mounted, setMounted] = React.useState<boolean>(false);
   const dispatch = useDispatch();
-  const onPressCheckOut = React.useCallback(() => {
-    navigation.navigate('Payment');
-  }, []);
+
+
 
   React.useEffect(() => {
     const controller = new AbortController();
@@ -72,7 +71,7 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
       .then(response => response.json())
       .then(json => {
         setItemCart(json.cart.items);
-        dispatch(onAddToCart(json.cart.items))
+        dispatch(onAddToCart(json.cart.items));
         setLoading(false);
       })
       .catch(err => {
@@ -87,10 +86,8 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
       controller.abort();
     };
   }, []);
-
   const onDelete = React.useCallback(
     async _id => {
-      
       const controller = new AbortController();
       const auth: IAuth | null = await getAuthAsync();
       const registerAuth: IAuthRegister | null = await getAuthAsync();
@@ -111,7 +108,9 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
         .then(json => {
           // setItemCart([...itemCart,json.cart.items])
           setItemCart(json.cart.items);
-          dispatch(onAddToCart(json.cart.items))
+          dispatch(onAddToCart(json.cart.items));
+          console.log(onAddToCart(json), 'json');
+
           // dispatch(removeFromCart(json.cart.items))
           setLoading(false);
         })
@@ -196,14 +195,6 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
         </Box>
       </Box>
       <Box></Box>
-      <View>
-        <TouchableOpacity
-          style={styles.btnDelete}
-          //   onPress={() => setQuantity(quantity + 1)}
-          onPress={() => {}}>
-          <Text style={{fontSize: 20, lineHeight: 22}}>Thanh toán</Text>
-        </TouchableOpacity>
-      </View>
     </CartContainer>
   );
 };

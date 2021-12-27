@@ -20,7 +20,6 @@ const AddCard = () => {
           set="bulk"
           primaryColor="white"
           secondaryColor={Colors.primary}
-          stroke="bold"
           size="medium"
         />
       </Box>

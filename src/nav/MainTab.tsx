@@ -88,7 +88,7 @@ const MainTab = () => {
             <Image assetGroup="iconTab" assetName="ic_new" tintColor={color} />
           ),
           tabBarLabel: 'Tin tức',
-          headerShown: false,
+          headerShown: true,
 
         }}
       />

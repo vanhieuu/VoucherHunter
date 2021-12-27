@@ -23,7 +23,40 @@ const ShowModal = ({item}: {item: IProduct}) => {
   const product = route.params.item;
   const id = product._id;
   const dispatch = useDispatch();
- 
+  const putQuantity = React.useCallback(async (id, quantity) => {
+    const controller = new AbortController();
+    const auth: IAuth | null = await getAuthAsync();
+    const registerAuth: IAuthRegister | null = await getAuthAsync();
+    setLoading(true);
+    fetch(URL.addQuantity, {
+      method: 'PUT',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        id: item._id,
+        quantity: quantity,
+      }),
+    })
+      .then(response => response.json())
+      .then(json => {
+        dispatch(onAddToCart(json));
+        setLoading(false);
+      })
+      .catch(err => {
+        if (err.name === 'AbortError') {
+          console.log('Success Abort');
+        } else {
+          console.error(err);
+        }
+      });
+    return () => {
+      // cancel the request before component unmounts
+      controller.abort();
+    };
+  }, []);
   const addItemCart = React.useCallback(async () => {
     const auth: IAuth | null = await getAuthAsync();
     const registerAuth: IAuthRegister | null = await getAuthAsync();
@@ -45,6 +78,7 @@ const ShowModal = ({item}: {item: IProduct}) => {
       .then(json => {
         Alert.alert(json.message);
         dispatch(onAddToCart(json));
+        console.log(onAddToCart(json))
       })
       .catch(err => {
         console.error(err);
@@ -58,7 +92,7 @@ const ShowModal = ({item}: {item: IProduct}) => {
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
+        
           setModalVisible(!modalVisible);
         }}>
         <View style={styles.centeredView}>

@@ -17,7 +17,11 @@ import {getAuthAsync, IAuth} from '../../../../redux/authSlice';
 import {IAuthRegister} from '../../../../redux/authRegisterSlice';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../../../redux/store';
-import {onUpdateQuantity} from '../../../../redux/authCartSlice';
+import {
+  onUpdateQuantity,
+  onAddToCart,
+  onGetTotalPrice,
+} from '../../../../redux/authCartSlice';
 
 interface ICart {
   _id: string;
@@ -111,87 +115,51 @@ const Items = ({items, onDelete}: Props) => {
   // const [quantity, setQuantity] = React.useState(items.quantity);
   const [loading, setLoading] = React.useState<boolean>(false);
   const dispatch = useDispatch();
-  const quantity = useSelector<RootState, number>(state => state.cart.quantity);
-  const putQuantity = React.useCallback(
-    debounce(async () => {
-      const controller = new AbortController();
-      const auth: IAuth | null = await getAuthAsync();
-      const registerAuth: IAuthRegister | null = await getAuthAsync();
-      setLoading(true);
-      fetch(URL.addQuantity, {
-        method: 'PUT',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${
-            auth?.accessToken || registerAuth?.accessToken
-          }`,
-        },
-        body: JSON.stringify({
-          id: items._id,
-          quantity: quantity,
-        }),
-      })
-        .then(response => response.json())
-        .then(json => {
-          dispatch(onUpdateQuantity(json.cart.items));
-          setLoading(false);
-        })
-        .catch(err => {
-          if (err.name === 'AbortError') {
-            console.log('Success Abort');
-          } else {
-            console.error(err);
-          }
-        });
-      return () => {
-        // cancel the request before component unmounts
-        controller.abort();
-      };
-    }, 1000),
+  // const quantity = useSelector<RootState, number>(state => state.cart.quantity);
+  const [quantity, setQuantity] = React.useState(items.quantity);
+  const token = useSelector<RootState, string>(state => state.auth.accessToken);
+  const [itemQuantity, setItemQuantity] = React.useState<ICart[]>([]);
 
-    [quantity],
-  );
+  const putQuantity = React.useCallback(() => {
+    const controller = new AbortController();
 
-  const onChangeQuantity = React.useCallback(
-    async _id => {
-      const controller = new AbortController();
-      const auth: IAuth | null = await getAuthAsync();
-      const registerAuth: IAuthRegister | null = await getAuthAsync();
-      const signal = controller.signal;
-      await fetch(URL.addQuantity, {
-        signal: signal,
-        method: 'PUT',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${
-            auth?.accessToken || registerAuth?.accessToken
-          }`,
-        },
-        body: JSON.stringify({id: _id}),
+    setLoading(true);
+    fetch(URL.addQuantity, {
+      method: 'PUT',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        id: items._id,
+        quantity: quantity,
+      }),
+    })
+      .then(response => response.json())
+      .then(json => {
+        dispatch(onUpdateQuantity(json.cart.items));
+        dispatch(onAddToCart(json.cart.items));
+        
+        setItemQuantity(json.cart.items);
+        setLoading(false);
       })
-        .then(response => response.json())
-        .then(json => {
-          // setItemCart([...itemCart,json.cart.items])
-          dispatch(onUpdateQuantity(json.cart.items));
-          // dispatch(removeFromCart(json.cart.items))
-          setLoading(false);
-        })
-        .catch(err => {
-          if (err.name === 'AbortError') {
-            console.log('Success Abort');
-          } else {
-            console.error(err);
-          }
-        });
-      return () => {
-        // cancel the request before component unmounts
-        controller.abort();
-      };
-    },
-    [quantity],
-  );
+      .catch(err => {
+        if (err.name === 'AbortError') {
+          console.log('Success Abort');
+        } else {
+          console.error(err);
+        }
+      });
+    return () => {
+      // cancel the request before component unmounts
+      controller.abort();
+    };
+  }, [quantity]);
+
+  React.useEffect(() => {
+    putQuantity();
+  }, [quantity]);
 
   return (
     <SwipeableRow onDelete={onDelete} items={items} height={height}>
@@ -215,11 +183,9 @@ const Items = ({items, onDelete}: Props) => {
             style={styles.btnMinus}
             //   onPress={() => setQuantity(quantity - 1)}
             onPress={() => {
-              if (quantity === 0) {
-                onDelete;
-              } else if (items.quantity > 0)
-                dispatch(onUpdateQuantity({quantity: quantity - 1}));
               putQuantity();
+              
+              setQuantity(prev => prev - 1);
             }}>
             <Image source={require('../../../../assets/minus.png')} />
           </TouchableOpacity>
@@ -227,7 +193,11 @@ const Items = ({items, onDelete}: Props) => {
           <TouchableOpacity
             style={styles.btnPlus}
             //   onPress={() => setQuantity(quantity + 1)}
-            onPress={() => dispatch(onUpdateQuantity({quantity: quantity}))}>
+            onPress={() => {
+              putQuantity();
+              setQuantity(quantity + 1);
+              
+            }}>
             <Image source={require('../../../../assets/plus.png')} />
           </TouchableOpacity>
         </View>

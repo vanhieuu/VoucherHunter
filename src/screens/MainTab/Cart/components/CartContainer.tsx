@@ -28,8 +28,8 @@ interface CartProps {
   CheckOutComponent: FC<{minHeight: number}>;
 }
 const {width} = Dimensions.get('window');
-const height = (700 * width) / 375;
-const minHeight = (228 * width) / 375;
+const height = (680 * width) / 375;
+const minHeight = (200 * width) / 375;
 const snapPoints = [-(height - minHeight), 0];
 
 const CartContainer = gestureHandlerRootHOC(
@@ -82,8 +82,8 @@ const CartContainer = gestureHandlerRootHOC(
                 right: 0,
                 height,
                 backgroundColor: 'white',
-                borderBottomLeftRadius: theme.borderRadii.l,
-                borderBottomRightRadius: theme.borderRadii.l,
+                borderBottomLeftRadius: theme.borderRadii.xl,
+                borderBottomRightRadius: theme.borderRadii.xl,
               },
               style,
             ]}>
@@ -102,7 +102,7 @@ const CartContainer = gestureHandlerRootHOC(
                 style={{
                   height: 5,
                   backgroundColor: Colors.grey,
-                  width: (60 * width) / 375,
+                  width: (50 * width) / 375,
                   borderRadius: (2.5 * width) / 375,
                   marginBottom: Spacings.s2,
                 }}

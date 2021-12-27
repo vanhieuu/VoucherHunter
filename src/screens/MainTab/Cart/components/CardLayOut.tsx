@@ -23,8 +23,6 @@ interface CardProps {
   backgroundColor: BoxProps<Theme>["backgroundColor"]
 }
 
-const visaLogo = require('./assets/visaLogo.png');
-const codLogo = require('./assets/codIcon.png');
 
 const CardLayOut = ({ onPress, children,backgroundColor}: CardProps) => {
   return (
