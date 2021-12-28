@@ -22,6 +22,7 @@ import {
   onAddToCart,
   onGetTotalPrice,
 } from '../../../../redux/authCartSlice';
+import { saveAuthAsync } from './AsynStoreCart';
 
 interface ICart {
   _id: string;
@@ -109,6 +110,12 @@ const styles = StyleSheet.create({
 });
 const widthScreen = Dimensions.get('window').width;
 
+
+
+
+
+
+
 const Items = ({items, onDelete}: Props) => {
   const theme = useTheme<Theme>();
   const height = 120 + Spacings.s2 * 2;
@@ -119,6 +126,9 @@ const Items = ({items, onDelete}: Props) => {
   const [quantity, setQuantity] = React.useState(items.quantity);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemQuantity, setItemQuantity] = React.useState<ICart[]>([]);
+const [price,setPrice] = React.useState(0)
+
+  
 
   const putQuantity = React.useCallback(() => {
     const controller = new AbortController();
@@ -140,7 +150,8 @@ const Items = ({items, onDelete}: Props) => {
       .then(json => {
         dispatch(onUpdateQuantity(json.cart.items));
         dispatch(onAddToCart(json.cart.items));
-        
+        setPrice(json.cart.totalPrice)
+        saveAuthAsync(json);
         setItemQuantity(json.cart.items);
         setLoading(false);
       })
@@ -159,7 +170,10 @@ const Items = ({items, onDelete}: Props) => {
 
   React.useEffect(() => {
     putQuantity();
-  }, [quantity]);
+  }, [putQuantity]);
+
+
+
 
   return (
     <SwipeableRow onDelete={onDelete} items={items} height={height}>
@@ -195,7 +209,7 @@ const Items = ({items, onDelete}: Props) => {
             //   onPress={() => setQuantity(quantity + 1)}
             onPress={() => {
               putQuantity();
-              setQuantity(quantity + 1);
+              setQuantity(prev => prev + 1 );
               
             }}>
             <Image source={require('../../../../assets/plus.png')} />

@@ -1,20 +1,26 @@
 import {useTheme} from '@shopify/restyle';
-import {debounce} from 'lodash';
+import {debounce, method} from 'lodash';
 import React from 'react';
-import {ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
+import {Alert, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
 
 import {Text, View, Colors} from 'react-native-ui-lib';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {Theme} from 'react-toastify';
 import Box from '../../../../components/Box';
 import URL from '../../../../config/Api';
 
 import {numberFormat} from '../../../../config/formatCurrency';
-import { IProduct, onAddToCart, onGetTotalPrice, onUpdateQuantity } from '../../../../redux/authCartSlice';
-import { RootState } from '../../../../redux/store';
+import {
+  IProduct,
+  onAddToCart,
+  onGetTotalPrice,
+  onUpdateQuantity,
+} from '../../../../redux/authCartSlice';
+import {RootState} from '../../../../redux/store';
 
 import AddCard from './AddCard';
+import {getAuthAsync} from './AsynStoreCart';
 import Card, {CardType} from './Card';
 
 interface CheckOutProps {
@@ -56,28 +62,31 @@ interface ICart {
   totalPrice: number;
 }
 
-
 const CheckOut = ({minHeight}: CheckOutProps) => {
-
   const [selectedCard, setSelectedCard] = React.useState(cards[0].id);
-  const [address, setAddress] = React.useState<addressProps>(initStateAddress);
+  // console.log(selectedCard === 0 ? 'Visa' : 'COD');
+  const [card, setCard] = React.useState('');
+  // selectedCard === 0 ? setCard('VISA'): setCard('COD')
 
+  const [address, setAddress] = React.useState<addressProps>(initStateAddress);
+  const addressDetail = JSON.stringify(address);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
+  // console.log(itemCart);
+  // const [itemCarts, setItemCarts] = React.useState<ICart[]>([]);
+  const [quantity, setQuantity] = React.useState<number>(0);
+
   const [loading, setLoading] = React.useState<boolean>(true);
   const [mounted, setMounted] = React.useState<boolean>(false);
-  const [price,setPrice] = React.useState(0)
-  const dispatch = useDispatch();
-  const findQuantity = itemCart.map((item)=>item.quantity);
-  console.log(findQuantity,'A')
+  const [price, setPrice] = React.useState<number>(0);
 
-  const fetchApi = React.useCallback(() => {
-    setMounted(true)
+  const fetchApi = React.useCallback(async () => {
+    loading;
+    setMounted(true);
     const controller = new AbortController();
     const signal = controller.signal;
     if (!token) return;
-
-   fetch(URL.getItemCart, {
+    await fetch(URL.getItemCart, {
       signal: signal,
       method: 'GET',
       headers: {
@@ -89,16 +98,11 @@ const CheckOut = ({minHeight}: CheckOutProps) => {
       .then(response => response.json())
       .then(json => {
         setItemCart(json.cart.items);
-       dispatch(onGetTotalPrice(json.cart.totalPrice))
-       console.log(json.cart.totalPrice)
-       setPrice(json.cart.totalPrice)
-        console.log(json,'aaaa')
+        setPrice(json.cart.totalPrice);
         setLoading(false);
-        setMounted(false)
       })
       .catch(err => {
         if (err.name === 'AbortError') {
-          
           console.log('Success Abort');
         } else {
           console.error(err);
@@ -106,15 +110,60 @@ const CheckOut = ({minHeight}: CheckOutProps) => {
       });
     return () => {
       // cancel the request before component unmounts
-      setMounted(false)
+      setMounted(false);
       controller.abort();
     };
+  }, [selectedCard]);
+
+  React.useEffect(() => {
+    fetchApi();
+  }, [fetchApi]);
+
+  const onPressCheckOut = React.useCallback(async () => {
+    setLoading(true);
+    const controller = new AbortController();
+    const signal = controller.signal;
+    let dataToSend = {
+      note: 'NoNote',
+      deliveryAddress: addressDetail,
+      paymentMethod: 'COD',
+      items: itemCart,
+    };
+    await fetch(URL.createInvoice, {
+      signal: signal,
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(dataToSend),
+    })
+      .then(response => response.json())
+      .then(json => {
+        Alert.alert(json.message);
+      });
   }, []);
 
-  React.useEffect(()=>{
-    fetchApi();
-  },[])
 
+  // React.useEffect(() => {
+  //   setLoading(true);
+  //   const controller = new AbortController();
+  //   const signal = controller.signal;
+  //   fetch(URL.removeAll, {
+  //     signal: signal,
+  //     method: 'DELETE',
+  //     headers: {
+  //       Accept: 'application/json',
+  //       'Content-Type': 'application/json',
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //   })
+  //     .then(response => response.json())
+  //     .then(json => {
+  //       setItemCart(json.cart.items);
+  //     });
+  // }, [onPressCheckOut]);
 
   return (
     <Box
@@ -171,7 +220,8 @@ const CheckOut = ({minHeight}: CheckOutProps) => {
             </Box>
             <Box>
               <Text color={Colors.primary}>
-                {numberFormat.format(itemCart?.map((item)=>item.totalPrice).reduceRight((a,b) => a +b,0))}
+                {/* {numberFormat.format(itemCart?.map((item)=>item.totalPrice).reduceRight((a,b) => a +b,0))} */}
+                {numberFormat.format(price)}
               </Text>
             </Box>
           </Box>
@@ -180,7 +230,7 @@ const CheckOut = ({minHeight}: CheckOutProps) => {
             <TouchableOpacity
               style={styles.btnDelete}
               //   onPress={() => setQuantity(quantity + 1)}
-              onPress={() => {}}>
+              onPress={onPressCheckOut}>
               <Text style={{fontSize: 20, lineHeight: 22}}>Thanh toán</Text>
             </TouchableOpacity>
           </View>

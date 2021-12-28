@@ -12,8 +12,14 @@ import { IProduct } from '../types/IProduct';
 
 import { RootState } from '../redux/store';
 import { useSelector } from 'react-redux';
+import URL from '../config/Api';
 
-
+interface ICart {
+  _id: string;
+  product_id: IProduct;
+  quantity: number;
+  totalPrice: number;
+}
 export type MainTabParamList = {
   Home: undefined;
   News: undefined;
@@ -25,10 +31,49 @@ export type MainTabParamList = {
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 const MainTab = () => {
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const [mounted, setMounted] = React.useState<boolean>(false);
+  const token = useSelector<RootState, string>(state => state.auth.accessToken);
+  const [itemCart, setItemCart] = React.useState<ICart[]>([]);
+  
+  const fetchApi = React.useCallback(async () => {
+    loading;
+    setMounted(true);
+    const controller = new AbortController();
+    const signal = controller.signal;
+    if (!token) return;
+    await fetch(URL.getItemCart, {
+      signal: signal,
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(response => response.json())
+      .then(json => {
+        setItemCart(json.cart.items);
+        setLoading(false);
+      })
+      .catch(err => {
+        if (err.name === 'AbortError') {
+          console.log('Success Abort');
+        } else {
+          console.error(err);
+        }
+      });
+    return () => {
+      // cancel the request before component unmounts
+      setMounted(false);
+      controller.abort();
+    };
+  }, [itemCart.length]);
 
+  React.useEffect(()=>{
+    fetchApi()
+  },[itemCart.length])
 
-  // const [numberCart,setNumberCart] = React.useState<IAuth>()
-  // const numberCart = useSelector<RootState, number>(state => state.cart.numberCart)
 
   const { navigate } = useNavigation<NavigationProp<RootStackParamList>>()
   return (
@@ -105,7 +150,7 @@ const MainTab = () => {
           ),
           tabBarLabel: 'Giỏ hàng',
           headerShown: false,
-          tabBarBadge: 1
+          tabBarBadge: itemCart.length
         }}
       />
       <Tab.Screen

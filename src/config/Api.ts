@@ -13,6 +13,7 @@ const URL = {
   addQuantity: MainURL + '/cart/auth/changeqty',
   removeItem: MainURL + '/cart/auth/removeitem',
   removeAll: MainURL + '/cart/auth/removeall',
+  createInvoice: MainURL + '/invoice/auth/create'
 };
 export default URL;
 
