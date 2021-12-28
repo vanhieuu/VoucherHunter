@@ -109,8 +109,11 @@ const onEndReached = React.useCallback(() =>{
   // }, [page]);
 
   React.useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
     setLoading(true);
     fetch(URL.News(page), {
+      signal: signal,
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -130,9 +133,17 @@ const onEndReached = React.useCallback(() =>{
           componentMounted.current = false; // (4) set it to false when we leave the page
         };
       })
-      .catch(error => {
-        console.error(error);
+      .catch(err => {
+        if (err.name === 'AbortError') {
+          console.log('Success Abort');
+        } else {
+          console.error(err);
+        }
       });
+    return () => {
+      // cancel the request before component unmounts
+      controller.abort();
+    };
   }, [page]);
 
   const renderListFooter = React.useCallback(() =>{

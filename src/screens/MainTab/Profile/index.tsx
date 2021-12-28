@@ -21,11 +21,13 @@ import Box from '../../../components/Box';
 import {RootStackParamList} from '../../../nav/RootStack';
 import {spacing, useTheme} from '@shopify/restyle';
 import Header from '../../components/Header';
+import Tab from './components/Tab';
+import GetInvoice from './components/GetInvoice';
 
 
 const {width}= Dimensions.get('window');
 const tabs = [{
-  id: 'Configuration', label:'Chỉnh sửa thông tin'
+  id: 'invoice', label:'Đơn hàng đã mua '
 },
 {
   id:'info', label:'Thông tin cá nhân'
@@ -58,7 +60,7 @@ const Profile = () => {
       .then(response => response.json())
       .then((json: IResUser | IResUserRegister) => {
         setUsers(json.user);
-        console.log(user,'user');
+        console.log(json,'user');
         
         setLoading(false);
         return clearTimeout(Timer1);
@@ -117,11 +119,11 @@ const Profile = () => {
             {user?.email}
           </Text>
         </Box>
-        <Box backgroundColor='danger'>
-          <Text h16>
-            Invoice
-          </Text>
-        </Box>
+        <Tab
+        tabs={tabs}
+        >
+          <GetInvoice/>
+        </Tab>
       </Box>
     </Box>
   );

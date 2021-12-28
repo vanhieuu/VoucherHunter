@@ -2,8 +2,6 @@ import React from 'react';
 import {
   StyleSheet,
   Dimensions,
-  Pressable,
-  TouchableOpacity,
 } from 'react-native';
 import {Carousel, Colors, View, Image} from 'react-native-ui-lib';
 

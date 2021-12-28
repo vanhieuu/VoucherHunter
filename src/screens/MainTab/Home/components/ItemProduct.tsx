@@ -1,7 +1,7 @@
 import {NavigationProp, useNavigation} from '@react-navigation/core';
 import React from 'react';
 import {Dimensions, StyleSheet, TouchableOpacity} from 'react-native';
-import {View, Card, Text, Image, Colors} from 'react-native-ui-lib';
+import {View,  Text, Image, } from 'react-native-ui-lib';
 
 import {numberFormat} from '../../../../config/formatCurrency';
 import {RootStackParamList} from '../../../../nav/RootStack';

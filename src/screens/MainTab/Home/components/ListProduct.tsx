@@ -1,9 +1,7 @@
 import React from 'react';
 import {FlatList, LayoutAnimation, StyleSheet} from 'react-native';
-
 import {useSelector} from 'react-redux';
 import URL from '../../../../config/Api';
-
 import {RootState} from '../../../../redux/store';
 import {IProduct} from '../../../../types/IProduct';
 import ItemProduct from './ItemProduct';
