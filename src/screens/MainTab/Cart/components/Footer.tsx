@@ -17,7 +17,7 @@ const Footer =React.forwardRef<RefFooter> ((props,ref) => {
       });
     return (
         <View style={styles.footerList}>
-            {!!isLoadmore && <ActivityIndicator color='#15BE77' />}
+            {!!isLoadmore && <ActivityIndicator color='#E9707D' size='large' />}
         </View>
 )
 });

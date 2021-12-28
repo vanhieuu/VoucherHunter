@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
-import {Card, Colors, Text, View} from 'react-native-ui-lib';
+import {Card, Colors, Image, Text, View} from 'react-native-ui-lib';
 import {RootStackParamList} from '../../../../nav/RootStack';
 import {INewsData} from '../../../../redux/newSlice';
 import RenderHTML from 'react-native-render-html';
@@ -36,6 +36,13 @@ const ItemCard = ({item}: {item: INewsData}) => {
       <TouchableOpacity onPress={onPressItem} style={{flexDirection: 'column'}}>
         <View style={styles.container}>
           <View>
+            <View flex marginH-12 marginL-60>
+              <Image
+              source={{uri:item.image}}
+              style={{width:100,height: 80 }}
+              resizeMode="contain"
+              />
+            </View>
             <View row marginV-15 marginR-20>
               <View
                 br100
