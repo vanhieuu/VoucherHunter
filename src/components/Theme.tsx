@@ -9,7 +9,7 @@ const theme = createTheme({
     primary: '#E9707D',
     title: '#0c0d34',
     text: 'rgba(12,13,52,0.7)',
-    background:'black',
+    background:'#f5f5f5',
     white: '#fff',
     grey: 'grey',
     secondary:'#000',
@@ -19,7 +19,8 @@ const theme = createTheme({
     lightBlue:'#bfeaf5',
     primaryLight:'#e7f9f7',
     info:'#808080',
-    lightPrimary:'#ffcdd2'
+    lightPrimary:'#ffcdd2',
+    undefined:''
     
 
   },

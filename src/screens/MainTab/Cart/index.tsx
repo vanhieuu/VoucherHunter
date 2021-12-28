@@ -1,30 +1,24 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {useTheme} from '@shopify/restyle';
-import axios from 'axios';
-import {debounce} from 'lodash';
 import React from 'react';
 import {
-  Alert,
+  
   Dimensions,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
-  Image,
+ 
+  
 } from 'react-native';
 import {Header} from 'react-native-elements';
-import Animated from 'react-native-reanimated';
-import {Colors, Text, View} from 'react-native-ui-lib';
+import {Colors, Text} from 'react-native-ui-lib';
 import {useDispatch, useSelector} from 'react-redux';
 import Box from '../../../components/Box';
 import {Theme} from '../../../components/theme';
 import URL from '../../../config/Api';
 import {RootStackParamList} from '../../../nav/RootStack';
-import {onAddToCart} from '../../../redux/authCartSlice';
-import {onUpdateQuantity} from '../../../redux/authProductSlice';
-
+import {onAddToCart} from '../../../redux/authCartSlice';;
 import {IAuthRegister} from '../../../redux/authRegisterSlice';
 import {getAuthAsync, IAuth} from '../../../redux/authSlice';
-
 import {RootState} from '../../../redux/store';
 import {IProduct} from '../../../types/IProduct';
 import CartContainer from './components/CartContainer';

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Alert, BackHandler, Dimensions, Platform, StyleSheet, UIManager} from 'react-native';
+import {Alert, BackHandler, Dimensions,StyleSheet} from 'react-native';
 import {View, Image,Colors} from 'react-native-ui-lib';
 
 import Banner from './components/Banner';

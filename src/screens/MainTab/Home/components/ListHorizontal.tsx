@@ -9,12 +9,10 @@ import {
 } from 'react-native';
 import {Colors, Card, Text, View} from 'react-native-ui-lib';
 import {useSelector} from 'react-redux';
-
 import URL from '../../../../config/Api';
 import {numberFormat} from '../../../../config/formatCurrency';
 import {RootStackParamList} from '../../../../nav/RootStack';
 import {RootState} from '../../../../redux/store';
-
 import {IProduct} from '../../../../types/IProduct';
 
 if (Platform.OS === 'android') {
@@ -137,7 +135,7 @@ const ListHorizontal = () => {
         />
       )}
       <View paddingH-16 centerV>
-        <Text h24> Product</Text>
+        <Text style={styles.text}> Sản phẩm</Text>
       </View>
     </View>
   );
@@ -152,5 +150,5 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     elevation: 2,
   },
-  text: {fontSize: 24, fontWeight: 'bold', lineHeight: 22},
+  text: {fontSize: 24, fontWeight: 'bold', lineHeight: 26},
 });

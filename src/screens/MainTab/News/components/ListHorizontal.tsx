@@ -1,21 +1,16 @@
 import React from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   LayoutAnimation,
   Platform,
   StyleSheet,
   UIManager,
 } from 'react-native';
-import {View, Text, Colors} from 'react-native-ui-lib';
-import {useDispatch, useSelector} from 'react-redux';
-
+import {View} from 'react-native-ui-lib';
+import { useSelector} from 'react-redux';
 import URL from '../../../../config/Api';
-
 import {
   INewsData,
-  onGetNews,
-  onUpdatePageNumber,
 } from '../../../../redux/newSlice';
 import {RootState} from '../../../../redux/store';
 import Footer, { RefFooter } from '../../Cart/components/Footer';

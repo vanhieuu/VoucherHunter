@@ -1,87 +1,129 @@
 import React from 'react';
-import {StyleSheet} from 'react-native';
+import {Dimensions, StyleSheet} from 'react-native';
 import {useSelector} from 'react-redux';
 import URL from '../../../config/Api';
 import {IResUser, IUser} from '../../../redux/authSlice';
 import {RootState} from '../../../redux/store';
 import {Colors, Text, View, Image} from 'react-native-ui-lib';
-import {Header} from 'react-native-elements';
+
 import {
   IResUserRegister,
   IUserRegister,
 } from '../../../redux/authRegisterSlice';
-import { RouteProp, useRoute } from '@react-navigation/core';
-import { MainTabParamList } from '../../../nav/MainTab';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/core';
+import {MainTabParamList} from '../../../nav/MainTab';
+import Box from '../../../components/Box';
+import {RootStackParamList} from '../../../nav/RootStack';
+import {spacing, useTheme} from '@shopify/restyle';
+import Header from '../../components/Header';
+
+
+const {width}= Dimensions.get('window');
+const tabs = [{
+  id: 'Configuration', label:'Chỉnh sửa thông tin'
+},
+{
+  id:'info', label:'Thông tin cá nhân'
+}
+]
 const Profile = () => {
-  
+  const theme = useTheme()
+  const {navigate} = useNavigation<NavigationProp<RootStackParamList>>();
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
-  const registerToken = useSelector<RootState, string>(state => state.register.accessToken)
+  const registerToken = useSelector<RootState, string>(
+    state => state.register.accessToken,
+  );
   const [user, setUsers] = React.useState<IUser | IUserRegister>();
-  const [loading,setLoading] = React.useState<boolean>(false)
-  const route = useRoute<RouteProp<MainTabParamList>>()
-  console.log(route.name,route.key)
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const route = useRoute<RouteProp<MainTabParamList>>();
 
   React.useEffect(() => {
-    let Timer1 = setTimeout(() =>setLoading(true),3000)
+    let Timer1 = setTimeout(() => setLoading(true), 3000);
+    const controller = new AbortController();
+    const signal = controller.signal;
     fetch(URL.ValidateToken, {
+      signal:signal,
       method: 'GET',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token||registerToken}`,
+        Authorization: `Bearer ${token || registerToken}`,
       },
     })
       .then(response => response.json())
       .then((json: IResUser | IResUserRegister) => {
-        console.log(json.message);
         setUsers(json.user);
-        // console.log(user,'user');
-        // dispatch(users)
-        setLoading(false)
-        return clearTimeout(Timer1)
+        console.log(user,'user');
+        
+        setLoading(false);
+        return clearTimeout(Timer1);
       })
-      .catch(error => {
-        console.error(error);
+      .catch(err => {
+        if (err.name === 'AbortError') {
+          console.log('successfully aborted');
+        } else {
+          // handle error
+        }
       });
+    return () => {
+      // cancel the request before component unmounts
+      controller.abort();
+    };
   }, []);
 
   return (
-    <View backgroundColor={Colors.primary}>
-      <Header
-        placement="center"
-        leftComponent={{icon: 'menu', color: Colors.bgApp}}
-        centerComponent={{
-          text: 'VoucherHunter',
-          style: {color: Colors.primary, fontSize: 20},
-        }}
-        rightComponent={{icon: 'search', color: Colors.bgApp}}
-        containerStyle={{
-          backgroundColor: 'white',
-          justifyContent: 'space-around',
-        }}
-        barStyle="light-content"
-        statusBarProps={{barStyle: 'light-content'}}
-      />
-      <View
-        row
-        marginH-12
-        marginV-20
-        backgroundColor={Colors.onBoard3}
-        style={styles.container}>
-        <View style={styles.img}>
+    <Box flex={1} backgroundColor='background'>
+      <Box flex={0.2} backgroundColor="background">
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          borderBottomRightRadius="xl"
+          backgroundColor="secondary">
+        <Header left={{
+          icon:'arrow-left',
+          onPress:() => navigate('MainTab')
+        }} 
+        title='Cá nhân'        
+        dark
+        />
+        </Box>
+      </Box>
+      <Box flex={0.8}>
+        <Box
+          position="absolute"
+          left={width / 2 - 50}
+          top={-50}
+          width={100}
+          height={100}
+          style={{borderRadius: 50}}
+
+          >
           <Image
             source={{uri: user?.photoUrl}}
             resizeMode="contain"
             style={styles.img}
           />
-        </View>
-        <View>
-          <Text h16 black marginV-12 marginH-5>
+        </Box>
+        <Box marginVertical="m" style={{marginTop: 50 +  theme.spacing.m}}>
+          <Text h16 black style={{textAlign: 'center'}}>
             {user?.email}
           </Text>
-        </View>
-      </View>
-    </View>
+        </Box>
+        <Box backgroundColor='danger'>
+          <Text h16>
+            Invoice
+          </Text>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

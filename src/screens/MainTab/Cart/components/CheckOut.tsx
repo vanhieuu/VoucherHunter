@@ -168,7 +168,7 @@ const CheckOut = ({minHeight}: CheckOutProps) => {
   return (
     <Box
       flex={1}
-      backgroundColor="background"
+      backgroundColor="secondary"
       padding="m"
       style={{paddingTop: minHeight}}>
       <Box flex={1} padding="m">

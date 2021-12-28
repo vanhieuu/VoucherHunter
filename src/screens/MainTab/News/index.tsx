@@ -1,7 +1,7 @@
-import { RouteProp, useRoute } from '@react-navigation/core';
+
 import React from 'react'
-import { Platform, StyleSheet, Text, UIManager, View } from 'react-native'
-import { MainTabParamList } from '../../../nav/MainTab';
+import { Platform, StyleSheet, UIManager} from 'react-native'
+
 import ListHorizontal from './components/ListHorizontal';
 
 

@@ -1,15 +1,12 @@
 import {
   NavigationProp,
-  RouteProp,
   useNavigation,
-  useRoute,
 } from '@react-navigation/core';
 import React from 'react';
 import {
   Dimensions,
   StyleSheet,
   TouchableOpacity,
-  useWindowDimensions,
 } from 'react-native';
 import {Card, Colors, Image, Text, View} from 'react-native-ui-lib';
 import {RootStackParamList} from '../../../../nav/RootStack';

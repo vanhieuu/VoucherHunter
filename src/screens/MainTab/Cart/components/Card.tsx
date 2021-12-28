@@ -28,7 +28,7 @@ const Card = ({card, selected, onSelected}: CardProps) => {
   return (
     <CardLayOut
       onPress={onSelected}
-      backgroundColor={selected ? 'primary' : 'background'}>
+      backgroundColor={selected ? 'primary' : 'secondary'}>
       <View style={{height: 20}}>
         <Image
           style={

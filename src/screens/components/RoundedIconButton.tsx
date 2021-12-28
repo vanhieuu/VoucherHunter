@@ -1,0 +1,24 @@
+import React from 'react'
+import { StyleSheet} from 'react-native'
+import { BorderlessButton} from 'react-native-gesture-handler'
+import RoundedIcon, { RoundedIconProps } from './RoundedIcon'
+
+
+interface RoundedIconButtonProps extends RoundedIconProps{
+    onPress:() => void
+}
+
+const RoundedIconButton = ({onPress,...props}:RoundedIconButtonProps) => {
+    return (
+        <BorderlessButton {...{onPress}}>
+            <RoundedIcon {...props}/>
+        </BorderlessButton>
+    )
+}
+RoundedIconButton.defaultProps= {
+    iconRatio:0.7   
+}
+
+export default RoundedIconButton
+
+const styles = StyleSheet.create({})

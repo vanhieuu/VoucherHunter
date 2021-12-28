@@ -9,7 +9,7 @@ interface AddCardProps {}
 
 const AddCard = () => {
   return (
-    <CardLayOut onPress={() => true} backgroundColor="background">
+    <CardLayOut onPress={() => true} backgroundColor="secondary">
       <Box
         flex={1}
         justifyContent="center"
