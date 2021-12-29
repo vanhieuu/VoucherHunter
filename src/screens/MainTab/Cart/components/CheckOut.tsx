@@ -1,26 +1,15 @@
-import {useTheme} from '@shopify/restyle';
-import {debounce, method} from 'lodash';
 import React from 'react';
 import {Alert, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
-
 import {Text, View, Colors} from 'react-native-ui-lib';
-import {useDispatch, useSelector} from 'react-redux';
-
-import {Theme} from 'react-toastify';
+import {useSelector} from 'react-redux';
 import Box from '../../../../components/Box';
 import URL from '../../../../config/Api';
-
 import {numberFormat} from '../../../../config/formatCurrency';
-import {
-  IProduct,
-  onAddToCart,
-  onGetTotalPrice,
-  onUpdateQuantity,
-} from '../../../../redux/authCartSlice';
+import {IProduct} from '../../../../redux/authCartSlice';
 import {RootState} from '../../../../redux/store';
 
 import AddCard from './AddCard';
-import {getAuthAsync} from './AsynStoreCart';
+
 import Card, {CardType} from './Card';
 
 interface CheckOutProps {
@@ -64,18 +53,10 @@ interface ICart {
 
 const CheckOut = ({minHeight}: CheckOutProps) => {
   const [selectedCard, setSelectedCard] = React.useState(cards[0].id);
-  // console.log(selectedCard === 0 ? 'Visa' : 'COD');
-  const [card, setCard] = React.useState('');
-  // selectedCard === 0 ? setCard('VISA'): setCard('COD')
-
   const [address, setAddress] = React.useState<addressProps>(initStateAddress);
   const addressDetail = JSON.stringify(address);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
-  // console.log(itemCart);
-  // const [itemCarts, setItemCarts] = React.useState<ICart[]>([]);
-  const [quantity, setQuantity] = React.useState<number>(0);
-
   const [loading, setLoading] = React.useState<boolean>(true);
   const [mounted, setMounted] = React.useState<boolean>(false);
   const [price, setPrice] = React.useState<number>(0);
@@ -191,16 +172,13 @@ const CheckOut = ({minHeight}: CheckOutProps) => {
             Phương thức thanh toán
           </Text>
           <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>
-              {selectedCard ? 'COD' : 'VISA'}
-            </Text>
+            {selectedCard ? 'COD' : 'VISA'}
+          </Text>
           <Box flexDirection="row" opacity={0.5}>
-          
             <Box
               justifyContent="center"
               alignItems="center"
-              paddingVertical="m">
-            
-            </Box>
+              paddingVertical="m"></Box>
           </Box>
           <Box flexDirection="row" paddingVertical="s">
             <Box flex={1}>
@@ -209,20 +187,14 @@ const CheckOut = ({minHeight}: CheckOutProps) => {
               </Text>
             </Box>
             <Box>
-              <Text color={Colors.primary}>
-                {/* {numberFormat.format(itemCart?.map((item)=>item.totalPrice).reduceRight((a,b) => a +b,0))} */}
-                {numberFormat.format(price)}
-              </Text>
+              <Text color={Colors.primary}>{numberFormat.format(price)}</Text>
             </Box>
           </Box>
         </Box>
       </Box>
 
       <View flex-end>
-        <TouchableOpacity
-          style={styles.btnDelete}
-          //   onPress={() => setQuantity(quantity + 1)}
-          onPress={onPressCheckOut}>
+        <TouchableOpacity style={styles.btnDelete} onPress={onPressCheckOut}>
           <Text style={{fontSize: 20, lineHeight: 22}}>Thanh toán</Text>
         </TouchableOpacity>
       </View>

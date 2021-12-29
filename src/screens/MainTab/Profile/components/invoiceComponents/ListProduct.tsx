@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlatList, ScrollView, StyleSheet} from 'react-native';
+import {FlatList, ScrollView, SectionList, StyleSheet} from 'react-native';
 
 import URL from '../../../../../config/Api';
 import {View} from 'react-native-ui-lib';
@@ -16,7 +16,7 @@ interface Props {
     | undefined;
 }
 
-const ListProduct = ({ListHeaderComponent}: Props) => {
+const ListProduct = () => {
   const refFooter = React.useRef<RefFooter>(null);
   const refListOrder = React.useRef<FlatList>(null);
   const [loading, setLoading] = React.useState(false);
@@ -49,20 +49,20 @@ const ListProduct = ({ListHeaderComponent}: Props) => {
     return <Footer ref={refFooter} />;
   }, []);
   return (
-    <View paddingV-20 style={{alignSelf: 'center'}} flex>
+    
       <FlatList
         ref={refListOrder}
         data={invoice}
         horizontal={false}
-        scrollEnabled={true}
+        // scrollEnabled={true}
         renderItem={({item}) => {
           return <ItemInvoice items={item} />;
         }}
         keyExtractor={(item, index) => item._id.toString()}
-        ListHeaderComponent={ListHeaderComponent}
-        ListFooterComponent={renderListFooter}
+      
       />
-    </View>
+     
+   
   );
 };
 

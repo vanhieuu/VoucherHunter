@@ -1,5 +1,4 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
 import * as IconlyPack from 'react-native-iconly';
 import {Colors} from 'react-native-ui-lib';
 import Box from '../../../../components/Box';
@@ -29,4 +28,4 @@ const AddCard = () => {
 
 export default AddCard;
 
-const styles = StyleSheet.create({});
+

@@ -8,6 +8,7 @@ import {numberFormat} from '../../../../config/formatCurrency';
 import {getAuthAsync, IAuth} from '../../../../redux/authSlice';
 import {RootState} from '../../../../redux/store';
 import {InvoiceProps} from '../../../../types/InvoiceType';
+import ItemInvoice from './invoiceComponents/ItemInvoice';
 import ListProduct from './invoiceComponents/ListProduct';
 import StatusInvoice from './invoiceComponents/StatusInvoice';
 
@@ -77,9 +78,23 @@ const GetInvoice = () => {
         </Text>
       </Box>
       <Box padding="m">
-        <TabInvoice  tabs={invoiceType}>
-            <ListProduct ListHeaderComponent={undefined}/>
-          </TabInvoice>
+{/*         
+      <FlatList
+        data={invoice}
+        showsVerticalScrollIndicator={true}
+        horizontal={false}
+        // scrollEnabled={true}
+        renderItem={({item}) => {
+          return <ItemInvoice items={item} />;
+        }}
+        keyExtractor={(item, index) => item._id.toString()}
+      
+      /> */}
+       <ScrollView>
+         {invoice.map((item,index) =>(
+           <ItemInvoice   items={item} key={index}  />
+         ))}
+       </ScrollView>
       </Box>
     </ScrollView>
   );
