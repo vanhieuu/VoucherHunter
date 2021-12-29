@@ -60,8 +60,7 @@ const SignIn = () => {
         //login fail
         if (!accessToken) {
           Alert.alert('Sai thông tin đăng nhập ', json.message);
-
-          return setLoading(true);
+          setLoading(false);
         }
         //login Success
         console.log(json.accessToken)

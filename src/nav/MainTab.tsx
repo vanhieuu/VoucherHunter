@@ -13,6 +13,7 @@ import { IProduct } from '../types/IProduct';
 import { RootState } from '../redux/store';
 import { useSelector } from 'react-redux';
 import URL from '../config/Api';
+import { StatusBar } from 'react-native';
 
 interface ICart {
   _id: string;
@@ -73,7 +74,7 @@ const MainTab = () => {
   React.useEffect(()=>{
     fetchApi()
   },[itemCart.length])
-
+  const [hidden, setHidden] = React.useState(true);
 
   const { navigate } = useNavigation<NavigationProp<RootStackParamList>>()
   return (
@@ -105,6 +106,8 @@ const MainTab = () => {
               headerRight={({ tintColor }) => {
                 return (
                   <View row>
+                      <StatusBar
+                    hidden={hidden} />
                     <Button
                       iconSource={Assets.iconHeader.ic_search}
                       style={{ width: 40, height: 40 }}
@@ -118,7 +121,7 @@ const MainTab = () => {
               }}
               headerStyle={{
                 backgroundColor: Colors.white,
-                elevation: 0,
+                elevation:1,
               }}
               headerTintColor={Colors.black}
             />

@@ -16,7 +16,7 @@ interface Props {
 
 const HeaderDetail = ({scrollY, title}: Props) => {
   const opacity = scrollY.interpolate({
-    inputRange: [0, 120],
+    inputRange: [0, 100],
     outputRange: [0, 1],
   });
 
@@ -29,8 +29,8 @@ const HeaderDetail = ({scrollY, title}: Props) => {
         flexDirection: 'row',
         position: 'absolute',
         zIndex: 1,
-        height: getStatusBarHeight(true),
-        width: '100%',
+        height: getStatusBarHeight(false),
+        width: '12%',
       }}>
       <TouchableOpacity
         style={{
@@ -41,7 +41,6 @@ const HeaderDetail = ({scrollY, title}: Props) => {
         <Icon.ArrowLeft
           size={20}
           color={Colors.primary}
-          set="bulk"
           stroke="bold"
         />
       </TouchableOpacity>

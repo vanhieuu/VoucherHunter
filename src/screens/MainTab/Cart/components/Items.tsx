@@ -2,28 +2,20 @@ import React from 'react';
 import {Dimensions, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import Box from '../../../../components/Box';
 import {Spacings, Text, View} from 'react-native-ui-lib';
-
 import {IProduct} from '../../../../types/IProduct';
 import {numberFormat} from '../../../../config/formatCurrency';
 import SwipeableRow from './SwipeableRow';
-
 import {useTheme} from '@shopify/restyle';
 import {Theme} from 'react-toastify';
-
-import {debounce} from 'lodash';
 import URL from '../../../../config/Api';
-
-import {getAuthAsync, IAuth} from '../../../../redux/authSlice';
-import {IAuthRegister} from '../../../../redux/authRegisterSlice';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../../../redux/store';
 import {
   onUpdateQuantity,
   onAddToCart,
-  onGetTotalPrice,
+
 } from '../../../../redux/authCartSlice';
 import { saveAuthAsync } from './AsynStoreCart';
-
 interface ICart {
   _id: string;
   product_id: IProduct;

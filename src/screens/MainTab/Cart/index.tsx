@@ -1,14 +1,7 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {useTheme} from '@shopify/restyle';
 import React from 'react';
-import {
-  
-  Dimensions,
-  ScrollView,
-  StyleSheet,
- 
-  
-} from 'react-native';
+import {Dimensions, ScrollView, StyleSheet} from 'react-native';
 import {Header} from 'react-native-elements';
 import {Colors, Text} from 'react-native-ui-lib';
 import {useDispatch, useSelector} from 'react-redux';
@@ -16,7 +9,7 @@ import Box from '../../../components/Box';
 import {Theme} from '../../../components/theme';
 import URL from '../../../config/Api';
 import {RootStackParamList} from '../../../nav/RootStack';
-import {onAddToCart} from '../../../redux/authCartSlice';;
+import {onAddToCart} from '../../../redux/authCartSlice';
 import {IAuthRegister} from '../../../redux/authRegisterSlice';
 import {getAuthAsync, IAuth} from '../../../redux/authSlice';
 import {RootState} from '../../../redux/store';
@@ -24,7 +17,7 @@ import {IProduct} from '../../../types/IProduct';
 import CartContainer from './components/CartContainer';
 import CheckOut from './components/CheckOut';
 import Items from './components/Items';
-
+import * as Icon from 'react-native-iconly';
 const {width} = Dimensions.get('window');
 const height = 120 * (width / 375);
 interface ICart {
@@ -45,8 +38,6 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [mounted, setMounted] = React.useState<boolean>(false);
   const dispatch = useDispatch();
-
-
 
   React.useEffect(() => {
     const controller = new AbortController();
@@ -188,7 +179,20 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
             }}></Text>
         </Box>
       </Box>
-      <Box></Box>
+      <Box justifyContent="center" alignContent="center" alignSelf="center" marginBottom='xl'>
+        <Box
+          style={styles.containerIcon}>
+          <Icon.ArrowUpSquare size={20} color="#000" />
+        </Box>
+
+        <Text
+          textAlign="center"
+          style={{fontWeight: 'bold', fontSize: 15}}
+          color="#000"
+          marginB-10>
+          Vuốt lên để thanh toán
+        </Text>
+      </Box>
     </CartContainer>
   );
 };
@@ -214,4 +218,10 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     marginHorizontal: 20,
   },
+  containerIcon:{
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
+
 });

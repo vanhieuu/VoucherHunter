@@ -16,7 +16,7 @@ interface TabProps {
   children: ReactNode;
 }
 const {width} = Dimensions.get('window');
-const Tab = ({tabs, children}: TabProps) => {
+const TabInvoice = ({tabs, children}: TabProps) => {
   //   const [selectedTab, setSelectedTab] = React.useState(tabs[0]);
   const [index, setIndex] = React.useState(0);
   const ScrollX = React.useRef(new Animated.Value(0)).current;
@@ -27,7 +27,8 @@ const Tab = ({tabs, children}: TabProps) => {
     () => [index, width * 0.25, width * 0.75],
     [index],
   );
-  const translateX = mix(index, width * 0.25, width * 0.75);
+//   const translateX = mix(index, width * 0.15, width * 0.45);
+const translateX = mix(index, width * 0.23, width * 0.70);
   const scale = ScrollX.interpolate({
     inputRange,
     outputRange: [0.75, 1, 0.75],
@@ -46,9 +47,9 @@ const Tab = ({tabs, children}: TabProps) => {
             style={{flex: 1}}
             onPress={() => setIndex(index)}>
             <Box
-              paddingBottom="xl"
-              padding="m"
-              style={{paddingBottom: theme.spacing.m + 2}}>
+              paddingBottom="l"
+              padding="s"
+              style={{paddingBottom: 5 }}>
               <Text style={styles.txtStyle}>{tab.label}</Text>
             </Box>
           </TouchableOpacity>
@@ -61,7 +62,7 @@ const Tab = ({tabs, children}: TabProps) => {
         style={{
           width: width * tabs.length,
           flexDirection: 'row',
-          transform: [{translateX: multiply(-width, index)}],
+          transform: [{translateX: multiply(width, index)}],
         }}>
         {Children.map(children, (child, index) => (
           <Box flex={1} key={index} width={width}>
@@ -73,12 +74,12 @@ const Tab = ({tabs, children}: TabProps) => {
   );
 };
 
-export default Tab;
+export default TabInvoice;
 
 const styles = StyleSheet.create({
   txtStyle: {
     textAlign: 'center',
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: 'bold',
     lineHeight: 20,
   },
@@ -87,8 +88,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     backgroundColor: Colors.primary,
-    width: 10,
-    height: 10,
+    width: 4,
+    height: 4,
     borderRadius: 5,
   },
 });

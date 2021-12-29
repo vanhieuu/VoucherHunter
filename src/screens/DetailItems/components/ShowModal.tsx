@@ -19,7 +19,7 @@ const ShowModal = ({item}: {item: IProduct}) => {
   const registerToken = useSelector<RootState, string>(
     state => state.register.accessToken,
   );
-  const token = useSelector<RootState,string>(state => state.auth.accessToken)
+  const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const product = route.params.item;
   const id = product._id;
   const dispatch = useDispatch();
@@ -78,7 +78,7 @@ const ShowModal = ({item}: {item: IProduct}) => {
       .then(json => {
         Alert.alert(json.message);
         dispatch(onAddToCart(json));
-        console.log(onAddToCart(json))
+        console.log(onAddToCart(json));
       })
       .catch(err => {
         console.error(err);
@@ -92,7 +92,6 @@ const ShowModal = ({item}: {item: IProduct}) => {
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
-        
           setModalVisible(!modalVisible);
         }}>
         <View style={styles.centeredView}>
@@ -132,33 +131,16 @@ const ShowModal = ({item}: {item: IProduct}) => {
               <Text style={{fontSize: 25, fontWeight: 'bold'}}>x</Text>
             </Pressable>
           </View>
-          <Pressable
-            style={{
-              marginBottom: 100,
-              alignItems: 'center',
-              alignSelf: 'stretch',
-              backgroundColor: '#f5f5f5',
-              borderRadius: 10,
-              marginHorizontal: 10,
-              borderColor: Colors.black,
-              height: 60,
-              borderWidth: 0.6,
-            }}
-            onPress={addItemCart}>
+          <Pressable style={styles.buttonClose} onPress={addItemCart}>
             <Text
-              style={{
-                fontSize: 20,
-                fontWeight: 'bold',
-                alignSelf: 'center',
-                marginTop: 12,
-              }}>
+              style={styles.modalText}>
               Thêm vào giỏ hàng
             </Text>
           </Pressable>
         </View>
       </Modal>
       <Pressable
-        style={[ styles.buttonOpen]}
+        style={[styles.buttonOpen]}
         onPress={() => setModalVisible(true)}>
         <Text style={styles.textStyle}>Thêm vào giỏ hàng</Text>
       </Pressable>
@@ -171,7 +153,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    
   },
   modalView: {
     backgroundColor: Colors.white,
@@ -191,23 +172,38 @@ const styles = StyleSheet.create({
   },
   buttonOpen: {
     backgroundColor: '#E9707D',
-    marginHorizontal:20,
-    height:45,
-    width: '100%',
-
+    marginHorizontal: 20,
+    height: 45,
+    width: '80%',
+    borderRadius: 5,
+    marginBottom:1
   },
   buttonClose: {
-    backgroundColor: '#E9707D',
+    marginBottom: 100,
     alignItems: 'center',
+    alignSelf: 'stretch',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 20,
+    marginHorizontal: 10,
+    borderColor: Colors.black,
+    height: 60,
+    borderWidth: 0.6,
   },
   textStyle: {
     color: 'black',
     fontWeight: 'bold',
     textAlign: 'center',
+    marginTop:12
   },
   modalText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    alignSelf: 'center',
+    marginTop: 12,
+    color: '#000',
     marginBottom: 2,
     textAlign: 'center',
+   
   },
 });
 

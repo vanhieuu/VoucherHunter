@@ -145,7 +145,6 @@ const CheckOut = ({minHeight}: CheckOutProps) => {
       });
   }, []);
 
-
   // React.useEffect(() => {
   //   setLoading(true);
   //   const controller = new AbortController();
@@ -189,27 +188,18 @@ const CheckOut = ({minHeight}: CheckOutProps) => {
         </Box>
         <Box marginTop="l">
           <Text color="#fff" h16 bold marginB-10>
-            Địa chỉ giao hàng
+            Phương thức thanh toán
           </Text>
+          <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>
+              {selectedCard ? 'COD' : 'VISA'}
+            </Text>
           <Box flexDirection="row" opacity={0.5}>
-            <Box flex={1} paddingVertical="m" opacity={0.5}>
-              <Text color="#fff" h13>
-                {address.number}
-              </Text>
-              <Text color="#fff" h13>
-                {address.street}
-              </Text>
-              <Text color="#fff" h13>
-                {address.city}
-              </Text>
-            </Box>
+          
             <Box
               justifyContent="center"
               alignItems="center"
               paddingVertical="m">
-              <TouchableOpacity>
-                <Text color="#fff">Change</Text>
-              </TouchableOpacity>
+            
             </Box>
           </Box>
           <Box flexDirection="row" paddingVertical="s">
@@ -225,17 +215,17 @@ const CheckOut = ({minHeight}: CheckOutProps) => {
               </Text>
             </Box>
           </Box>
-
-          <View>
-            <TouchableOpacity
-              style={styles.btnDelete}
-              //   onPress={() => setQuantity(quantity + 1)}
-              onPress={onPressCheckOut}>
-              <Text style={{fontSize: 20, lineHeight: 22}}>Thanh toán</Text>
-            </TouchableOpacity>
-          </View>
         </Box>
       </Box>
+
+      <View flex-end>
+        <TouchableOpacity
+          style={styles.btnDelete}
+          //   onPress={() => setQuantity(quantity + 1)}
+          onPress={onPressCheckOut}>
+          <Text style={{fontSize: 20, lineHeight: 22}}>Thanh toán</Text>
+        </TouchableOpacity>
+      </View>
     </Box>
   );
 };
@@ -250,7 +240,7 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 10,
     width: '90%',
-    marginVertical: 10,
+    marginVertical: 5,
     borderWidth: 0,
     marginHorizontal: 20,
   },

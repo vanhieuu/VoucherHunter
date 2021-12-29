@@ -23,6 +23,7 @@ import {spacing, useTheme} from '@shopify/restyle';
 import Header from '../../components/Header';
 import Tab from './components/Tab';
 import GetInvoice from './components/GetInvoice';
+import EditInfo from './components/EditInfo';
 
 
 const {width}= Dimensions.get('window');
@@ -79,8 +80,8 @@ const Profile = () => {
   }, []);
 
   return (
-    <Box flex={1} backgroundColor='background'>
-      <Box flex={0.2} backgroundColor="background">
+    <Box flex={1} backgroundColor='background' >
+      <Box flex={0.15} backgroundColor="background">
         <Box
           position="absolute"
           top={0}
@@ -91,10 +92,10 @@ const Profile = () => {
           backgroundColor="secondary">
         <Header left={{
           icon:'arrow-left',
-          onPress:() => navigate('MainTab')
+          onPress:()=>{console.log('click')}
         }} 
         title='Cá nhân'        
-        dark
+          
         />
         </Box>
       </Box>
@@ -102,7 +103,7 @@ const Profile = () => {
         <Box
           position="absolute"
           left={width / 2 - 50}
-          top={-50}
+          top={-40}
           width={100}
           height={100}
           style={{borderRadius: 50}}
@@ -123,6 +124,7 @@ const Profile = () => {
         tabs={tabs}
         >
           <GetInvoice/>
+          <EditInfo/>
         </Tab>
       </Box>
     </Box>

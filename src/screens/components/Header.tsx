@@ -40,7 +40,7 @@ const Header = ({left, right, title, dark}: HeaderProps) => {
         align={backgroundColor === undefined ? 'flex-start' : 'center'}
         {...{colors, backgroundColor}}
       />
-      <Text h20 textAlign="center" {...{colors}}>
+      <Text h20 textAlign="center" style={{color:'#fff'}}>
         {title.toUpperCase()}
       </Text>
       {right ? (

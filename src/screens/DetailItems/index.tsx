@@ -5,6 +5,7 @@ import {
   Dimensions,
   Platform,
   StyleSheet,
+  TouchableOpacity,
   UIManager,
 } from 'react-native';
 
@@ -16,13 +17,14 @@ import {numberFormat} from '../../config/formatCurrency';
 import HeaderDetail from './components/HeaderDetail';
 import {FONTS} from '../../config/Typo';
 import ShowModal from './components/ShowModal';
+import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 
 // if (Platform.OS === 'android') {
 //   if (UIManager.setLayoutAnimationEnabledExperimental) {
 //     UIManager.setLayoutAnimationEnabledExperimental(true);
 //   }
 // }
-const widthBanner = Dimensions.get('screen').width;
+const widthBanner = Dimensions.get('window').width;
 const heightBanner = (widthBanner / 1200) * 1000;
 
 const ItemBanner = ({image}: {image: string}) => {
@@ -46,7 +48,10 @@ const DetailItems = () => {
   const scrollY = React.useRef(new Animated.Value(0)).current;
   const [textShown, setTextShown] = React.useState(false);
   const [lengthMore, setLengthMore] = React.useState(false);
-
+  const opacity = scrollY.interpolate({
+    inputRange: [0, 120],
+    outputRange: [0, 1],
+  });
   const toggleNumberOfLines = () => {
     setTextShown(!textShown);
   };
@@ -56,8 +61,7 @@ const DetailItems = () => {
 
   return (
     <View style={{flex: 1, backgroundColor: '#FFF'}}>
-      <HeaderDetail scrollY={scrollY} title={product.name} />
-
+        <HeaderDetail scrollY={scrollY} title={''} />
       <Animated.ScrollView
         onScroll={Animated.event(
           [
@@ -95,7 +99,7 @@ const DetailItems = () => {
           </Carousel>
         </View>
 
-        <Text h28 marginH-16 marginV-5>
+        <Text style={{fontSize:26,fontWeight: 'bold'}} marginH-16 marginV-5>
           {product.name}
         </Text>
         <View row centerV marginH-16 paddingV-4>
@@ -168,4 +172,23 @@ export default DetailItems;
 
 const styles = StyleSheet.create({
   viewMoreText: {lineHeight: 21, fontSize: 12, fontFamily: FONTS.Heavy},
+  HeaderContainer:{
+    paddingBottom: 12,
+    flexDirection: 'row',
+    position: 'absolute',
+    zIndex: 1,
+    height: getStatusBarHeight(false),
+    width: '100%',
+  },
+  HeaderTitle:{
+    backgroundColor: '#FFF',
+    ...StyleSheet.absoluteFillObject,
+    zIndex: -1,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.grey60,
+    paddingBottom: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
+
 });

@@ -1,41 +1,13 @@
-import {useTheme} from '@shopify/restyle';
 import React, {ReactNode} from 'react';
-import {
-  Alert,
-  Button,
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {
-  gestureHandlerRootHOC,
-  PanGestureHandler,
-  PanGestureHandlerGestureEvent,
-} from 'react-native-gesture-handler';
-import LinearGradient from 'react-native-linear-gradient';
+import {Dimensions, StyleSheet} from 'react-native';
+
 import Animated, {
   Transition,
   Transitioning,
   TransitioningView,
-  useAnimatedGestureHandler,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
 } from 'react-native-reanimated';
-import {snapPoint} from 'react-native-redash';
-import {Colors} from 'react-native-ui-lib';
-import Box from '../../../../components/Box';
-import {Theme} from '../../../../components/theme';
-import * as Icon from 'react-native-iconly';
-import {IProduct} from '../../../../types/IProduct';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../../../../redux/store';
 
-import URL from '../../../../config/Api';
-import {debounce} from 'lodash';
+import {IProduct} from '../../../../types/IProduct';
 
 interface ICart {
   _id: string;
@@ -51,10 +23,6 @@ interface SwipeableRowProps {
 }
 
 const {width} = Dimensions.get('window');
-const aspectRatio = width / 375;
-const editWidth = 85 * aspectRatio;
-const finalDes = width / 375;
-const snapPoints = [-85 * aspectRatio, 0, finalDes];
 
 const transition = (
   <Transition.Together>
@@ -63,9 +31,7 @@ const transition = (
   </Transition.Together>
 );
 
-const SwipeableRow = ({
-  children
-}: SwipeableRowProps) => {
+const SwipeableRow = ({children}: SwipeableRowProps) => {
   const ref = React.useRef<TransitioningView>(null);
 
   return (

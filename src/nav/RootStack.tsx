@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, Alert } from 'react-native';
+import { ActivityIndicator, Alert, StatusBar } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import OnboardingScreen from '../screens/Onboarding';
@@ -43,12 +43,16 @@ export type RootStackParamList = {
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-
+const STYLES = ['default', 'dark-content', 'light-content'];
+const TRANSITIONS = ['fade', 'slide', 'none'];
 const RootStack = () => {
   const statusAuth = useSelector<RootState, EStatusAuth>(
     state => state.auth.statusAuth,
   );
-
+  const [hidden, setHidden] = React.useState(false);
+  const changeStatusBarVisibility = () => setHidden(hidden);
+  const [statusBarStyle, setStatusBarStyle] = React.useState(STYLES[0]);
+  const [statusBarTransition, setStatusBarTransition] = React.useState(TRANSITIONS[0]);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const dispatch = useDispatch();
   const checkLogin = React.useCallback(async () => {
@@ -100,6 +104,7 @@ const RootStack = () => {
 
   return (
     <NavigationContainer>
+     
       <Stack.Navigator initialRouteName="SignIn">
         {statusAuth === EStatusAuth.unauth ? (
           <>

@@ -37,8 +37,6 @@ const DetailNews = () => {
           backgroundColor: '#f5f5f5',
           justifyContent: 'space-around',
         }}
-        
-       
         barStyle="light-content"
         statusBarProps={{barStyle: 'light-content'}}
         leftComponent={{onPress: () => goBack()}}
