@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 import URL from '../../../config/Api';
 import {IResUser, IUser} from '../../../redux/authSlice';
 import {RootState} from '../../../redux/store';
-import {Colors, Text, View, Image} from 'react-native-ui-lib';
+import {Text, Image} from 'react-native-ui-lib';
 
 import {
   IResUserRegister,
@@ -19,23 +19,25 @@ import {
 import {MainTabParamList} from '../../../nav/MainTab';
 import Box from '../../../components/Box';
 import {RootStackParamList} from '../../../nav/RootStack';
-import {spacing, useTheme} from '@shopify/restyle';
+import {useTheme} from '@shopify/restyle';
 import Header from '../../components/Header';
 import Tab from './components/Tab';
 import GetInvoice from './components/GetInvoice';
 import EditInfo from './components/EditInfo';
 
-
-const {width}= Dimensions.get('window');
-const tabs = [{
-  id: 'invoice', label:'Đơn hàng đã mua '
-},
-{
-  id:'info', label:'Thông tin cá nhân'
-}
-]
+const {width} = Dimensions.get('window');
+const tabs = [
+  {
+    id: 'invoice',
+    label: 'Đơn hàng đã mua ',
+  },
+  {
+    id: 'info',
+    label: 'Thông tin cá nhân',
+  },
+];
 const Profile = () => {
-  const theme = useTheme()
+  const theme = useTheme();
   const {navigate} = useNavigation<NavigationProp<RootStackParamList>>();
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const registerToken = useSelector<RootState, string>(
@@ -50,7 +52,7 @@ const Profile = () => {
     const controller = new AbortController();
     const signal = controller.signal;
     fetch(URL.ValidateToken, {
-      signal:signal,
+      signal: signal,
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -61,8 +63,8 @@ const Profile = () => {
       .then(response => response.json())
       .then((json: IResUser | IResUserRegister) => {
         setUsers(json.user);
-        console.log(json,'user');
-        
+        console.log(json, 'user');
+
         setLoading(false);
         return clearTimeout(Timer1);
       })
@@ -80,7 +82,7 @@ const Profile = () => {
   }, []);
 
   return (
-    <Box flex={1} backgroundColor='background' >
+    <Box flex={1} backgroundColor="background">
       <Box flex={0.15} backgroundColor="background">
         <Box
           position="absolute"
@@ -90,13 +92,15 @@ const Profile = () => {
           bottom={0}
           borderBottomRightRadius="xl"
           backgroundColor="secondary">
-        <Header left={{
-          icon:'arrow-left',
-          onPress:()=>{console.log('click')}
-        }} 
-        title='Cá nhân'        
-          
-        />
+          <Header
+            left={{
+              icon: 'arrow-left',
+              onPress: () => {
+                console.log('click');
+              },
+            }}
+            title="Cá nhân"
+          />
         </Box>
       </Box>
       <Box flex={0.8}>
@@ -106,25 +110,21 @@ const Profile = () => {
           top={-40}
           width={100}
           height={100}
-          style={{borderRadius: 50}}
-
-          >
+          style={{borderRadius: 50}}>
           <Image
             source={{uri: user?.photoUrl}}
             resizeMode="contain"
             style={styles.img}
           />
         </Box>
-        <Box marginVertical="m" style={{marginTop: 50 +  theme.spacing.m}}>
+        <Box marginVertical="m" style={{marginTop: 50 + theme.spacing.m}}>
           <Text h16 black style={{textAlign: 'center'}}>
             {user?.email}
           </Text>
         </Box>
-        <Tab
-        tabs={tabs}
-        >
-          <GetInvoice/>
-          <EditInfo/>
+        <Tab tabs={tabs}>
+          <GetInvoice />
+          <EditInfo />
         </Tab>
       </Box>
     </Box>

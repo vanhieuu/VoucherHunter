@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlatList, ScrollView, StyleSheet, Text, View} from 'react-native';
+import { ScrollView, StyleSheet, Text} from 'react-native';
 import {Colors} from 'react-native-ui-lib';
 import {useSelector} from 'react-redux';
 import Box from '../../../../components/Box';
@@ -9,24 +9,6 @@ import {getAuthAsync, IAuth} from '../../../../redux/authSlice';
 import {RootState} from '../../../../redux/store';
 import {InvoiceProps} from '../../../../types/InvoiceType';
 import ItemInvoice from './invoiceComponents/ItemInvoice';
-import ListProduct from './invoiceComponents/ListProduct';
-import StatusInvoice from './invoiceComponents/StatusInvoice';
-
-import TabInvoice from './TabInvoice';
-
-
-
-
-
-const invoiceType = [
-  {
-    label:'Mã đơn hàng', id: 'products'
-  },{
-    label:'Trạng thái đơn hàng',id:'paymentStatus'
-  }
-]
-
-
 
 
 
@@ -34,6 +16,9 @@ const GetInvoice = () => {
   const [invoice, setInvoice] = React.useState<InvoiceProps[]>([]);
   const [loading, setLoading] = React.useState(false);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
+
+
+  
   const fetchApi = React.useCallback(async () => {
     const controller = new AbortController();
     const signal = controller.signal;
@@ -68,7 +53,7 @@ const GetInvoice = () => {
         <Text>
           Tổng số tiền bạn đã chi:{' '}
           <Text
-            style={{fontSize: 16, fontWeight: 'bold', color: Colors.primary}}>
+            style={styles.txt}>
             {numberFormat.format(
               invoice
                 .map(item => item.totalDiscountPrice)
@@ -76,20 +61,10 @@ const GetInvoice = () => {
             )}
           </Text>
         </Text>
-      </Box>
+      </Box>  
       <Box padding="m">
-{/*         
-      <FlatList
-        data={invoice}
-        showsVerticalScrollIndicator={true}
-        horizontal={false}
-        // scrollEnabled={true}
-        renderItem={({item}) => {
-          return <ItemInvoice items={item} />;
-        }}
-        keyExtractor={(item, index) => item._id.toString()}
       
-      /> */}
+
        <ScrollView>
          {invoice.map((item,index) =>(
            <ItemInvoice   items={item} key={index}  />
@@ -103,9 +78,5 @@ const GetInvoice = () => {
 export default GetInvoice;
 
 const styles = StyleSheet.create({
-  txt: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
-  },
+  txt: {fontSize: 16, fontWeight: 'bold', color: '#e9707d'},
 });

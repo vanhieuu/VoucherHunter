@@ -1,9 +1,9 @@
 import React, {Children, ReactNode} from 'react';
 import {Dimensions, StyleSheet, TouchableOpacity} from 'react-native';
-import {RectButton} from 'react-native-gesture-handler';
+
 import {Colors, Text} from 'react-native-ui-lib';
 import Box from '../../../../components/Box';
-import {spacing, useTheme} from '@shopify/restyle';
+import { useTheme} from '@shopify/restyle';
 import Animated from 'react-native-reanimated';
 import {mix} from 'react-native-redash';
 import {multiply} from 'lodash';
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     left: 0,
-    backgroundColor: Colors.primary,
+    backgroundColor:'#E9707D',
     width: 10,
     height: 10,
     borderRadius: 5,

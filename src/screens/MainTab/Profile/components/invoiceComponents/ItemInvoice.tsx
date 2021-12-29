@@ -15,10 +15,10 @@ const ItemInvoice = ({items}: {items: InvoiceProps}) => {
         numberOfLines={2}
         color={'#000'}
         marginH-12>
-        Trạng thái đơn hàng :
+        
         <Text style={styles.txt} color="#8CCE46">
           {' '}
-          {items.paymentStatus}
+          {items.paymentStatus === 1 ? 'Đặt hàng thành công' : 'Đang xử lý...'}
         </Text>
       </Text>
       <TouchableOpacity onPress={() => true}>
