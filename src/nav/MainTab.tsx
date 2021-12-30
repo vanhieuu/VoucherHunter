@@ -105,7 +105,7 @@ const MainTab = () => {
               headerTitleAlign="left"
               headerRight={({ tintColor }) => {
                 return (
-                  <View row>
+                  <View row marginR-12>
                       <StatusBar
                     hidden={hidden} />
                     <Button

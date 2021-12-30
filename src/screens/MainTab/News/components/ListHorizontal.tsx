@@ -7,10 +7,10 @@ import {
   UIManager,
 } from 'react-native';
 import {View} from 'react-native-ui-lib';
-import { useSelector} from 'react-redux';
+import { useDispatch, useSelector} from 'react-redux';
 import URL from '../../../../config/Api';
 import {
-  INewsData,
+  INewsData, onUpdatePageNumber,
 } from '../../../../redux/newSlice';
 import {RootState} from '../../../../redux/store';
 import Footer, { RefFooter } from '../../Cart/components/Footer';
@@ -67,18 +67,18 @@ const reducerCart=(state :IStateNews ,action:IActionCart):IStateNews =>{
 
 
 const ListHorizontal = () => {
-  const [stateNews,dispatch] = React.useReducer(reducerCart,initStateNews)
+  // const [stateNews,dispatch] = React.useReducer(reducerCart,initStateNews)
   const [news, setNews] = React.useState<INewsData[]>([]);
   const [loading, setLoading] = React.useState(false);
   const refFooter = React.useRef<RefFooter>(null)
   const refListOrder  = React.useRef<FlatList>(null);
-
+  
   // const [pageNumber, setPageNumber] = React.useState(1);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const page = useSelector<RootState, number>(state => state.news.page);
   const componentMounted = React.useRef(true);
 
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const onRefresh = React.useCallback(() =>{
     dispatch({type:'onRefreshLoading'});
     setTimeout(() =>{
@@ -86,27 +86,26 @@ const ListHorizontal = () => {
     },2000)
 },[])
 
-const onEndReached = React.useCallback(() =>{
-  refFooter.current?.setIsLoadmore(true);
-   setTimeout(() => {
-       setNews(prev => prev.concat(initDataNews));
-       refFooter.current?.setIsLoadmore(false)
-   },500)
-},[])
+// const onEndReached = React.useCallback(() =>{
+//   refFooter.current?.setIsLoadmore(true);
+//    setTimeout(() => {
+//        setNews(prev => prev.concat(initDataNews));
+//        refFooter.current?.setIsLoadmore(false)
+//    },500)
+// },[])
 
 
 
 
 
-  // const onEndReached = React.useCallback(() => {
-  //   setLoading(true);
-  //     dispatch(onUpdatePageNumber({page: page + 1}));
-  //     console.log(onUpdatePageNumber({page: page + 1}))
-  //     setNews(prev => prev.concat())
-  //     setLoading(false)
-    
-  //   console.log(page);
-  // }, [page]);
+  const onEndReached = React.useCallback(() => {
+   
+      dispatch(onUpdatePageNumber({page: page + 1}));
+      console.log(onUpdatePageNumber({page: page + 1}))
+      setNews(prev => prev.concat())
+      refFooter.current?.setIsLoadmore(false)
+    console.log(page);
+  }, [page]);
 
   React.useEffect(() => {
     const controller = new AbortController();
@@ -163,11 +162,10 @@ const onEndReached = React.useCallback(() =>{
         }}
         numColumns={2}
         key={2}
-        ListFooterComponent={renderListFooter }
+        ListFooterComponent={renderListFooter}
         onEndReached={onEndReached}
-        refreshing={stateNews.refreshing}
-        onRefresh={onRefresh}
         onEndReachedThreshold={0.5}
+        onRefresh={onRefresh}
         keyExtractor={(item, index) => index.toString()}
       />
     </View>

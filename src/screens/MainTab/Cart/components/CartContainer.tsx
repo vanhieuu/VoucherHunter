@@ -1,6 +1,6 @@
-import {backgroundColor, useTheme} from '@shopify/restyle';
+import { useTheme} from '@shopify/restyle';
 import React, {FC, ReactNode} from 'react';
-import {Dimensions, StyleSheet, Text, View} from 'react-native';
+import {Dimensions, StyleSheet,  View} from 'react-native';
 import {
   gestureHandlerRootHOC,
   PanGestureHandler,

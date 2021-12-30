@@ -138,6 +138,7 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
         </Box>
       </Box>
       <Box flex={1}>
+        
         <ScrollView
           style={{
             borderBottomRightRadius: theme.borderRadii.xl,

@@ -43,7 +43,7 @@ const GetInvoice = () => {
   }, []);
   console.log(
     invoice
-    .map(item => item)
+    .map(item => item.products.map(item=>item.quantity))
     ,'aaa'
   );
 
