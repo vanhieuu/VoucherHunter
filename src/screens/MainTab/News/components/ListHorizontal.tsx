@@ -7,13 +7,11 @@ import {
   UIManager,
 } from 'react-native';
 import {View} from 'react-native-ui-lib';
-import { useDispatch, useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import URL from '../../../../config/Api';
-import {
-  INewsData, onUpdatePageNumber,
-} from '../../../../redux/newSlice';
+import {INewsData, onUpdatePageNumber} from '../../../../redux/newSlice';
 import {RootState} from '../../../../redux/store';
-import Footer, { RefFooter } from '../../Cart/components/Footer';
+import Footer, {RefFooter} from '../../Cart/components/Footer';
 
 import ItemCard from './ItemCard';
 
@@ -22,7 +20,7 @@ if (Platform.OS === 'android') {
     UIManager.setLayoutAnimationEnabledExperimental(true);
   }
 }
-const initDataNews:INewsData[] =[
+const initDataNews: INewsData[] = [
   {
     _id: '',
     title: '',
@@ -30,80 +28,73 @@ const initDataNews:INewsData[] =[
     content: '',
     created_at: '',
     updated_at: '',
-    image:'',
-  }
-]
+    image: '',
+  },
+];
 
-
-interface IStateNews{
-  dataNews:INewsData[],
-  refreshing:boolean,
+interface IStateNews {
+  dataNews: INewsData[];
+  refreshing: boolean;
 }
-interface IActionCart{
-  type:string
+interface IActionCart {
+  type: string;
 }
-const initStateNews ={
-  dataNews:initDataNews,
-  refreshing:false
+const initStateNews = {
+  dataNews: initDataNews,
+  refreshing: false,
 };
-const reducerCart=(state :IStateNews ,action:IActionCart):IStateNews =>{
-        switch (action.type) {
-            case 'onEndReached':
-                return {
-                    ...state,
-                    dataNews:state.dataNews.concat(initDataNews)
-                }
-            case 'onRefreshLoading':
-                return {
-                    ...state,
-                    refreshing:true
-                }
-            case 'onRefresh':
-               return initStateNews
-               default:
-                   return initStateNews
-        }
-}
-
+const reducerCart = (state: IStateNews, action: IActionCart): IStateNews => {
+  switch (action.type) {
+    case 'onEndReached':
+      return {
+        ...state,
+        dataNews: state.dataNews.concat(initDataNews),
+      };
+    case 'onRefreshLoading':
+      return {
+        ...state,
+        refreshing: true,
+      };
+    case 'onRefresh':
+      return initStateNews;
+    default:
+      return initStateNews;
+  }
+};
 
 const ListHorizontal = () => {
   // const [stateNews,dispatch] = React.useReducer(reducerCart,initStateNews)
   const [news, setNews] = React.useState<INewsData[]>([]);
   const [loading, setLoading] = React.useState(false);
-  const refFooter = React.useRef<RefFooter>(null)
-  const refListOrder  = React.useRef<FlatList>(null);
-  
+  const refFooter = React.useRef<RefFooter>(null);
+  const refListOrder = React.useRef<FlatList>(null);
+
   // const [pageNumber, setPageNumber] = React.useState(1);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const page = useSelector<RootState, number>(state => state.news.page);
   const componentMounted = React.useRef(true);
 
   const dispatch = useDispatch();
-  const onRefresh = React.useCallback(() =>{
-    dispatch({type:'onRefreshLoading'});
-    setTimeout(() =>{
-        dispatch({type:'onRefresh'});
-    },2000)
-},[])
+  const onRefresh = React.useCallback(() => {
+    dispatch({type: 'onRefreshLoading'});
+    setTimeout(() => {
+      dispatch({type: 'onRefresh'});
+    }, 2000);
+  }, []);
 
-// const onEndReached = React.useCallback(() =>{
-//   refFooter.current?.setIsLoadmore(true);
-//    setTimeout(() => {
-//        setNews(prev => prev.concat(initDataNews));
-//        refFooter.current?.setIsLoadmore(false)
-//    },500)
-// },[])
-
-
-
-
+  // const onEndReached = React.useCallback(() =>{
+  //   refFooter.current?.setIsLoadmore(true);
+  //    setTimeout(() => {
+  //        setNews(prev => prev.concat(initDataNews));
+  //        refFooter.current?.setIsLoadmore(false)
+  //    },500)
+  // },[])
 
   const onEndReached = React.useCallback(() => {
-   
-      dispatch(onUpdatePageNumber({page: page + 1}));
-      console.log(onUpdatePageNumber({page: page + 1}))
-      setNews(prev => prev.concat())
-      refFooter.current?.setIsLoadmore(false)
+    dispatch(onUpdatePageNumber({page: page + 1}));
+    console.log(onUpdatePageNumber({page: page + 1}));
+    setNews(prev => prev.concat());
+    refFooter.current?.setIsLoadmore(false);
     console.log(page);
   }, [page]);
 
@@ -145,12 +136,9 @@ const ListHorizontal = () => {
     };
   }, [page]);
 
-  const renderListFooter = React.useCallback(() =>{
-    return(
-        <Footer ref={refFooter}/>
-    )
-},[])
-
+  const renderListFooter = React.useCallback(() => {
+    return <Footer ref={refFooter} />;
+  }, []);
 
   return (
     <View paddingV-20 style={{alignSelf: 'center'}} flex>
