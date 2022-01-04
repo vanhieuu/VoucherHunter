@@ -1,18 +1,16 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import React from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {BackHandler, ScrollView, StyleSheet} from 'react-native';
+import { Text, View } from 'react-native-ui-lib';
 import Box from '../../../../components/Box';
-import ListedButton, { ListButtonProps } from './invoiceComponents/ListButton';
-
-
+import {RootStackParamList} from '../../../../nav/RootStack';
+import ListedButton from './invoiceComponents/ListButton';
 
 const initDataCheck = [
   {
-    label: 'Quên mật khẩu',
-    value: 'Forget Password',
-  },
-  {
     label: 'Đổi mật khẩu',
-    value: 'Change Password',
+    value: 'ChangePassword',
   },
   {
     label: 'Đăng xuất',
@@ -20,22 +18,40 @@ const initDataCheck = [
   },
 ];
 
-
 const EditInfo = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  const clearAsyncStorage = async() => {
+    AsyncStorage.clear();
+    console.log(AsyncStorage.clear())
+}
+
   return (
     <ScrollView>
+      <Box padding="m"></Box>
       <Box padding="m">
+        <ScrollView>
+          {initDataCheck.map((item, index) => (
+            <ListedButton
+              items={item}
+              key={index}
+              label={item.label}
+              value={item.value}
+              onPress={()=>{
+                if(item.label === 'Đăng xuất'){
+                  clearAsyncStorage()
+                  // navigation.navigate('SignIn')
+                  BackHandler.exitApp()
+                }
+                navigation.navigate('ChangePassword')
+              }}
+            />
+            // <View>
+            //   <Text key={item.value}>{item.label}</Text>
+            // </View>
+          ))}
+        </ScrollView>
        
-      
-      </Box>  
-      <Box padding="m">
-      
-
-       <ScrollView>
-         {initDataCheck.map((item,index) =>(
-           <ListedButton   items={item} key={index} label={item.label} value={item.value}  />
-         ))}
-       </ScrollView>
       </Box>
     </ScrollView>
   );

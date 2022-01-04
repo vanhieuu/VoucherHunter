@@ -1,6 +1,7 @@
 
 import React from 'react'
 import { Platform, StyleSheet, UIManager} from 'react-native'
+import { View } from 'react-native-ui-lib';
 
 import ListHorizontal from './components/ListHorizontal';
 
@@ -13,7 +14,10 @@ if (Platform.OS === 'android') {
 const News = () => { 
 
   return (
+    
     <ListHorizontal/>
+   
+
   )
 }
 

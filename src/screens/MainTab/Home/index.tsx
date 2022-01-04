@@ -13,30 +13,11 @@ const heightImg = (widthImg / 375) * 256;
 
 const Home = () => {
 
-  React.useEffect(() => {
-    const backAction = () => {
-      Alert.alert("Chờ đã ", "Bạn có chắc là muốn thoát App 😭?", [
-        {
-          text: "Cancel",
-          onPress: () => null,
-          style: "cancel"
-        },
-        { text: "YES", onPress: () => BackHandler.exitApp() }
-      ]);
-      return true;
-    };
-
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
-
-    return () => backHandler.remove();
-  }, []);
+ 
 
 
   return (
-    <View flex backgroundColor={Colors.primary} marginT-50>
+    <View flex backgroundColor={Colors.primary} marginT-40>
       <Image
         assetGroup="imgNewScreen"
         assetName="ic_bg"

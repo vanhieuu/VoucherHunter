@@ -15,7 +15,8 @@ const URL = {
   removeItem: MainURL + '/cart/auth/removeitem',
   removeAll: MainURL + '/cart/auth/removeall',
   createInvoice: MainURL + '/invoice/auth/create',
-  getInvoice: MainURL + '/auth/invoice'
+  getInvoice: MainURL + '/auth/invoice',
+  changePassword: MainURL + '/auth/changepwd'
 };
 export default URL;
 

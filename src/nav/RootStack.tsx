@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, Alert, StatusBar } from 'react-native';
+import { ActivityIndicator, Alert } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import OnboardingScreen from '../screens/Onboarding';
@@ -12,6 +12,7 @@ import {
   EStatusAuth,
   getAuthAsync,
   IAuth,
+  IUser,
   onLogin,
   updateStatusAuth,
 } from '../redux/authSlice';
@@ -23,13 +24,17 @@ import SignIn from '../screens/SignIn';
 import URL from '../config/Api';
 import Search from '../screens/Search';
 import { Colors, View } from 'react-native-ui-lib';
-import Payment from '../screens/Payment';
+import ChangePassword from '../screens/ChangePassword';
+
+
+
 
 
 export type RootStackParamList = {
   Onboarding: undefined;
   SignIn: undefined;
   SignUp: undefined;
+  ChangePassword:undefined;
   MainTab: undefined;
   DetailItems: {
     item: IProduct;
@@ -38,24 +43,24 @@ export type RootStackParamList = {
     item: INewsData;
   };
   Search: undefined;
-  Payment:undefined;
+  
 
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-const STYLES = ['default', 'dark-content', 'light-content'];
-const TRANSITIONS = ['fade', 'slide', 'none'];
+
 const RootStack = () => {
   const statusAuth = useSelector<RootState, EStatusAuth>(
     state => state.auth.statusAuth,
   );
-  const [hidden, setHidden] = React.useState(false);
-  const changeStatusBarVisibility = () => setHidden(hidden);
-  const [statusBarStyle, setStatusBarStyle] = React.useState(STYLES[0]);
-  const [statusBarTransition, setStatusBarTransition] = React.useState(TRANSITIONS[0]);
+
+
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const dispatch = useDispatch();
-  const checkLogin = React.useCallback(async () => {
+
+
+
+  const checkLogin = async () => {
     const auth: IAuth | null = await getAuthAsync();
     if (auth) {
       fetch(URL.CheckToken, {
@@ -74,23 +79,28 @@ const RootStack = () => {
           const error = json.error; 
           const success = json.success;
           //token fail
-          if (!success) {
+          if (!token) {
             Alert.alert('Đã hết phiên đăng nhập', 'vui lòng đăng nhập lại ');
             dispatch(updateStatusAuth({ statusAuth: EStatusAuth.unauth }));
+            console.log(updateStatusAuth({ statusAuth: EStatusAuth.unauth }))
+            console.log(statusAuth)
             return;
+          }else{
+            dispatch(onLogin(auth));
+            console.log(statusAuth)
+            return json;
           }
           //token success
-          dispatch(onLogin(auth));
-          return json;
+         
         });
     } else {
       dispatch(updateStatusAuth({ statusAuth: EStatusAuth.unauth }));
     }
-  }, []);
+  };
 
   React.useEffect(() => {
     checkLogin();
-  }, []);
+  }, [statusAuth]);
 
 
 
@@ -104,7 +114,6 @@ const RootStack = () => {
 
   return (
     <NavigationContainer>
-     
       <Stack.Navigator initialRouteName="SignIn">
         {statusAuth === EStatusAuth.unauth ? (
           <>
@@ -118,7 +127,15 @@ const RootStack = () => {
               component={SignIn}
               options={{ headerShown: false }}
             />
-
+              <Stack.Screen
+              name="SignUp"
+              component={SignUp}
+              options={{
+                headerShown: true,
+              }}
+            />
+          
+          
           </>
         ) : (
           <>
@@ -128,13 +145,7 @@ const RootStack = () => {
               options={{ headerShown: false }}
 
             />
-            <Stack.Screen
-              name="SignUp"
-              component={SignUp}
-              options={{
-                headerShown: true,
-              }}
-            />
+           <Stack.Screen name='ChangePassword' component={ChangePassword}  options={{ headerShown: false }}/>
             <Stack.Screen
               name="DetailItems"
               component={DetailItems}
@@ -154,14 +165,6 @@ const RootStack = () => {
                 headerShown: true,
               }}
             />
-              <Stack.Screen
-              name="Payment"
-              component={Payment}
-              options={{
-                headerShown: true,
-              }}
-            />
-
           </>
         )}
       </Stack.Navigator>

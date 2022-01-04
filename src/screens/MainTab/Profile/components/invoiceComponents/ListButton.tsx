@@ -1,10 +1,6 @@
 import React from 'react';
-import {Image, StyleSheet, TouchableOpacity} from 'react-native';
+import {StyleSheet, TouchableOpacity} from 'react-native';
 import {Text, View} from 'react-native-ui-lib';
-import {numberFormat} from '../../../../../config/formatCurrency';
-import {InvoiceProps} from '../../../../../types/InvoiceType';
-import dayjs from 'dayjs';
-import Box from '../../../../../components/Box';
 
 export interface ListButtonProps {
   label: string;
@@ -12,22 +8,21 @@ export interface ListButtonProps {
 }
 interface Props extends ListButtonProps {
   items: ListButtonProps;
+  onPress: () => void;
 }
 
-
-const ListedButton = ({items}: Props) => {
+const ListedButton = ({items, onPress}: Props) => {
   return (
     <View>
-      <TouchableOpacity onPress={() => true}>
+      <TouchableOpacity onPress={onPress}>
         <View style={styles.container}>
-          <View style={{flex:1}}>
-              <View key={items.label}>
-                <Text style={styles.txt} color="#E9707D" marginV-10 marginL-10>
-                  {items.label}
-                </Text>
-                <View height={3} bg-dark80 marginT-12 />
-              </View>
-           
+          <View style={{flex: 1}}>
+            <View key={items.label}>
+              <Text style={styles.txt} color="#E9707D" marginV-10 marginL-10>
+                {items.label}
+              </Text>
+              <View height={3} bg-dark80 marginT-5 />
+            </View>
           </View>
         </View>
       </TouchableOpacity>
@@ -39,7 +34,7 @@ export default ListedButton;
 
 const styles = StyleSheet.create({
   txt: {
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   txtId: {
@@ -69,6 +64,4 @@ const styles = StyleSheet.create({
 
     flex: 1,
   },
- 
-
 });

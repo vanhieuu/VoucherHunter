@@ -23,24 +23,26 @@ const ItemCard = ({item}: {item: INewsData}) => {
     });
   }, []);
   const sourceTitle = {
-    html: `<span 
-    style="text-Color:'#000';
-    ">${item.title}</span>`,
+    html: `<h3 
+    style="text-Color:'#000'";
+    ">${item.title}</h3>`,
   };
 
   return (
-    <View backgroundColor="#ffff">
-      <TouchableOpacity onPress={onPressItem} style={{flexDirection: 'column'}}>
-        <View style={styles.container}>
-          <View>
-            <View flex marginH-12 marginL-60>
+    <View backgroundColor="#ffff" >
+      <TouchableOpacity onPress={onPressItem}>
+   
+        <View style={styles.container} padding-10>
+        <View  >
               <Image
-              source={{uri:item.image}}
-              style={{width:100,height: 80 }}
+              source={require('../../../../assets/Login.jpg')}
+              style={{width:100,height: 100 , marginHorizontal:10}}
               resizeMode="contain"
               />
             </View>
-            <View row marginV-15 marginR-20>
+          <View >
+           
+            <View row marginV-15>
               <View
                 br100
                 marginL-10
@@ -48,12 +50,12 @@ const ItemCard = ({item}: {item: INewsData}) => {
                 marginV-2
                 marginB-20
                 backgroundColor={Colors.black}>
-                <Text h8 color={Colors.white} marginR-12>
+                <Text h8 color={Colors.white} marginR-12  >
                   {item.created_at}
                 </Text>
               </View>
             </View>
-            <View>
+            <View >
               <RenderHTML source={sourceTitle} contentWidth={widthScreen} />
             </View>
           </View>
@@ -67,15 +69,16 @@ export default ItemCard;
 
 const styles = StyleSheet.create({
   container: {
-    width: widthScreen - 195,
+    width: widthScreen ,
     backgroundColor: '#f5f5f5',
     elevation: 1,
     alignSelf: 'center',
     marginBottom: 5,
-    flexDirection: 'column',
-    justifyContent: 'center',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     height: widthScreen - 280,
+   
   },
   contentItem: {
     overflow: 'hidden',

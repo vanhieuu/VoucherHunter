@@ -67,7 +67,7 @@ const ListHorizontal = () => {
   const [news, setNews] = React.useState<INewsData[]>([]);
   const [loading, setLoading] = React.useState(false);
   const refFooter = React.useRef<RefFooter>(null);
-  const refListOrder = React.useRef<FlatList>(null);
+
 
   // const [pageNumber, setPageNumber] = React.useState(1);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
@@ -75,21 +75,10 @@ const ListHorizontal = () => {
   const componentMounted = React.useRef(true);
 
   const dispatch = useDispatch();
-  const onRefresh = React.useCallback(() => {
-    dispatch({type: 'onRefreshLoading'});
-    setTimeout(() => {
-      dispatch({type: 'onRefresh'});
-    }, 2000);
-  }, []);
 
-  // const onEndReached = React.useCallback(() =>{
-  //   refFooter.current?.setIsLoadmore(true);
-  //    setTimeout(() => {
-  //        setNews(prev => prev.concat(initDataNews));
-  //        refFooter.current?.setIsLoadmore(false)
-  //    },500)
-  // },[])
 
+
+ 
   const onEndReached = React.useCallback(() => {
     dispatch(onUpdatePageNumber({page: page + 1}));
     console.log(onUpdatePageNumber({page: page + 1}));
@@ -141,19 +130,18 @@ const ListHorizontal = () => {
   }, []);
 
   return (
-    <View paddingV-20 style={{alignSelf: 'center'}} flex>
+    <View paddingV-20 style={{alignSelf: 'center'}} >
       <FlatList
         showsHorizontalScrollIndicator={true}
         data={news}
         renderItem={({item}) => {
           return <ItemCard item={item} />;
         }}
-        numColumns={2}
-        key={2}
+        // numColumns={2}
+        // key={2}
         ListFooterComponent={renderListFooter}
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
-        onRefresh={onRefresh}
         keyExtractor={(item, index) => index.toString()}
       />
     </View>
