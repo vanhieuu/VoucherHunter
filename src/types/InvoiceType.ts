@@ -12,6 +12,7 @@ export interface InvoiceProps {
       listPrice: number;
       discountPrice: number;
       quantity: number;
+      img:string
     },
   ];
   totalListPrice: number;

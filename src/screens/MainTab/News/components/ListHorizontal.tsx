@@ -140,6 +140,7 @@ const ListHorizontal = () => {
         // numColumns={2}
         // key={2}
         ListFooterComponent={renderListFooter}
+        initialNumToRender={7}
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
         keyExtractor={(item, index) => index.toString()}

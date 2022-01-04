@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {BackHandler, ScrollView, StyleSheet} from 'react-native';
-import { Text, View } from 'react-native-ui-lib';
 import Box from '../../../../components/Box';
 import {RootStackParamList} from '../../../../nav/RootStack';
 import ListedButton from './invoiceComponents/ListButton';
@@ -46,9 +45,7 @@ const EditInfo = () => {
                 navigation.navigate('ChangePassword')
               }}
             />
-            // <View>
-            //   <Text key={item.value}>{item.label}</Text>
-            // </View>
+            
           ))}
         </ScrollView>
        

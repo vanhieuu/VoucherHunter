@@ -46,6 +46,7 @@ const GetInvoice = () => {
     .map(item => item.products.map(item=>item.quantity))
     ,'aaa'
   );
+  console.log(invoice)
 
   return (
     <ScrollView>

@@ -15,16 +15,18 @@ const ItemInvoice = ({items}: {items: InvoiceProps}) => {
         numberOfLines={2}
         color={'#000'}
         marginH-12>
-        <Text style={styles.txt} color="#F7CA02">
+          {/* {items.paymentStatus === 1 ? 'Paid' : ''} */}
+        <Text style={styles.txt} color={items.paymentStatus === 3 ? 'green' : '#F7CA02'}>
           {' '}
-          {items.paymentStatus === 1 ? 'Đặt hàng thành công' : 'Đang xử lý...'}
+          {items.paymentStatus === 3 ? 'Đặt hàng thành công' : 'Đang xử lý...'}
+       
         </Text>
       </Text>
       <TouchableOpacity onPress={() => true}>
         <View style={styles.container}>
           <View style={styles.imgContainer}>
             <Image
-              source={require('../../../../../assets/icon-shopee.png')}
+              source={require('../../../../../assets/icon-shopee.jpg')}
               style={styles.imgStyle}
               resizeMode="contain"
             />
