@@ -12,7 +12,6 @@ import {
   EStatusAuth,
   getAuthAsync,
   IAuth,
-  IUser,
   onLogin,
   updateStatusAuth,
 } from '../redux/authSlice';
@@ -79,15 +78,12 @@ const RootStack = () => {
           const error = json.error; 
           const success = json.success;
           //token fail
-          if (!token) {
+          if (success === false) {
             Alert.alert('Đã hết phiên đăng nhập', 'vui lòng đăng nhập lại ');
             dispatch(updateStatusAuth({ statusAuth: EStatusAuth.unauth }));
-            console.log(updateStatusAuth({ statusAuth: EStatusAuth.unauth }))
-            console.log(statusAuth)
             return;
           }else{
             dispatch(onLogin(auth));
-            console.log(statusAuth)
             return json;
           }
           //token success
@@ -116,7 +112,7 @@ const RootStack = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="SignIn">
         {statusAuth === EStatusAuth.unauth ? (
-          <>
+          <Stack.Navigator>
             <Stack.Screen
               name="Onboarding"
               component={OnboardingScreen}
@@ -135,10 +131,9 @@ const RootStack = () => {
               }}
             />
           
-          
-          </>
+          </Stack.Navigator>
         ) : (
-          <>
+          <Stack.Navigator>
             <Stack.Screen
               name='MainTab'
               component={MainTab}
@@ -165,7 +160,7 @@ const RootStack = () => {
                 headerShown: true,
               }}
             />
-          </>
+          </Stack.Navigator>
         )}
       </Stack.Navigator>
     </NavigationContainer>
