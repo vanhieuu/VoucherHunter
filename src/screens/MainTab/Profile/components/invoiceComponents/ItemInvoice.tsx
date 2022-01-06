@@ -26,7 +26,7 @@ const ItemInvoice = ({items}: {items: InvoiceProps}) => {
         <View style={styles.container}>
           <View style={styles.imgContainer}>
             <Image
-              source={require('../../../../../assets/icon-shopee.jpg')}
+              source={require('../../../../../assets/CreateAccountImg.png')}
               style={styles.imgStyle}
               resizeMode="contain"
             />

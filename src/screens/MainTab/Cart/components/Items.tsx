@@ -212,7 +212,7 @@ const [price,setPrice] = React.useState(0)
             style={styles.btnDelete}
             //   onPress={() => setQuantity(quantity + 1)}
             onPress={onDelete}>
-            <Image source={require('../../../../assets/plus.png')} />
+            <Image source={require('../../../../assets/Trash.png')} />
           </TouchableOpacity>
         </View>
       </Box>

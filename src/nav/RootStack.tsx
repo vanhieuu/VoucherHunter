@@ -112,7 +112,7 @@ const RootStack = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="SignIn">
         {statusAuth === EStatusAuth.unauth ? (
-          <Stack.Navigator>
+          <>
             <Stack.Screen
               name="Onboarding"
               component={OnboardingScreen}
@@ -131,9 +131,9 @@ const RootStack = () => {
               }}
             />
           
-          </Stack.Navigator>
+          </>
         ) : (
-          <Stack.Navigator>
+          <>
             <Stack.Screen
               name='MainTab'
               component={MainTab}
@@ -160,7 +160,7 @@ const RootStack = () => {
                 headerShown: true,
               }}
             />
-          </Stack.Navigator>
+          </>
         )}
       </Stack.Navigator>
     </NavigationContainer>
