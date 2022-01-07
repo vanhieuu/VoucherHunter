@@ -1,5 +1,10 @@
 import React from 'react';
-import {StyleSheet, Dimensions, LayoutAnimation, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  Dimensions,
+  LayoutAnimation,
+  TouchableOpacity,
+} from 'react-native';
 import {Carousel, Colors, View, Image} from 'react-native-ui-lib';
 import {useSelector} from 'react-redux';
 import URL from '../../../../config/Api';
@@ -32,7 +37,7 @@ const ItemBanner = ({image}: {image: string}) => {
 };
 
 const Banner = () => {
-  const [loading, setLoading] = React.useState(true); 
+  const [loading, setLoading] = React.useState(true);
   const [product, setProduct] = React.useState<IProduct[]>([]);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const componentMounted = React.useRef(true);
@@ -84,20 +89,20 @@ const Banner = () => {
           inactiveColor: Colors.white,
         }}
         pageControlPosition={Carousel.pageControlPositions.OVER}>
-        {product.map((image, i) => {
+        {product.map((item, i) => {
           return (
             <View flex centerV key={i}>
-              <TouchableOpacity onPress={()=>{
-
-              }}>
-              <Image
-                overlayType={Image.overlayTypes.BOTTOM}
-                style={{flex: 1}}
-                source={{
-                  uri: image.listphotos.find(item => item !== undefined),
-                }}
-              />
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => {}}>
+                {item.listphotos.map(image => (
+                  <Image
+                    overlayType={Image.overlayTypes.BOTTOM}
+                    style={{flex: 1}}
+                    source={{
+                      uri: image,
+                    }}
+                  />
+                ))}
+              </TouchableOpacity>
             </View>
           );
         })}
