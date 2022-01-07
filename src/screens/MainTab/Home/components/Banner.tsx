@@ -91,10 +91,11 @@ const Banner = () => {
         pageControlPosition={Carousel.pageControlPositions.OVER}>
         {product.map((item, i) => {
           return (
-            <View flex centerV key={i}>
+            <View flex centerV key={i.toString()}>
               <TouchableOpacity onPress={() => {}}>
-                {item.listphotos.map(image => (
+                {item.listphotos.map((image,index) => (
                   <Image
+                  key={index}
                     overlayType={Image.overlayTypes.BOTTOM}
                     style={{flex: 1}}
                     source={{
