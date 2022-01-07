@@ -109,8 +109,7 @@ const widthScreen = Dimensions.get('window').width;
 
 
 const Items = ({items, onDelete}: Props) => {
-  const theme = useTheme<Theme>();
-  const height = 120 + Spacings.s2 * 2;
+
   // const [quantity, setQuantity] = React.useState(items.quantity);
   const [loading, setLoading] = React.useState<boolean>(false);
   const dispatch = useDispatch();
@@ -120,7 +119,7 @@ const Items = ({items, onDelete}: Props) => {
   const [itemQuantity, setItemQuantity] = React.useState<ICart[]>([]);
 const [price,setPrice] = React.useState(0)
 
-  
+
 
   const putQuantity = React.useCallback(() => {
     const controller = new AbortController();

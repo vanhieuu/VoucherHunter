@@ -1,13 +1,13 @@
 import React from 'react';
-import { ActivityIndicator, Alert } from 'react-native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationContainer } from '@react-navigation/native';
+import {ActivityIndicator, Alert} from 'react-native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {NavigationContainer} from '@react-navigation/native';
 import OnboardingScreen from '../screens/Onboarding';
 import SignUp from '../screens/SignUp';
 import MainTab from './MainTab';
-import { IProduct } from '../types/IProduct';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
+import {IProduct} from '../types/IProduct';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../redux/store';
 import {
   EStatusAuth,
   getAuthAsync,
@@ -16,24 +16,19 @@ import {
   updateStatusAuth,
 } from '../redux/authSlice';
 import DetailItems from '../screens/DetailItems';
-
-import { INewsData } from '../redux/newSlice';
+import {INewsData} from '../redux/newSlice';
 import DetailNews from '../screens/DetailNews';
 import SignIn from '../screens/SignIn';
 import URL from '../config/Api';
 import Search from '../screens/Search';
-import { Colors, View } from 'react-native-ui-lib';
+import {Colors, View} from 'react-native-ui-lib';
 import ChangePassword from '../screens/ChangePassword';
-
-
-
-
 
 export type RootStackParamList = {
   Onboarding: undefined;
   SignIn: undefined;
   SignUp: undefined;
-  ChangePassword:undefined;
+  ChangePassword: undefined;
   MainTab: undefined;
   DetailItems: {
     item: IProduct;
@@ -42,8 +37,6 @@ export type RootStackParamList = {
     item: INewsData;
   };
   Search: undefined;
-  
-
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -53,11 +46,8 @@ const RootStack = () => {
     state => state.auth.statusAuth,
   );
 
-
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const dispatch = useDispatch();
-
-
 
   const checkLogin = async () => {
     const auth: IAuth | null = await getAuthAsync();
@@ -74,23 +64,22 @@ const RootStack = () => {
         }),
       })
         .then(response => response.json())
-        .then((json: { error: string, success: boolean }) => {
-          const error = json.error; 
+        .then((json: {error: string; success: boolean}) => {
+          const error = json.error;
           const success = json.success;
           //token fail
           if (!token) {
             Alert.alert('Đã hết phiên đăng nhập', 'vui lòng đăng nhập lại ');
-            dispatch(updateStatusAuth({ statusAuth: EStatusAuth.unauth }));
+            dispatch(updateStatusAuth({statusAuth: EStatusAuth.unauth}));
             return;
-          }else{
+          } else {
             dispatch(onLogin(auth));
             return json;
           }
           //token success
-         
         });
     } else {
-      dispatch(updateStatusAuth({ statusAuth: EStatusAuth.unauth }));
+      dispatch(updateStatusAuth({statusAuth: EStatusAuth.unauth}));
     }
   };
 
@@ -98,12 +87,10 @@ const RootStack = () => {
     checkLogin();
   }, [statusAuth]);
 
-
-
   if (statusAuth === EStatusAuth.check) {
     return (
       <View flex center>
-        <ActivityIndicator size='large' color={Colors.primary} />
+        <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     );
   }
@@ -116,52 +103,54 @@ const RootStack = () => {
             <Stack.Screen
               name="Onboarding"
               component={OnboardingScreen}
-              options={{ headerShown: false }}
-            />  
+              options={{headerShown: false}}
+            />
             <Stack.Screen
               name="SignIn"
               component={SignIn}
-              options={{ headerShown: false }}
+              options={{headerShown: false}}
             />
-              <Stack.Screen
+            <Stack.Screen
               name="SignUp"
               component={SignUp}
               options={{
                 headerShown: true,
               }}
             />
-          
           </>
         ) : (
           <>
             <Stack.Screen
-              name='MainTab'
+              name="MainTab"
               component={MainTab}
-              options={{ headerShown: false }}
-
-            />
-           <Stack.Screen name='ChangePassword' component={ChangePassword}  options={{ headerShown: false }}/>
-            <Stack.Screen
-              name="DetailItems"
-              component={DetailItems}
-              options={{ headerShown: false }}
-            />
-
-            <Stack.Screen
-              name="Search"
-              component={Search}
-              options={{ headerShown: true }}
-            />
-
-            <Stack.Screen
-              name="DetailNews"
-              component={DetailNews}
-              options={{
-                headerShown: true,
-              }}
+              options={{headerShown: false}}
             />
           </>
         )}
+        <Stack.Screen
+          name="ChangePassword"
+          component={ChangePassword}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="DetailItems"
+          component={DetailItems}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="Search"
+          component={Search}
+          options={{headerShown: true}}
+        />
+
+        <Stack.Screen
+          name="DetailNews"
+          component={DetailNews}  
+          options={{
+          headerShown: true,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
