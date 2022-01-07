@@ -78,7 +78,7 @@ const RootStack = () => {
           const error = json.error; 
           const success = json.success;
           //token fail
-          if (success === false) {
+          if (!token) {
             Alert.alert('Đã hết phiên đăng nhập', 'vui lòng đăng nhập lại ');
             dispatch(updateStatusAuth({ statusAuth: EStatusAuth.unauth }));
             return;

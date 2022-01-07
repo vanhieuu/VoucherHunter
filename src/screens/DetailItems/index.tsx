@@ -73,7 +73,7 @@ const DetailItems = () => {
               },
             },
           ],
-          {
+            {
             useNativeDriver: true,
           },
         )}>
@@ -93,37 +93,37 @@ const DetailItems = () => {
               inactiveColor: Colors.white,
             }}
             pageControlPosition={Carousel.pageControlPositions.OVER}>
-            {product.listphotos.map((image, i) => {
-              return <ItemBanner key={i.toString()} image={image} />;
+            {product?.listphotos.map((image, i) => {
+              return <ItemBanner key={i.toString()} image={image} /> || null;
             })}
           </Carousel>
         </View>
 
         <Text style={{fontSize:26,fontWeight: 'bold'}} marginH-16 marginV-5>
-          {product.name}
+          {product?.name}
         </Text>
         <View row centerV marginH-16 paddingV-4>
           <Icon.Calendar color={Colors.black} size={20} />
           <Text marginL-12>
-            Hết hạn: {dayjs(product.deletedAt).format('DD/MM/YYYY')}
+            Hết hạn: {dayjs(product?.deletedAt).format('DD/MM/YYYY')}
           </Text>
         </View>
         <View row centerV marginH-16 paddingV-3 marginB-5>
           <Icon.Discount color={Colors.black} size={20} />
           <Text marginL-12 color={Colors.primary}>
-            Giá ưu đãi: {numberFormat.format(product.discountPrice)}
+            Giá ưu đãi: {numberFormat.format(product?.discountPrice)}
           </Text>
         </View>
         <View row centerV marginH-16 paddingV-4 marginB-5>
           <Icon.Ticket color={Colors.black} size={20} />
           <Text marginL-12>Giá gốc:</Text>
           <Text style={{textDecorationLine: 'line-through'}} marginL-12>
-            {numberFormat.format(product.listedPrice)}
+            {numberFormat.format(product?.listedPrice)}
           </Text>
         </View>
         <View row centerV marginH-16 paddingV-4 marginB-5>
           <Icon.Ticket color={Colors.black} size={20} />
-          <Text marginL-12>Số lượng: {product.quantity}</Text>
+          <Text marginL-12>Số lượng: {product?.quantity}</Text>
         </View>
         <View row centerV marginH-13 paddingV-6 marginB-5>
           <Icon.Filter color={Colors.black} size={20} />
@@ -149,7 +149,7 @@ const DetailItems = () => {
               marginL-12
               onTextLayout={onTextLayout}
               numberOfLines={textShown ? undefined : 3}>
-              Mô tả: {product.description}
+              Mô tả: {product?.description}
             </Text>
           </View>
         </View>
@@ -171,7 +171,7 @@ const DetailItems = () => {
 export default DetailItems;
 
 const styles = StyleSheet.create({
-  viewMoreText: {lineHeight: 21, fontSize: 12, fontFamily: FONTS.Heavy},
+  viewMoreText: {lineHeight: 21, fontSize: 12, fontFamily: FONTS.Medium},
   HeaderContainer:{
     paddingBottom: 12,
     flexDirection: 'row',

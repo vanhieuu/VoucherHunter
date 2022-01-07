@@ -1,9 +1,9 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {useTheme} from '@shopify/restyle';
 import React from 'react';
-import {Dimensions, ScrollView, StyleSheet} from 'react-native';
+import {Alert, Dimensions, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
 import {Header} from 'react-native-elements';
-import {Colors, Text} from 'react-native-ui-lib';
+import {Colors, Text, View} from 'react-native-ui-lib';
 import {useDispatch, useSelector} from 'react-redux';
 import Box from '../../../components/Box';
 import {Theme} from '../../../components/theme';
@@ -29,10 +29,23 @@ interface ICart {
 interface Props {
   items: ICart;
 }
+interface addressProps {
+  number: string;
+  city: string;
+  street: string;
+}
+
+const initStateAddress: addressProps = {
+  number: '23 ngách 17/2',
+  city: 'Hà Nội',
+  street: 'Nguyễn Văn Lộc',
+};
 
 const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const theme = useTheme<Theme>();
+  const [address, setAddress] = React.useState<addressProps>(initStateAddress);
+  const addressDetail = JSON.stringify(address);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
@@ -70,6 +83,31 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
       // cancel the request before component unmounts
       controller.abort();
     };
+  }, []);
+  const onPressCheckOut = React.useCallback(async () => {
+    setLoading(true);
+    const controller = new AbortController();
+    const signal = controller.signal;
+    let dataToSend = {
+      note: 'NoNote',
+      deliveryAddress: addressDetail,
+      paymentMethod: 'COD',
+      items: itemCart,
+    };
+    await fetch(URL.createInvoice, {
+      signal: signal,
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(dataToSend),
+    })
+      .then(response => response.json())
+      .then(json => {
+        Alert.alert(json.message);
+      });
   }, []);
   const onDelete = React.useCallback(
     async _id => {
@@ -180,19 +218,14 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
             }}></Text>
         </Box>
       </Box>
-      <Box justifyContent="center" alignContent="center" alignSelf="center" marginBottom='xl'>
-        <Box
-          style={styles.containerIcon}>
-          <Icon.ArrowUpSquare size={20} color="#000" />
-        </Box>
+      <Box justifyContent="center" alignContent="center" alignSelf="center" marginBottom='m'>
+       
 
-        <Text
-          textAlign="center"
-          style={{fontWeight: 'bold', fontSize: 15}}
-          color="#000"
-          marginB-10>
-          Vuốt lên để thanh toán
-        </Text>
+        <View flex-end width-120>
+        <TouchableOpacity style={styles.btnCheckout} onPress={onPressCheckOut}>
+          <Text style={{fontSize: 20, lineHeight: 22}}>Thanh toán</Text>
+        </TouchableOpacity>
+      </View>
       </Box>
     </CartContainer>
   );
@@ -224,5 +257,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'center',
   },
-
+  btnCheckout: {
+    backgroundColor: '#E9707D',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 48,
+    borderRadius: 10,
+    width: '100%',
+    marginVertical: 5,
+    borderWidth: 0,
+    marginHorizontal: 10,
+  },
 });

@@ -15,6 +15,10 @@ import {IProduct} from '../../types/IProduct';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {debounce} from 'lodash';
 import LinearGradient from 'react-native-linear-gradient';
+import {numberFormat} from '../../config/formatCurrency';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {RootStackParamList} from '../../nav/RootStack';
+import {Input} from 'react-native-elements';
 
 interface ISection {
   title: string;
@@ -39,22 +43,18 @@ const Section = ({title, data}: ISection) => {
 };
 
 const Search = () => {
-  const dataFilterFood = [
-    'Cake',
-    'Soup',
-    'Main Course',
-    'Appetizer',
-    'Dessert',
-  ];
+  const {navigate} = useNavigation<NavigationProp<RootStackParamList>>();
 
   const [filterData, setFilterData] = React.useState<IProduct[]>([]);
   // const [dataFilter, setDataFilter] = React.useState(dataFilterFood);
   const [masterData, setMasterData] = React.useState<IProduct[]>([]);
   const [search, setSearch] = React.useState('');
-  filterData.map(item => item.tags);
 
   React.useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
     fetch(URL.item(''), {
+      signal: signal,
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -68,18 +68,19 @@ const Search = () => {
         setMasterData(json);
         return json;
       })
-      .catch(error => {
-        console.error(error);
+      .catch(err => {
+        if (err.name === 'AbortError') {
+          console.log('Success Abort');
+        } else {
+          console.error(err);
+        }
       });
+    return () => {
+      // cancel the request before component unmounts
+      controller.abort();
+    };
   }, [filterData]);
 
-  // const onchangeText = React.useCallback(
-  //   debounce(() => {
-  //     let result = filterData.filter((item) => item.name);
-  //     setFilterData(result);
-  //   }, 1000),
-  //   [filterData]//
-  // );
   const searchFilter = React.useCallback(
     debounce(text => {
       if (text) {
@@ -101,80 +102,72 @@ const Search = () => {
     [filterData],
   );
 
-  const renderItem = React.useCallback(({item}: {item: IProduct}) => {
-    return (
-      <View
-        style={{
-          justifyContent: 'space-between',
-          flex: 1,
-          alignSelf: 'center',
-        }}
-        marginV-20>
-        <Image
-          source={{uri: item.listphotos.find(element => element !== undefined)}}
-          width={120}
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            flex: 1,
-          }}
-          height={100}
-        />
-        <Text h10 paddingH-15 paddingV-15 style={{maxWidth: 150}}>
-          {item.name.toUpperCase()}
-        </Text>
-        <Text h10 paddingH-15 paddingV-15>
-          {item.listedPrice}
-        </Text>
-      </View>
-    );
-  }, []);
-
   return (
-    <View>
-      <TextInput
+    <View marginB-80 bg-white>
+      <Input
         style={styles.inputSearch}
+        inputContainerStyle={styles.inputContainer}
+        inputStyle={styles.inputText}
         placeholder="Tìm kiếm sản phẩm"
         placeholderTextColor="#e9707d"
         onChangeText={(text: string) => {
           searchFilter(text);
           // setSearch(text);
         }}
+        leftIcon={
+          <Icon
+            name="search"
+            size={20}
+            color='#E9707d'
+          />
+        }
+        autoCompleteType={undefined}
       />
 
-      <View style={styles.spaceFlex} />
+  
 
       <FlatList
         data={filterData}
         keyExtractor={(item, index) => index.toString()}
         renderItem={item => (
-          <View
-            style={{
-              justifyContent: 'space-between',
-              flex: 1,
-              alignSelf: 'center',
-            }}
-            marginV-20>
-            <Image
-              source={{
-                uri: item.item.listphotos.find(
-                  element => element !== undefined,
-                ),
-              }}
-              width={120}
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                flex: 1,
-              }}
-              height={100}
-            />
-            <Text h10 paddingH-15 paddingV-15 style={{maxWidth: 150}}>
-              {item.item.name.toUpperCase()}
-            </Text>
-            <Text h10 paddingH-15 paddingV-15>
-              {item.item.listedPrice}
-            </Text>
+          <View backgroundColor="#fff" style={styles.container} flex>
+            <TouchableOpacity
+              onPress={() => {
+                navigate('DetailItems', {
+                  item: item.item,
+                });
+                console.log(item);
+              }}>
+              <View style={styles.contentItem}>
+                <Image
+                  style={{
+                    height: 100,
+                    width: 150,
+                    alignSelf: 'center',
+                    borderRadius:3
+                  }}
+                  source={{uri: item.item.img}}
+                  resizeMode="contain"
+                />
+              </View>
+              <View>
+                <View>
+                  <View  marginB-11 marginL-20  >
+                    <Text
+                      style={{fontSize: 15,fontWeight: 'bold'}}
+                      marginT-10
+                      numberOfLines={2}
+                      color={'#6f6f6f'}
+                      marginL-20>
+                      {item.item.name}
+                    </Text>
+                    <Text style={{fontSize: 14,fontWeight: 'bold'}} color={'#E9707d'} marginL-20>
+                     Giá tiền:{numberFormat.format(item.item.listedPrice)}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
           </View>
         )}
         numColumns={2}
@@ -192,13 +185,22 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
   },
-  textInput: {
-    height: 40,
-    borderWidth: 1,
-    paddingLeft: 20,
-    margin: 5,
-    borderColor: Colors.primary,
-    backgroundColor: '#fff',
+  containerInput: {
+    width: '90%',
+    height: 58,
+    borderRadius: 100,
+    marginVertical: 10,
+    borderWidth: 3.5,
+  },
+  inputText: {
+    color: '#0779e4',
+    fontWeight: 'bold',
+    marginLeft: 8,
+    marginVertical: 0,
+  },
+  inputContainer: {
+    borderBottomWidth: 0,
+    
   },
   txtTitleSection: {
     fontSize: 15,
@@ -232,7 +234,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#000',
     lineHeight: 14,
-    marginLeft: 19,
+    marginHorizontal: 10,
+    borderRadius: 5,
+    borderWidth:0.5,
+    marginTop:5,
+    borderColor:'#E9707D'
   },
   linearButton: {
     marginHorizontal: 25,
@@ -252,5 +258,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 14,
     fontWeight: '700',
+  },
+  contentItem: {
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+    alignItems: 'center',
+    height: 100,
+    width: 200,
   },
 });

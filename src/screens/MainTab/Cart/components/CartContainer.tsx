@@ -1,6 +1,6 @@
-import { useTheme} from '@shopify/restyle';
+import {useTheme} from '@shopify/restyle';
 import React, {FC, ReactNode} from 'react';
-import {Dimensions, StyleSheet,  View} from 'react-native';
+import {Dimensions, StyleSheet, View} from 'react-native';
 import {
   gestureHandlerRootHOC,
   PanGestureHandler,
@@ -34,7 +34,7 @@ const snapPoints = [-(height - minHeight), 0];
 
 const CartContainer = gestureHandlerRootHOC(
   ({children, CheckOutComponent}: CartProps) => {
-    const [items,setItems] = React.useState<ICart[]>([])
+    const [items, setItems] = React.useState<ICart[]>([]);
     const theme = useTheme<Theme>();
     const translateY = useSharedValue(0);
     const onGestureEvent = useAnimatedGestureHandler<
@@ -72,44 +72,43 @@ const CartContainer = gestureHandlerRootHOC(
     return (
       <Box flex={1}>
         <CheckOutComponent minHeight={minHeight} />
-        <PanGestureHandler onGestureEvent={onGestureEvent}>
-          <Animated.View
-            style={[
-              {
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height,
-                backgroundColor: 'white',
-                borderBottomLeftRadius: theme.borderRadii.xl,
-                borderBottomRightRadius: theme.borderRadii.xl,
-              },
-              style,
-            ]}>
-            {children}
+
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height,
+              backgroundColor: 'white',
+              borderBottomLeftRadius: theme.borderRadii.xl,
+              borderBottomRightRadius: theme.borderRadii.xl,
+            },
+            style,
+          ]}>
+          {children}
+          <View
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: theme.borderRadii.xl,
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+            }}>
             <View
               style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: theme.borderRadii.xl,
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-              }}>
-              <View
-                style={{
-                  height: 5,
-                  backgroundColor: Colors.grey,
-                  width: (50 * width) / 375,
-                  borderRadius: (2.5 * width) / 375,
-                  marginBottom: Spacings.s2,
-                }}
-              />
-            </View>
-          </Animated.View>
-        </PanGestureHandler>
+                height: 5,
+                backgroundColor: Colors.grey,
+                width: (50 * width) / 375,
+                borderRadius: (2.5 * width) / 375,
+                marginBottom: Spacings.s2,
+              }}
+            />
+          </View>
+        </Animated.View>
       </Box>
     );
   },

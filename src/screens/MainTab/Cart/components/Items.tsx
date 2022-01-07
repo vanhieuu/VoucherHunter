@@ -168,7 +168,7 @@ const [price,setPrice] = React.useState(0)
 
 
   return (
-    <SwipeableRow onDelete={onDelete} items={items} height={height}>
+  
       <Box style={styles.container}>
         <Image
           source={{uri: items.product_id.img}}
@@ -212,11 +212,11 @@ const [price,setPrice] = React.useState(0)
             style={styles.btnDelete}
             //   onPress={() => setQuantity(quantity + 1)}
             onPress={onDelete}>
-            <Image source={require('../../../../assets/Trash.png')} />
+            <Image source={require('../../../../assets/Trash.png')}/>
           </TouchableOpacity>
         </View>
       </Box>
-    </SwipeableRow>
+    
   );
 };
 

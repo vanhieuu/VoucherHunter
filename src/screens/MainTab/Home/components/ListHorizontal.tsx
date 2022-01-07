@@ -97,9 +97,7 @@ const ListHorizontal = () => {
     <View paddingV-12 backgroundColor="#fff">
       <View row spread paddingH-16 centerV>
         <Text style={styles.text}>Sản phẩm nổi bật</Text>
-        <Text h15 color={Colors.dark70}>
-          Xem thêm
-        </Text>
+      
       </View>
       {loading ? (
         <View row paddingH-16 paddingV-12>
@@ -127,6 +125,7 @@ const ListHorizontal = () => {
           horizontal
           showsHorizontalScrollIndicator={true}
           data={product}
+          initialNumToRender={4}
           keyExtractor={item => item._id.toString()}
           contentContainerStyle={{paddingHorizontal: 16, paddingVertical: 12}}
           renderItem={({item}) => {

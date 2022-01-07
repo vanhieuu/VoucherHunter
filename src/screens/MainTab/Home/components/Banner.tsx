@@ -1,9 +1,10 @@
 import React from 'react';
-import {
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
+import {StyleSheet, Dimensions, LayoutAnimation, TouchableOpacity} from 'react-native';
 import {Carousel, Colors, View, Image} from 'react-native-ui-lib';
+import {useSelector} from 'react-redux';
+import URL from '../../../../config/Api';
+import {RootState} from '../../../../redux/store';
+import {IProduct} from '../../../../types/IProduct';
 
 const widthScreen = Dimensions.get('window').width;
 
@@ -18,7 +19,7 @@ const IMAGES = [
 
 const ItemBanner = ({image}: {image: string}) => {
   return (
-    <View flex centerV >
+    <View flex centerV>
       <Image
         overlayType={Image.overlayTypes.BOTTOM}
         style={{flex: 1}}
@@ -31,6 +32,44 @@ const ItemBanner = ({image}: {image: string}) => {
 };
 
 const Banner = () => {
+  const [loading, setLoading] = React.useState(true); 
+  const [product, setProduct] = React.useState<IProduct[]>([]);
+  const token = useSelector<RootState, string>(state => state.auth.accessToken);
+  const componentMounted = React.useRef(true);
+  React.useEffect(() => {
+    if (!token) return;
+    const controller = new AbortController();
+    const signal = controller.signal;
+    fetch(URL.Products, {
+      signal: signal,
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(response => response.json())
+      .then(json => {
+        if (componentMounted.current) {
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+          setProduct(json);
+          setLoading(false);
+        }
+        return (componentMounted.current = false);
+      })
+      .catch(err => {
+        if (err.name === 'AbortError') {
+          console.log('successfully aborted');
+        } else {
+          // handle error
+        }
+      });
+    return () => {
+      // cancel the request before component unmounts
+      controller.abort();
+    };
+  }, [componentMounted]);
   return (
     <View style={styles.container}>
       <Carousel
@@ -45,8 +84,22 @@ const Banner = () => {
           inactiveColor: Colors.white,
         }}
         pageControlPosition={Carousel.pageControlPositions.OVER}>
-        {IMAGES.map((image, i) => {
-          return <ItemBanner key={i} image={image} />;
+        {product.map((image, i) => {
+          return (
+            <View flex centerV key={i}>
+              <TouchableOpacity onPress={()=>{
+
+              }}>
+              <Image
+                overlayType={Image.overlayTypes.BOTTOM}
+                style={{flex: 1}}
+                source={{
+                  uri: image.listphotos.find(item => item !== undefined),
+                }}
+              />
+            </TouchableOpacity>
+            </View>
+          );
         })}
       </Carousel>
     </View>
