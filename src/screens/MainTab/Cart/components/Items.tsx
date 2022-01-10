@@ -10,12 +10,8 @@ import {Theme} from 'react-toastify';
 import URL from '../../../../config/Api';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../../../redux/store';
-import {
-  onUpdateQuantity,
-  onAddToCart,
-
-} from '../../../../redux/authCartSlice';
-import { saveAuthAsync } from './AsynStoreCart';
+import {onUpdateQuantity, onAddToCart} from '../../../../redux/authCartSlice';
+import {saveAuthAsync} from './AsynStoreCart';
 interface ICart {
   _id: string;
   product_id: IProduct;
@@ -102,14 +98,7 @@ const styles = StyleSheet.create({
 });
 const widthScreen = Dimensions.get('window').width;
 
-
-
-
-
-
-
 const Items = ({items, onDelete}: Props) => {
-
   // const [quantity, setQuantity] = React.useState(items.quantity);
   const [loading, setLoading] = React.useState<boolean>(false);
   const dispatch = useDispatch();
@@ -117,9 +106,7 @@ const Items = ({items, onDelete}: Props) => {
   const [quantity, setQuantity] = React.useState(items.quantity);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemQuantity, setItemQuantity] = React.useState<ICart[]>([]);
-const [price,setPrice] = React.useState(0)
-
-
+  const [price, setPrice] = React.useState(0);
 
   const putQuantity = React.useCallback(() => {
     const controller = new AbortController();
@@ -141,7 +128,7 @@ const [price,setPrice] = React.useState(0)
       .then(json => {
         dispatch(onUpdateQuantity(json.cart.items));
         dispatch(onAddToCart(json.cart.items));
-        setPrice(json.cart.totalPrice)
+        setPrice(json.cart.totalPrice);
         saveAuthAsync(json);
         setItemQuantity(json.cart.items);
         setLoading(false);
@@ -163,59 +150,57 @@ const [price,setPrice] = React.useState(0)
     putQuantity();
   }, [putQuantity]);
 
-
-
-
   return (
-  
-      <Box style={styles.container}>
-        <Image
-          source={{uri: items.product_id.img}}
-          style={{width: 70, height: 70}}
-          resizeMode="contain"
-        />
-        <View style={styles.content}>
-          <Text style={styles.txtName} numberOfLines={1}>
-            {items.product_id.name}
-          </Text>
-          <Text style={styles.txtDes}>{items.product_id.supplier}</Text>
-          <Text style={styles.txtPrice}>
-            {numberFormat.format(items.product_id.discountPrice)}
-          </Text>
-        </View>
-        <View style={styles.quantity}>
-          <TouchableOpacity
-            style={styles.btnMinus}
-            //   onPress={() => setQuantity(quantity - 1)}
-            onPress={() => {
-              putQuantity();
-              
-              setQuantity(prev => prev - 1);
-            }}>
-            <Image source={require('../../../../assets/minus.png')} />
-          </TouchableOpacity>
-          <Text style={styles.txtQuantity}>{quantity}</Text>
-          <TouchableOpacity
-            style={styles.btnPlus}
-            //   onPress={() => setQuantity(quantity + 1)}
-            onPress={() => {
-              putQuantity();
-              setQuantity(prev => prev + 1 );
-              
-            }}>
-            <Image source={require('../../../../assets/plus.png')} />
-          </TouchableOpacity>
-        </View>
-        <View style={{justifyContent: 'flex-start', top: widthScreen / 20}}>
-          <TouchableOpacity
-            style={styles.btnDelete}
-            //   onPress={() => setQuantity(quantity + 1)}
-            onPress={onDelete}>
-            <Image source={require('../../../../assets/Trash.png')}/>
-          </TouchableOpacity>
-        </View>
-      </Box>
-    
+    <Box style={styles.container}>
+      <Image
+        source={{uri: items.product_id.img}}
+        style={{width: 70, height: 70}}
+        resizeMode="contain"
+      />
+      <View style={styles.content}>
+        <Text style={styles.txtName} numberOfLines={1}>
+          {items.product_id.name}
+        </Text>
+        <Text style={styles.txtDes}>{items.product_id.supplier}</Text>
+        <Text style={styles.txtPrice}>
+          {numberFormat.format(items.product_id.discountPrice)}
+        </Text>
+      </View>
+      <View style={styles.quantity}>
+        <TouchableOpacity
+          style={styles.btnMinus}
+          //   onPress={() => setQuantity(quantity - 1)}
+          onPress={() => {
+            putQuantity();
+
+            setQuantity(prev => prev - 1);
+          }}>
+          <Image source={require('../../../../assets/minus.png')} />
+        </TouchableOpacity>
+        <Text style={styles.txtQuantity}>{quantity}</Text>
+        <TouchableOpacity
+          style={styles.btnPlus}
+          //   onPress={() => setQuantity(quantity + 1)}
+          onPress={() => {
+            putQuantity();
+            setQuantity(prev => prev + 1);
+          }}>
+          <Image source={require('../../../../assets/plus.png')} />
+        </TouchableOpacity>
+      </View>
+      <View style={{justifyContent: 'flex-start', top: widthScreen / 20}}>
+        <TouchableOpacity
+          style={styles.btnDelete}
+          //   onPress={() => setQuantity(quantity + 1)}
+          onPress={onDelete}>
+          <Image
+            source={require('../../../../assets/Trash.png')}
+            style={{width: 20, height: 20}}
+            resizeMode="cover"
+          />
+        </TouchableOpacity>
+      </View>
+    </Box>
   );
 };
 

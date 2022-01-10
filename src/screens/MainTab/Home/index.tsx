@@ -12,10 +12,6 @@ const widthImg = widthScreen;
 const heightImg = (widthImg / 375) * 256;
 
 const Home = () => {
-
- 
-
-
   return (
     <View flex backgroundColor={Colors.primary} marginT-40>
       <Image

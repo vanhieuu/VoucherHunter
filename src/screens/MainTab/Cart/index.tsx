@@ -49,7 +49,9 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
-  const [mounted, setMounted] = React.useState<boolean>(false);
+  const [show,setShow] = React.useState<boolean>(false)
+
+
   const dispatch = useDispatch();
 
   React.useEffect(() => {

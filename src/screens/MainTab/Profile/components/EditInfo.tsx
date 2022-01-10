@@ -12,7 +12,7 @@ const initDataCheck = [
     value: 'ChangePassword',
   },
   {
-    label: 'Đăng xuất',
+    label: 'Thoát tài khoản',
     value: 'LogOut',
   },
 ];
@@ -37,12 +37,14 @@ const EditInfo = () => {
               label={item.label}
               value={item.value}
               onPress={()=>{
-                if(item.label === 'Đăng xuất'){
+                if(item.value === 'LogOut'){
                   clearAsyncStorage()
                   // navigation.navigate('SignIn')
-                  BackHandler.exitApp()
+                  BackHandler.exitApp();
+                }else if(item.label === 'Đổi mật khẩu'){
+                  navigation.navigate('ChangePassword')
                 }
-                navigation.navigate('ChangePassword')
+               
               }}
             />
             

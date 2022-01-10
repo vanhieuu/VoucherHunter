@@ -41,12 +41,7 @@ const GetInvoice = () => {
   React.useEffect(() => {
     fetchApi();
   }, []);
-  console.log(
-    invoice
-    .map(item => item.products.map(item=>item.quantity))
-    ,'aaa'
-  );
-  console.log(invoice)
+ 
 
   return (
     <ScrollView>
@@ -59,7 +54,7 @@ const GetInvoice = () => {
               invoice
                 .map(item => item.totalDiscountPrice)
                 .reduceRight((a, b) => a + b, 0),
-            )}
+            ) || 0}
           </Text>
         </Text>
       </Box>  

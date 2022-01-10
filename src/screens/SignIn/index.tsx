@@ -26,7 +26,7 @@ const SignIn = () => {
   const [password, setPassword] = React.useState('');
   const [loading, setLoading] = React.useState<boolean>(false);
   const [errorText, setErrorText] = React.useState('');
-  const componentMounted = React.useRef(true);
+  
   const onPressLogin = async () => {
     const controller = new AbortController();
     const signal = controller.signal;

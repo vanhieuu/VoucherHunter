@@ -193,11 +193,7 @@ const CheckOut = ({minHeight}: CheckOutProps) => {
         </Box>
       </Box>
 
-      <View flex-end>
-        <TouchableOpacity style={styles.btnDelete} onPress={onPressCheckOut}>
-          <Text style={{fontSize: 20, lineHeight: 22}}>Thanh toán</Text>
-        </TouchableOpacity>
-      </View>
+     
     </Box>
   );
 };

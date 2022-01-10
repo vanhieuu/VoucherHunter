@@ -22,7 +22,8 @@ export interface IProduct {
   description:string
   sold:number;
   vote:number;
-  supplier:string
+  supplier:string;
+  in_slider:boolean;
   
 }
 export interface IResNews {

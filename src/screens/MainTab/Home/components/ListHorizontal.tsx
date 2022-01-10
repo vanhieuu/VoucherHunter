@@ -57,9 +57,11 @@ const ListHorizontal = () => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const componentMounted = React.useRef(true);
-  React.useEffect(() => {
-    const controller = new AbortController();
+  const controller = new AbortController();
   const signal = controller.signal;
+
+  React.useEffect(() => {
+  
     setLoading(true);
     if (!token) return;
     fetch(URL.Products, {
@@ -89,6 +91,7 @@ const ListHorizontal = () => {
       });
       return () => {
         // cancel the request before component unmounts
+        
         controller.abort();
       };
   }, []);

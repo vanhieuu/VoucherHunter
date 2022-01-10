@@ -41,6 +41,7 @@ export type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+export type TStatusLogin = "check" | "true" | "false";
 const RootStack = () => {
   const statusAuth = useSelector<RootState, EStatusAuth>(
     state => state.auth.statusAuth,
@@ -48,7 +49,7 @@ const RootStack = () => {
 
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const dispatch = useDispatch();
-
+  const [isLogin, setIsLogin] = React.useState<TStatusLogin>('check');
   const checkLogin = async () => {
     const auth: IAuth | null = await getAuthAsync();
     if (auth) {
@@ -71,9 +72,11 @@ const RootStack = () => {
           if (!token) {
             Alert.alert('Đã hết phiên đăng nhập', 'vui lòng đăng nhập lại ');
             dispatch(updateStatusAuth({statusAuth: EStatusAuth.unauth}));
+            setIsLogin('false');
             return;
           } else {
             dispatch(onLogin(auth));
+            setIsLogin('true');
             return json;
           }
           //token success
@@ -97,9 +100,41 @@ const RootStack = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="SignIn">
-        {statusAuth === EStatusAuth.unauth ? (
-          <>
+      <Stack.Navigator initialRouteName={isLogin ? 'MainTab' : 'SignIn'}>
+        {isLogin === 'true' ? (
+          <Stack.Group>
+            <Stack.Screen
+              name="MainTab"
+              component={MainTab}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="ChangePassword"
+              component={ChangePassword}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="DetailItems"
+              component={DetailItems}
+              options={{headerShown: false}}
+            />
+
+            <Stack.Screen
+              name="Search"
+              component={Search}
+              options={{headerShown: true}}
+            />
+
+            <Stack.Screen
+              name="DetailNews"
+              component={DetailNews}
+              options={{
+                headerShown: true,
+              }}
+            />
+          </Stack.Group>
+        ) : (
+          <Stack.Group screenOptions={{headerShown: false}}>
             <Stack.Screen
               name="Onboarding"
               component={OnboardingScreen}
@@ -117,40 +152,8 @@ const RootStack = () => {
                 headerShown: true,
               }}
             />
-          </>
-        ) : (
-          <>
-            <Stack.Screen
-              name="MainTab"
-              component={MainTab}
-              options={{headerShown: false}}
-            />
-          </>
+          </Stack.Group>
         )}
-        <Stack.Screen
-          name="ChangePassword"
-          component={ChangePassword}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="DetailItems"
-          component={DetailItems}
-          options={{headerShown: false}}
-        />
-
-        <Stack.Screen
-          name="Search"
-          component={Search}
-          options={{headerShown: true}}
-        />
-
-        <Stack.Screen
-          name="DetailNews"
-          component={DetailNews}  
-          options={{
-          headerShown: true,
-          }}
-        />
       </Stack.Navigator>
     </NavigationContainer>
   );

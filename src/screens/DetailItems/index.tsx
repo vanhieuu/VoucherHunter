@@ -17,13 +17,14 @@ import {numberFormat} from '../../config/formatCurrency';
 import HeaderDetail from './components/HeaderDetail';
 import {FONTS} from '../../config/Typo';
 import ShowModal from './components/ShowModal';
-import { getStatusBarHeight } from 'react-native-iphone-x-helper';
+import {getStatusBarHeight} from 'react-native-iphone-x-helper';
+import RenderHTML from 'react-native-render-html';
 
-// if (Platform.OS === 'android') {
-//   if (UIManager.setLayoutAnimationEnabledExperimental) {
-//     UIManager.setLayoutAnimationEnabledExperimental(true);
-//   }
-// }
+if (Platform.OS === 'android') {
+  if (UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+}
 const widthBanner = Dimensions.get('window').width;
 const heightBanner = (widthBanner / 1200) * 1000;
 
@@ -46,22 +47,16 @@ const DetailItems = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'DetailItems'>>();
   const product = route.params.item;
   const scrollY = React.useRef(new Animated.Value(0)).current;
-  const [textShown, setTextShown] = React.useState(false);
-  const [lengthMore, setLengthMore] = React.useState(false);
-  const opacity = scrollY.interpolate({
-    inputRange: [0, 120],
-    outputRange: [0, 1],
-  });
-  const toggleNumberOfLines = () => {
-    setTextShown(!textShown);
+  const source = {
+    html: `
+    <p style="color:black;">${product?.description}</p>`,
   };
-  const onTextLayout = React.useCallback(e => {
-    setLengthMore(e.nativeEvent.lines.length >= 3);
-  }, []);
+
+
 
   return (
     <View style={{flex: 1, backgroundColor: '#FFF'}}>
-        <HeaderDetail scrollY={scrollY} title={''} />
+      <HeaderDetail scrollY={scrollY} title={''} />
       <Animated.ScrollView
         onScroll={Animated.event(
           [
@@ -73,7 +68,7 @@ const DetailItems = () => {
               },
             },
           ],
-            {
+          {
             useNativeDriver: true,
           },
         )}>
@@ -99,7 +94,7 @@ const DetailItems = () => {
           </Carousel>
         </View>
 
-        <Text style={{fontSize:26,fontWeight: 'bold'}} marginH-16 marginV-5>
+        <Text style={{fontSize: 26, fontWeight: 'bold'}} marginH-16 marginV-5>
           {product?.name}
         </Text>
         <View row centerV marginH-16 paddingV-4>
@@ -145,20 +140,9 @@ const DetailItems = () => {
         <View height={1} bg-dark80 marginT-12 />
         <View row centerV marginH-16 paddingR-15>
           <View>
-            <Text
-              marginL-12
-              onTextLayout={onTextLayout}
-              numberOfLines={textShown ? undefined : 3}>
-              Mô tả: {product?.description}
-            </Text>
+            <Text >Mô tả:</Text>
+            <RenderHTML source={source} contentWidth={widthBanner} />
           </View>
-        </View>
-        <View style={{alignItems: 'flex-end'}} marginR-12>
-          {lengthMore ? (
-            <Text onPress={toggleNumberOfLines} style={styles.viewMoreText}>
-              {textShown ? 'Thu gọn' : 'Đọc thêm'}
-            </Text>
-          ) : null}
         </View>
       </Animated.ScrollView>
       <View row spread bottom backgroundColor={'#fff'}>
@@ -172,7 +156,7 @@ export default DetailItems;
 
 const styles = StyleSheet.create({
   viewMoreText: {lineHeight: 21, fontSize: 12, fontFamily: FONTS.Medium},
-  HeaderContainer:{
+  HeaderContainer: {
     paddingBottom: 12,
     flexDirection: 'row',
     position: 'absolute',
@@ -180,7 +164,7 @@ const styles = StyleSheet.create({
     height: getStatusBarHeight(false),
     width: '100%',
   },
-  HeaderTitle:{
+  HeaderTitle: {
     backgroundColor: '#FFF',
     ...StyleSheet.absoluteFillObject,
     zIndex: -1,
@@ -189,6 +173,5 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     justifyContent: 'center',
     alignItems: 'center',
-  }
-
+  },
 });
