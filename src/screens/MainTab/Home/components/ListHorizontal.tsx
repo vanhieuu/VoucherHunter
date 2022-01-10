@@ -31,23 +31,25 @@ const ItemList = ({item}: {item: IProduct}) => {
     <Card style={styles.containerItem} onPress={onPressItem}>
       <Card.Section
         imageSource={{
-          uri: item.listphotos.find(element => element !== undefined),
+          uri:  item.is_hot === true ? item.listphotos.find(element => element !== undefined) : undefined ,
         }}
         imageStyle={{height: 190, width: 190}}
       />
-      <View paddingL-16 paddingR-6 marginB-11>
-        <Text m15 marginT-10 numberOfLines={1}>
-          {item.name}
-        </Text>
-        <Text b13 color={Colors.black}>
-          Price:
-          {''} {numberFormat.format(item.discountPrice)} {`\n`}
-          <Text b13 color={Colors.red}>
-            Giảm: {''}{' '}
-            {Math.round((item.discountPrice / item.listedPrice) * 100)} %
+      {item.is_hot === true ? (
+        <View paddingL-16 paddingR-6 marginB-11>
+          <Text m15 marginT-10 numberOfLines={1}>
+            {item.name}
           </Text>
-        </Text>
-      </View>
+          <Text b13 color={Colors.black}>
+            Price:
+            {''} {numberFormat.format(item.discountPrice)} {`\n`}
+            <Text b13 color={Colors.red}>
+              Giảm: {''}{' '}
+              {Math.round((item.discountPrice / item.listedPrice) * 100)} %
+            </Text>
+          </Text>
+        </View>
+      ) : null}
     </Card>
   );
 };
@@ -61,7 +63,6 @@ const ListHorizontal = () => {
   const signal = controller.signal;
 
   React.useEffect(() => {
-  
     setLoading(true);
     if (!token) return;
     fetch(URL.Products, {
@@ -80,27 +81,25 @@ const ListHorizontal = () => {
           setProduct(json);
           setLoading(false);
         }
-       
       })
-      .catch((err) => {
+      .catch(err => {
         if (err.name === 'AbortError') {
           console.log('successfully aborted');
         } else {
           // handle error
         }
       });
-      return () => {
-        // cancel the request before component unmounts
-        
-        controller.abort();
-      };
+    return () => {
+      // cancel the request before component unmounts
+
+      controller.abort();
+    };
   }, []);
 
   return (
     <View paddingV-12 backgroundColor="#fff">
       <View row spread paddingH-16 centerV>
         <Text style={styles.text}>Sản phẩm nổi bật</Text>
-      
       </View>
       {loading ? (
         <View row paddingH-16 paddingV-12>
@@ -128,7 +127,7 @@ const ListHorizontal = () => {
           horizontal
           showsHorizontalScrollIndicator={true}
           data={product}
-          initialNumToRender={4}
+          initialNumToRender={5}
           keyExtractor={item => item._id.toString()}
           contentContainerStyle={{paddingHorizontal: 16, paddingVertical: 12}}
           renderItem={({item}) => {

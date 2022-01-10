@@ -40,7 +40,6 @@ const DetailNews = () => {
         barStyle="light-content"
         statusBarProps={{barStyle: 'light-content'}}
         leftComponent={{onPress: () => goBack()}}
-        
       />
       <View>
         <View style={{justifyContent: 'space-between', left: 1, padding: 15}} >
