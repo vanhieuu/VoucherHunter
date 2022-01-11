@@ -3,6 +3,14 @@ import { Dimensions } from 'react-native';
 
 const {width} = Dimensions.get('window');
 
+
+export const palette = {
+  purple: '#5A31F4',
+  white: '#FFF',
+  black: '#111',
+  darkGray: '#333',
+  lightGray: '#EEE',
+};
 const theme = createTheme({
   colors: {
     dots: '#d0d0d0',
@@ -20,10 +28,16 @@ const theme = createTheme({
     primaryLight:'#e7f9f7',
     info:'#808080',
     lightPrimary:'#ffcdd2',
-    undefined:''
-    
+    undefined:'',
+    mainBackground: palette.lightGray,
+    mainForeground: palette.black,
 
+    primaryCardBackground: palette.purple,
+    secondaryCardBackground: palette.white,
+    primaryCardText: palette.white,
+    secondaryCardText: palette.black,
   },
+  
   spacing: {
     s: 8,
     m: 16,
@@ -52,9 +66,23 @@ const theme = createTheme({
       color: 'text',
     }
   },
+  
 });
 
+
+const darkTheme: Theme = {
+  ...theme,
+  colors: {
+    ...theme.colors,
+    background: '#000',
+    mainForeground: palette.white,
+
+    secondaryCardBackground: palette.darkGray,
+    secondaryCardText: palette.white,
+  },
+};
 
 export const aspectRatio = width/375
 export type Theme = typeof theme;
 export default theme;
+export {darkTheme}

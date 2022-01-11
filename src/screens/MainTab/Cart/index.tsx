@@ -1,4 +1,4 @@
-import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {NavigationProp, RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {useTheme} from '@shopify/restyle';
 import React from 'react';
 import {Alert, Dimensions, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import Box from '../../../components/Box';
 import {Theme} from '../../../components/theme';
 import URL from '../../../config/Api';
+import { MainTabParamList } from '../../../nav/MainTab';
 import {RootStackParamList} from '../../../nav/RootStack';
 import {onAddToCart} from '../../../redux/authCartSlice';
 import {IAuthRegister} from '../../../redux/authRegisterSlice';
@@ -17,12 +18,17 @@ import {IProduct} from '../../../types/IProduct';
 import CartContainer from './components/CartContainer';
 import CheckOut from './components/CheckOut';
 import Items from './components/Items';
-import * as Icon from 'react-native-iconly';
 const {width} = Dimensions.get('window');
 const height = 120 * (width / 375);
 interface ICart {
   _id: string;
-  product_id: IProduct;
+  product_id: IProduct  ;
+  quantity: number;
+  totalPrice: number;
+}
+interface CheckOut{
+  _id: string;
+  product_id: string;
   quantity: number;
   totalPrice: number;
 }
@@ -44,17 +50,30 @@ const initStateAddress: addressProps = {
 const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const theme = useTheme<Theme>();
+  const route = useRoute<RouteProp<MainTabParamList,'Cart'>>();
+ const length = route.params.item
+ console.log(length)
   const [address, setAddress] = React.useState<addressProps>(initStateAddress);
   const addressDetail = JSON.stringify(address);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
+  const [itemSend,setItemSend] = React.useState<CheckOut>(
+  )
+  const [productId,setProductId] = React.useState('')
   const [loading, setLoading] = React.useState<boolean>(true);
   const [show,setShow] = React.useState<boolean>(false)
-
-
+    console.log(itemCart.length)
+    
+   console.log(itemCart.map((item) => console.log(item)))
+    for(let key in itemCart){
+      if (itemCart.hasOwnProperty(key)) {
+        console.log(`${key}: ${itemCart[key]}`)
+      }
+    }
   const dispatch = useDispatch();
 
-  React.useEffect(() => {
+
+  const fetchApi = React.useCallback(() =>{
     const controller = new AbortController();
     const signal = controller.signal;
     if (!token) return;
@@ -71,6 +90,12 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
       .then(response => response.json())
       .then(json => {
         setItemCart(json.cart.items);
+        setItemSend(json.cart.items)
+        for(let i = 0; i <= itemCart.length; i++) {
+          // console.log(itemCart[i]);
+          setProductId(itemCart[i].product_id._id)
+          console.log(itemCart[i].product_id._id)
+        }
         dispatch(onAddToCart(json.cart.items));
         setLoading(false);
       })
@@ -85,6 +110,11 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
       // cancel the request before component unmounts
       controller.abort();
     };
+  },[itemCart])
+
+
+  React.useEffect(() => {
+    fetchApi()
   }, []);
   const onPressCheckOut = React.useCallback(async () => {
     setLoading(true);
@@ -94,7 +124,14 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
       note: 'NoNote',
       deliveryAddress: addressDetail,
       paymentMethod: 'COD',
-      items: itemCart,
+      // items: itemCart.map((item,index) => {
+      //   _id:item._id;
+      //   product_id:item.product_id._id;
+      //   quantity:item.quantity;
+      //   totalPrice:item.totalPrice
+        
+      // }),
+      items:itemCart
     };
     await fetch(URL.createInvoice, {
       signal: signal,
@@ -109,6 +146,7 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
       .then(response => response.json())
       .then(json => {
         Alert.alert(json.message);
+        console.log(json)
       });
   }, []);
   const onDelete = React.useCallback(

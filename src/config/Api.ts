@@ -1,5 +1,5 @@
 const MainURL = 'https://voucherhunter.herokuapp.com';
-// const MainURL = 'http://localhost:4000'
+// const MainURL = 'http://118.70.184.229:4000'
 const URL = {
   Login: MainURL + '/login',
   ValidateToken: MainURL + `/auth/profile`,
@@ -16,7 +16,10 @@ const URL = {
   removeAll: MainURL + '/cart/auth/removeall',
   createInvoice: MainURL + '/invoice/auth/create',
   getInvoice: MainURL + '/auth/invoice',
-  changePassword: MainURL + '/auth/changepwd'
+  changePassword: MainURL + '/auth/changepwd',
+  getNewByTag: (tag: string, page: 1) =>
+    MainURL + `/news/by-tag/search?tag=${tag}&page=${page}`,
+  getItemByTag: (tag: string, page: 1) =>
+    MainURL + `/product/by-tag/search?tag=${tag} & page=${page}`,
 };
 export default URL;
-

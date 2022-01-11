@@ -2,6 +2,7 @@ import {NavigationProp, useNavigation} from '@react-navigation/core';
 import React from 'react';
 import {
   FlatList,
+  Image,
   LayoutAnimation,
   Platform,
   StyleSheet,
@@ -29,14 +30,13 @@ const ItemList = ({item}: {item: IProduct}) => {
   }, []);
   return (
     <Card style={styles.containerItem} onPress={onPressItem}>
-      <Card.Section
-        imageSource={{
-          uri:  item.is_hot === true ? item.listphotos.find(element => element !== undefined) : undefined ,
-        }}
-        imageStyle={{height: 190, width: 190}}
-      />
       {item.is_hot === true ? (
         <View paddingL-16 paddingR-6 marginB-11>
+          <Image
+            source={{uri: item.img}}
+            style={{height: 160, width: 160,borderRadius:10}}
+            resizeMode="contain"
+          />
           <Text m15 marginT-10 numberOfLines={1}>
             {item.name}
           </Text>
@@ -49,7 +49,7 @@ const ItemList = ({item}: {item: IProduct}) => {
             </Text>
           </Text>
         </View>
-      ) : null}
+      ) : undefined}
     </Card>
   );
 };
@@ -131,7 +131,14 @@ const ListHorizontal = () => {
           keyExtractor={item => item._id.toString()}
           contentContainerStyle={{paddingHorizontal: 16, paddingVertical: 12}}
           renderItem={({item}) => {
-            return <ItemList item={item} />;
+           if(item.is_hot === true ){
+            return (
+              <ItemList item={item}/>
+            )
+           }else {
+             return (<View></View>)
+           }
+             
           }}
         />
       )}
@@ -150,6 +157,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
     backgroundColor: Colors.white,
     elevation: 2,
+   
   },
   text: {fontSize: 24, fontWeight: 'bold', lineHeight: 26},
 });
