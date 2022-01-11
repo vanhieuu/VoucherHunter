@@ -1,7 +1,6 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Alert} from 'react-native';
+
 
 export interface IProduct {
   _id: string;
@@ -28,13 +27,16 @@ export enum EStatusAuth {
   auth = 3,
 }
 export interface IAuth {
-  
+  numberCart: number;
+  _id: string;
+  items: [
+    {
       product_id: IProduct;
       quantity: number;
       _id: string;
       totalPrice: number;
-      numberItemsCart: number;
-  
+    },
+  ];
 }
 
 export interface IResProduct {
@@ -43,12 +45,11 @@ export interface IResProduct {
   product: IProduct[];
 }
 
-
-
-
-
 const initValue: IAuth = {
-  
+  numberCart: 0,
+  _id: '',
+  items: [
+    {
       product_id: {
         _id: '',
         name: '',
@@ -57,7 +58,7 @@ const initValue: IAuth = {
         is_hot: false,
         listphotos: [],
         createdAt: '',
-        updateAt: '', 
+        updateAt: '',
         deletedAt: '',
         quantity: 0,
         img: '',
@@ -70,36 +71,22 @@ const initValue: IAuth = {
       quantity: 0,
       _id: '',
       totalPrice: 0,
-      numberItemsCart: 0,
-  
+    },
+  ],
 };
 
 export const CartSlice = createSlice({
   name: 'cart',
   initialState: initValue,
   reducers: {
-    onAddToCart: (state, action: PayloadAction<IAuth>) => {
-        state._id = action.payload._id
-        state.numberItemsCart++;
-        state.product_id= action.payload.product_id;
-        state.quantity= action.payload.quantity;
-        state.totalPrice= action.payload.totalPrice
+    onGetNumberCart: (
+      state,
+      action: PayloadAction<{numberItemsCart: number}>,
+    ) => {
+      state.numberCart = action.payload.numberItemsCart;
     },
-    onUpdateQuantity: (state, action: PayloadAction<{quantity: number}>) => {
-        state.quantity = action.payload.quantity
-       
-    },
-
-    removeFromCart: (state, action: PayloadAction<IAuth>) => {
-    
-      //  state.items =   {...state, item:state.items.filter((id)=> id._id === action.payload.id)}
-    },
-    onGetTotalPrice:(state,action:PayloadAction<{totalPrice:number}>) =>{
-      state.totalPrice = action.payload.totalPrice
-    }
   },
 });
 
-export const {onAddToCart, onUpdateQuantity, removeFromCart, onGetTotalPrice} =
-  CartSlice.actions;
+export const {onGetNumberCart} = CartSlice.actions;
 export default CartSlice.reducer;

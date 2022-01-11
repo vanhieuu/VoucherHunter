@@ -6,14 +6,14 @@ import { Header } from '@react-navigation/elements';
 import News from '../screens/MainTab/News';
 import Cart from '../screens/MainTab/Cart';
 import Profile from '../screens/MainTab/Profile';
-import { NavigationProp, useNavigation } from '@react-navigation/core';
+import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/core';
 import { RootStackParamList } from './RootStack';
 import { IProduct } from '../types/IProduct';
 
 import { RootState } from '../redux/store';
 import { useSelector } from 'react-redux';
-import URL from '../config/Api';
 import { StatusBar } from 'react-native';
+
 
 interface ICart {
   _id: string;
@@ -32,48 +32,12 @@ export type MainTabParamList = {
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 const MainTab = () => {
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [mounted, setMounted] = React.useState<boolean>(false);
+ 
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
-  const [itemCart, setItemCart] = React.useState<ICart[]>([]);
-  
-  const fetchApi = React.useCallback(async () => {
-    loading;
-    setMounted(true);
-    const controller = new AbortController();
-    const signal = controller.signal;
-    if (!token) return;
-    await fetch(URL.getItemCart, {
-      signal: signal,
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(response => response.json())
-      .then(json => {
-        setItemCart(json.cart.items);
-        setLoading(false);
-      })
-      .catch(err => {
-        if (err.name === 'AbortError') {
-          console.log('Success Abort');
-        } else {
-          console.error(err);
-        }
-      });
-    return () => {
-      // cancel the request before component unmounts
-      setMounted(false);
-      controller.abort();
-    };
-  }, [itemCart.length]);
+  const numberCart = useSelector<RootState, number>(state => state.cart.numberCart);
+console.log(numberCart,'numberCart')
 
-  React.useEffect(()=>{
-    fetchApi()
-  },[itemCart.length])
+
   const [hidden, setHidden] = React.useState(true);
 
   const { navigate } = useNavigation<NavigationProp<RootStackParamList>>()
@@ -153,7 +117,7 @@ const MainTab = () => {
           ),
           tabBarLabel: 'Giỏ hàng',
           headerShown: false,
-          tabBarBadge: itemCart.length
+          tabBarBadge: numberCart
         }}
       />
       <Tab.Screen

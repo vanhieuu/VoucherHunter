@@ -23,7 +23,7 @@ const ItemCard = ({item}: {item: INewsData}) => {
 
 
   return (
-    <View backgroundColor="#ffff">
+    <View backgroundColor="#ffff" marginV-10>
       <TouchableOpacity onPress={onPressItem}>
         <View style={styles.container} padding-10>
           <View>
@@ -40,14 +40,14 @@ const ItemCard = ({item}: {item: INewsData}) => {
                 marginL-10
                 paddingH-8
                 marginV-2
-                marginB-20
+                marginB-10
                 backgroundColor={Colors.black}>
-                <Text b13 color={Colors.white} marginR-12>
+                <Text h13 color={Colors.white} marginR-12>
                   {item.creator}
                 </Text>
               </View>
             </View>
-            <View>
+            <View marginB-12>
               <RenderHTML source={sourceTitle} contentWidth={widthScreen} />
               {/* <Text>{item.title}</Text> */}
             </View>

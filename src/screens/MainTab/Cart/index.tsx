@@ -1,16 +1,28 @@
-import {NavigationProp, RouteProp, useNavigation, useRoute} from '@react-navigation/native';
+import AsyncStorageLib from '@react-native-async-storage/async-storage';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {useTheme} from '@shopify/restyle';
 import React from 'react';
-import {Alert, Dimensions, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  Alert,
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import {Header} from 'react-native-elements';
 import {Colors, Text, View} from 'react-native-ui-lib';
 import {useDispatch, useSelector} from 'react-redux';
 import Box from '../../../components/Box';
 import {Theme} from '../../../components/theme';
 import URL from '../../../config/Api';
-import { MainTabParamList } from '../../../nav/MainTab';
+import {MainTabParamList} from '../../../nav/MainTab';
 import {RootStackParamList} from '../../../nav/RootStack';
-import {onAddToCart} from '../../../redux/authCartSlice';
+import {onGetNumberCart} from '../../../redux/authCartSlice';
 import {IAuthRegister} from '../../../redux/authRegisterSlice';
 import {getAuthAsync, IAuth} from '../../../redux/authSlice';
 import {RootState} from '../../../redux/store';
@@ -18,15 +30,16 @@ import {IProduct} from '../../../types/IProduct';
 import CartContainer from './components/CartContainer';
 import CheckOut from './components/CheckOut';
 import Items from './components/Items';
+
 const {width} = Dimensions.get('window');
 const height = 120 * (width / 375);
 interface ICart {
   _id: string;
-  product_id: IProduct  ;
+  product_id: IProduct;
   quantity: number;
   totalPrice: number;
 }
-interface CheckOut{
+interface CheckOut {
   _id: string;
   product_id: string;
   quantity: number;
@@ -47,37 +60,25 @@ const initStateAddress: addressProps = {
   street: 'Nguyễn Văn Lộc',
 };
 
-const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
+const Cart = ({_id}: ICart) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const theme = useTheme<Theme>();
-  const route = useRoute<RouteProp<MainTabParamList,'Cart'>>();
- const length = route.params.item
- console.log(length)
+
+
   const [address, setAddress] = React.useState<addressProps>(initStateAddress);
   const addressDetail = JSON.stringify(address);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
-  const [itemSend,setItemSend] = React.useState<CheckOut>(
-  )
-  const [productId,setProductId] = React.useState('')
+ const numberCart = useSelector<RootState, number>(state => state.cart.numberCart);
+ console.log(numberCart)
   const [loading, setLoading] = React.useState<boolean>(true);
-  const [show,setShow] = React.useState<boolean>(false)
-    console.log(itemCart.length)
-    
-   console.log(itemCart.map((item) => console.log(item)))
-    for(let key in itemCart){
-      if (itemCart.hasOwnProperty(key)) {
-        console.log(`${key}: ${itemCart[key]}`)
-      }
-    }
   const dispatch = useDispatch();
 
 
-  const fetchApi = React.useCallback(() =>{
+  const fetchApi = React.useCallback(() => {
     const controller = new AbortController();
     const signal = controller.signal;
     if (!token) return;
-
     fetch(URL.getItemCart, {
       signal: signal,
       method: 'GET',
@@ -90,13 +91,6 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
       .then(response => response.json())
       .then(json => {
         setItemCart(json.cart.items);
-        setItemSend(json.cart.items)
-        for(let i = 0; i <= itemCart.length; i++) {
-          // console.log(itemCart[i]);
-          setProductId(itemCart[i].product_id._id)
-          console.log(itemCart[i].product_id._id)
-        }
-        dispatch(onAddToCart(json.cart.items));
         setLoading(false);
       })
       .catch(err => {
@@ -110,12 +104,17 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
       // cancel the request before component unmounts
       controller.abort();
     };
-  },[itemCart])
-
+  }, [numberCart]);
 
   React.useEffect(() => {
-    fetchApi()
-  }, []);
+    const ac = new AbortController();
+    fetchApi();
+    return () => ac.abort();
+  }, [numberCart]);
+
+
+ 
+
   const onPressCheckOut = React.useCallback(async () => {
     setLoading(true);
     const controller = new AbortController();
@@ -129,9 +128,9 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
       //   product_id:item.product_id._id;
       //   quantity:item.quantity;
       //   totalPrice:item.totalPrice
-        
+
       // }),
-      items:itemCart
+      items: itemCart,
     };
     await fetch(URL.createInvoice, {
       signal: signal,
@@ -146,7 +145,7 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
       .then(response => response.json())
       .then(json => {
         Alert.alert(json.message);
-        console.log(json)
+       
       });
   }, []);
   const onDelete = React.useCallback(
@@ -171,9 +170,7 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
         .then(json => {
           // setItemCart([...itemCart,json.cart.items])
           setItemCart(json.cart.items);
-          dispatch(onAddToCart(json.cart.items));
-          console.log(onAddToCart(json), 'json');
-
+          dispatch(onGetNumberCart({numberItemsCart:numberCart - 1}))
           // dispatch(removeFromCart(json.cart.items))
           setLoading(false);
         })
@@ -216,7 +213,6 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
         </Box>
       </Box>
       <Box flex={1}>
-        
         <ScrollView
           style={{
             borderBottomRightRadius: theme.borderRadii.xl,
@@ -258,14 +254,18 @@ const Cart = ({_id, product_id, quantity, totalPrice}: ICart) => {
             }}></Text>
         </Box>
       </Box>
-      <Box justifyContent="center" alignContent="center" alignSelf="center" marginBottom='m'>
-       
-
+      <Box
+        justifyContent="center"
+        alignContent="center"
+        alignSelf="center"
+        marginBottom="m">
         <View flex-end width-120>
-        <TouchableOpacity style={styles.btnCheckout} onPress={onPressCheckOut}>
-          <Text style={{fontSize: 20, lineHeight: 22}}>Thanh toán</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={styles.btnCheckout}
+            onPress={onPressCheckOut}>
+            <Text style={{fontSize: 20, lineHeight: 22}}>Thanh toán</Text>
+          </TouchableOpacity>
+        </View>
       </Box>
     </CartContainer>
   );
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     marginHorizontal: 20,
   },
-  containerIcon:{
+  containerIcon: {
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',

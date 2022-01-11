@@ -4,8 +4,8 @@ import {Alert, Modal, StyleSheet, Pressable} from 'react-native';
 import {Colors, Image, View, Text} from 'react-native-ui-lib';
 import {useDispatch, useSelector} from 'react-redux';
 import URL from '../../../config/Api';
-import {RootStackParamList} from '../../../nav/RootStack';
-import {onAddToCart} from '../../../redux/authCartSlice';
+import RootStack, {RootStackParamList} from '../../../nav/RootStack';
+import {onGetNumberCart} from '../../../redux/authCartSlice';
 import {IAuthRegister} from '../../../redux/authRegisterSlice';
 import {getAuthAsync, IAuth} from '../../../redux/authSlice';
 import {RootState} from '../../../redux/store';
@@ -14,49 +14,13 @@ import {IProduct} from '../../../types/IProduct';
 const ShowModal = ({item}: {item: IProduct}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = React.useState<boolean>(false);
-
   const route = useRoute<RouteProp<RootStackParamList, 'DetailItems'>>();
-  const registerToken = useSelector<RootState, string>(
-    state => state.register.accessToken,
+  const numberCart = useSelector<RootState, number>(
+    state => state.cart.numberCart,
   );
-  const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const product = route.params.item;
   const id = product._id;
   const dispatch = useDispatch();
-  const putQuantity = React.useCallback(async (id, quantity) => {
-    const controller = new AbortController();
-    const auth: IAuth | null = await getAuthAsync();
-    const registerAuth: IAuthRegister | null = await getAuthAsync();
-    setLoading(true);
-    fetch(URL.addQuantity, {
-      method: 'PUT',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        id: item._id,
-        quantity: quantity,
-      }),
-    })
-      .then(response => response.json())
-      .then(json => {
-        dispatch(onAddToCart(json));
-        setLoading(false);
-      })
-      .catch(err => {
-        if (err.name === 'AbortError') {
-          console.log('Success Abort');
-        } else {
-          console.error(err);
-        }
-      });
-    return () => {
-      // cancel the request before component unmounts
-      controller.abort();
-    };
-  }, []);
   const addItemCart = React.useCallback(async () => {
     const auth: IAuth | null = await getAuthAsync();
     const registerAuth: IAuthRegister | null = await getAuthAsync();
@@ -77,8 +41,8 @@ const ShowModal = ({item}: {item: IProduct}) => {
       .then(response => response.json())
       .then(json => {
         Alert.alert(json.message);
-        dispatch(onAddToCart(json));
-        console.log(onAddToCart(json));
+        console.log(json, 'Json add cart');
+        dispatch(onGetNumberCart({numberItemsCart: numberCart + 1}));
       })
       .catch(err => {
         console.error(err);
@@ -132,10 +96,7 @@ const ShowModal = ({item}: {item: IProduct}) => {
             </Pressable>
           </View>
           <Pressable style={styles.buttonClose} onPress={addItemCart}>
-            <Text
-              style={styles.modalText}>
-              Thêm vào giỏ hàng
-            </Text>
+            <Text style={styles.modalText}>Thêm vào giỏ hàng</Text>
           </Pressable>
         </View>
       </Modal>
@@ -176,7 +137,7 @@ const styles = StyleSheet.create({
     height: 45,
     width: '100%',
     borderRadius: 5,
-    marginBottom:1
+    marginBottom: 1,
   },
   buttonClose: {
     marginBottom: 100,
@@ -193,7 +154,7 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop:12
+    marginTop: 12,
   },
   modalText: {
     fontSize: 20,
@@ -203,7 +164,6 @@ const styles = StyleSheet.create({
     color: '#000',
     marginBottom: 2,
     textAlign: 'center',
-   
   },
 });
 

@@ -50,6 +50,9 @@ const RootStack = () => {
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const dispatch = useDispatch();
   const [isLogin, setIsLogin] = React.useState<TStatusLogin>('check');
+
+
+  
   const checkLogin = async () => {
     const auth: IAuth | null = await getAuthAsync();
     if (auth) {

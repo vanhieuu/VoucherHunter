@@ -1,16 +1,13 @@
 import React from 'react';
 import {Dimensions, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import Box from '../../../../components/Box';
-import {Spacings, Text, View} from 'react-native-ui-lib';
+import { Text, View} from 'react-native-ui-lib';
 import {IProduct} from '../../../../types/IProduct';
 import {numberFormat} from '../../../../config/formatCurrency';
-import SwipeableRow from './SwipeableRow';
-import {useTheme} from '@shopify/restyle';
-import {Theme} from 'react-toastify';
+
 import URL from '../../../../config/Api';
-import {useDispatch, useSelector} from 'react-redux';
+import { useSelector} from 'react-redux';
 import {RootState} from '../../../../redux/store';
-import {onUpdateQuantity, onAddToCart} from '../../../../redux/authCartSlice';
 import {saveAuthAsync} from './AsynStoreCart';
 interface ICart {
   _id: string;
@@ -99,10 +96,7 @@ const styles = StyleSheet.create({
 const widthScreen = Dimensions.get('window').width;
 
 const Items = ({items, onDelete}: Props) => {
-  // const [quantity, setQuantity] = React.useState(items.quantity);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const dispatch = useDispatch();
-  // const quantity = useSelector<RootState, number>(state => state.cart.quantity);
   const [quantity, setQuantity] = React.useState(items.quantity);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemQuantity, setItemQuantity] = React.useState<ICart[]>([]);
@@ -126,10 +120,9 @@ const Items = ({items, onDelete}: Props) => {
     })
       .then(response => response.json())
       .then(json => {
-        dispatch(onUpdateQuantity(json.cart.items));
-        dispatch(onAddToCart(json.cart.items));
+        // dispatch(onUpdateQuantity(json.cart.items));
+        
         setPrice(json.cart.totalPrice);
-        saveAuthAsync(json);
         setItemQuantity(json.cart.items);
         setLoading(false);
       })
