@@ -33,11 +33,8 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 
 const MainTab = () => {
  
-  const token = useSelector<RootState, string>(state => state.auth.accessToken);
+
   const numberCart = useSelector<RootState, number>(state => state.cart.numberCart);
-console.log(numberCart,'numberCart')
-
-
   const [hidden, setHidden] = React.useState(true);
 
   const { navigate } = useNavigation<NavigationProp<RootStackParamList>>()

@@ -20,7 +20,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import Box from '../../../components/Box';
 import {Theme} from '../../../components/theme';
 import URL from '../../../config/Api';
-import {MainTabParamList} from '../../../nav/MainTab';
 import {RootStackParamList} from '../../../nav/RootStack';
 import {onGetNumberCart} from '../../../redux/authCartSlice';
 import {IAuthRegister} from '../../../redux/authRegisterSlice';
@@ -64,16 +63,16 @@ const Cart = ({_id}: ICart) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const theme = useTheme<Theme>();
 
-
   const [address, setAddress] = React.useState<addressProps>(initStateAddress);
   const addressDetail = JSON.stringify(address);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
- const numberCart = useSelector<RootState, number>(state => state.cart.numberCart);
- console.log(numberCart)
+
+  const numberCart = useSelector<RootState, number>(
+    state => state.cart.numberCart,
+  );
   const [loading, setLoading] = React.useState<boolean>(true);
   const dispatch = useDispatch();
-
 
   const fetchApi = React.useCallback(() => {
     const controller = new AbortController();
@@ -112,41 +111,40 @@ const Cart = ({_id}: ICart) => {
     return () => ac.abort();
   }, [numberCart]);
 
-
- 
-
   const onPressCheckOut = React.useCallback(async () => {
     setLoading(true);
     const controller = new AbortController();
     const signal = controller.signal;
-    let dataToSend = {
-      note: 'NoNote',
-      deliveryAddress: addressDetail,
-      paymentMethod: 'COD',
-      // items: itemCart.map((item,index) => {
-      //   _id:item._id;
-      //   product_id:item.product_id._id;
-      //   quantity:item.quantity;
-      //   totalPrice:item.totalPrice
+    for (let i = 0; i <= itemCart.length; i++) {
+      let dataToSend = {
+        note: 'NoNote',
+        deliveryAddress: addressDetail,
+        paymentMethod: 'COD',
+        item: [
+          {
+            _id: itemCart[i]._id,
+            product_id: itemCart[i].product_id._id,
+            quantity: itemCart[i].quantity,
+            totalPrice: itemCart[i].totalPrice,
+          },
+        ],
+      };
 
-      // }),
-      items: itemCart,
-    };
-    await fetch(URL.createInvoice, {
-      signal: signal,
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(dataToSend),
-    })
-      .then(response => response.json())
-      .then(json => {
-        Alert.alert(json.message);
-       
-      });
+      await fetch(URL.createInvoice, {
+        signal: signal,
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(dataToSend),
+      })
+        .then(response => response.json())
+        .then(json => {
+          Alert.alert(json.message);
+        });
+    }
   }, []);
   const onDelete = React.useCallback(
     async _id => {
@@ -170,7 +168,11 @@ const Cart = ({_id}: ICart) => {
         .then(json => {
           // setItemCart([...itemCart,json.cart.items])
           setItemCart(json.cart.items);
-          dispatch(onGetNumberCart({numberItemsCart:numberCart - 1}))
+          dispatch(
+            onGetNumberCart({
+              numberItemsCart: numberCart === 0 ? numberCart : numberCart - 1,
+            }),
+          );
           // dispatch(removeFromCart(json.cart.items))
           setLoading(false);
         })

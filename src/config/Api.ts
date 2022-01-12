@@ -20,6 +20,6 @@ const URL = {
   getNewByTag: (tag: string, page: 1) =>
     MainURL + `/news/by-tag/search?tag=${tag}&page=${page}`,
   getItemByTag: (tag: string, page: 1) =>
-    MainURL + `/product/by-tag/search?tag=${tag} & page=${page}`,
+    MainURL + `/product/by-tag/search?tag=${tag}&page=${page}`,
 };
 export default URL;

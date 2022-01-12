@@ -34,7 +34,7 @@ const ItemList = ({item}: {item: IProduct}) => {
         <View paddingL-16 paddingR-6 marginB-11>
           <Image
             source={{uri: item.img}}
-            style={{height: 160, width: 160,borderRadius:10}}
+            style={{height: 160, width: 160, borderRadius: 10}}
             resizeMode="contain"
           />
           <Text m15 marginT-10 numberOfLines={1}>
@@ -61,7 +61,6 @@ const ListHorizontal = () => {
   const componentMounted = React.useRef(true);
   const controller = new AbortController();
   const signal = controller.signal;
-
   React.useEffect(() => {
     setLoading(true);
     if (!token) return;
@@ -131,14 +130,11 @@ const ListHorizontal = () => {
           keyExtractor={item => item._id.toString()}
           contentContainerStyle={{paddingHorizontal: 16, paddingVertical: 12}}
           renderItem={({item}) => {
-           if(item.is_hot === true ){
-            return (
-              <ItemList item={item}/>
-            )
-           }else {
-             return (<View></View>)
-           }
-             
+            if (item.is_hot === true) {
+              return <ItemList item={item} />;
+            } else {
+              return <View></View>;
+            }
           }}
         />
       )}
@@ -157,7 +153,6 @@ const styles = StyleSheet.create({
     marginRight: 12,
     backgroundColor: Colors.white,
     elevation: 2,
-   
   },
   text: {fontSize: 24, fontWeight: 'bold', lineHeight: 26},
 });

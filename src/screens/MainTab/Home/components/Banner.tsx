@@ -1,16 +1,18 @@
 import {useNavigation, NavigationProp} from '@react-navigation/native';
+import {transform} from 'lodash';
 import React from 'react';
 import {
   StyleSheet,
   Dimensions,
   LayoutAnimation,
   TouchableOpacity,
-  FlatList,
+  Animated,
 } from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {Carousel, Colors, View, Image} from 'react-native-ui-lib';
+import {View, Image} from 'react-native-ui-lib';
 import {useSelector} from 'react-redux';
 import URL from '../../../../config/Api';
+
 import {RootStackParamList} from '../../../../nav/RootStack';
 import {RootState} from '../../../../redux/store';
 import {IProduct} from '../../../../types/IProduct';
@@ -28,6 +30,9 @@ const Banner = () => {
   const [loading, setLoading] = React.useState(true);
   const {navigate} = useNavigation<NavigationProp<RootStackParamList>>();
   const [product, setProduct] = React.useState<IProduct[]>([]);
+  const [currentIndex, setCurrentIndex] = React.useState<number>(0);
+  const [currentImage, setCurrentImage] = React.useState<number>(0);
+  const [post,setPost] = React.useState(0)
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const componentMounted = React.useRef(true);
   const refDots = React.useRef<IRefDots>(null);
@@ -35,7 +40,41 @@ const Banner = () => {
   const onMomentumScrollEnd = React.useCallback(({nativeEvent}) => {
     const x = nativeEvent.contentOffset.x;
     let indexFocus = Math.round(x / widthScreen);
+    console.log(indexFocus);
+
     refDots.current?.setIndexPageFocus(indexFocus);
+  }, []);
+      
+  React.useEffect(() => {
+    const process = () => {
+      let y;
+      y = currentIndex + 1;
+     
+      if (y > 4) y = 0;
+      setCurrentIndex(y);
+      setPost(y*widthCarousel);
+      refScrollView.current?.scrollTo({
+        x:y * widthCarousel,
+        y:0,
+        animated:true
+      })
+    };
+    let timer = setTimeout(() => process(), 3000);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [post, currentIndex]);
+  const handleScroll = React.useCallback(({nativeEvent}) => {
+    if (nativeEvent && nativeEvent.contentOffset) {
+      const currentOffset = nativeEvent.contentOffset.x;
+      let imageIndex = 0;
+      if (nativeEvent.contentOffset.x > 0) {
+        imageIndex = Math.floor(
+          (nativeEvent.contentOffset.x + widthCarousel / 2) / widthCarousel,
+        );
+      }
+      setCurrentImage(imageIndex)
+    }
   }, []);
 
   React.useEffect(() => {
@@ -72,11 +111,14 @@ const Banner = () => {
       controller.abort();
     };
   }, [componentMounted]);
+
   return (
     <View style={styles.container}>
-      <ScrollView
+      <Animated.ScrollView
         style={{flex: 1}}
         horizontal
+        scrollEventThrottle={16}
+        onScroll={handleScroll}
         pagingEnabled
         onMomentumScrollEnd={onMomentumScrollEnd}
         showsHorizontalScrollIndicator={false}
@@ -101,7 +143,7 @@ const Banner = () => {
             ) : null}
           </View>
         ))}
-      </ScrollView>
+      </Animated.ScrollView>
     </View>
   );
 };
