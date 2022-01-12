@@ -119,7 +119,7 @@ const DetailItems = ({navigation}:Props) => {
             width: widthBanner,
           }}>
           <Carousel
-            autoplay={false}
+            autoplay={true}
             pageWidth={widthBanner}
             containerStyle={{height: '100%'}}
             loop
