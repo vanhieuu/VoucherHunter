@@ -1,3 +1,6 @@
+import { ImageSourcePropType } from "react-native";
+import { IProduct } from "./IProduct";
+
 export enum PaymentStatus {
   pending = 1,
   cancel = 2,
@@ -8,11 +11,11 @@ export interface InvoiceProps {
   _id: string;
   products: [
     {
-      _id: string;
+      product_id: IProduct;
       listPrice: number;
       discountPrice: number;
       quantity: number;
-      img:string
+      _id:string
     },
   ];
   totalListPrice: number;

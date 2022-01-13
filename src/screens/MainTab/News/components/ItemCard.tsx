@@ -7,7 +7,12 @@ import {INewsData} from '../../../../redux/newSlice';
 import RenderHTML from 'react-native-render-html';
 const widthScreen = Dimensions.get('window').width;
 
-const ItemCard = ({item}: {item: INewsData}) => {
+interface Props {
+  item: INewsData;
+  totalPage: number;
+}
+
+const ItemCard = ({item, totalPage}: Props) => {
   const {navigate} = useNavigation<NavigationProp<RootStackParamList>>();
 
   const onPressItem = React.useCallback(() => {
@@ -17,10 +22,8 @@ const ItemCard = ({item}: {item: INewsData}) => {
   }, []);
   const sourceTitle = {
     html: `<div 
-    style="font-size: 1.3rem; padding: 0px 10px ; max-width:320px; padding-right:35px">${item.title}</div>`,
+    style="font-size: 1.2rem; padding: 0px 10px ; max-width:320px; padding-right:35px; font-weight:bold">${item.title}</div>`,
   };
-
-
 
   return (
     <View backgroundColor="#ffff" marginV-10>
@@ -28,13 +31,13 @@ const ItemCard = ({item}: {item: INewsData}) => {
         <View style={styles.container} padding-10>
           <View>
             <Image
-              source={{uri: item.image }}
+              source={{uri: item.image}}
               style={{width: 100, height: 100, marginHorizontal: 10}}
               resizeMode="contain"
             />
           </View>
-          <View>
-            <View row marginV-15>
+          <View width={350} flex>
+            <View row>
               <View
                 br100
                 marginL-10
@@ -47,7 +50,7 @@ const ItemCard = ({item}: {item: INewsData}) => {
                 </Text>
               </View>
             </View>
-            <View marginB-12>
+            <View marginB-15 padding-1>
               <RenderHTML source={sourceTitle} contentWidth={widthScreen} />
               {/* <Text>{item.title}</Text> */}
             </View>

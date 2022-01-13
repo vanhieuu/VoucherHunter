@@ -28,6 +28,7 @@ Typography.loadTypographies({
   m16: {fontSize: 16,  fontFamily: FONTS.Medium},
   m17: {fontSize: 17, fontFamily: FONTS.Medium},
   m24: {fontSize: 24,   fontFamily: FONTS.Medium},
+  m20: {fontSize: 20,   fontFamily: FONTS.Medium},
   m27: {fontSize: 27,  fontFamily: FONTS.Medium},
   m28: {fontSize: 28,  fontFamily: FONTS.Medium},
   m30: {fontSize: 30, fontFamily: FONTS.Medium},
@@ -40,5 +41,6 @@ Typography.loadTypographies({
   b17: {fontSize: 17,   fontFamily: FONTS.Book},
   b24: {fontSize: 24,   fontFamily: FONTS.Book},
   b27: {fontSize: 27,   fontFamily: FONTS.Book},
+  b20: {fontSize: 20,   fontFamily: FONTS.Book},
   b28: {fontSize: 28,  fontFamily: FONTS.Book},
 });

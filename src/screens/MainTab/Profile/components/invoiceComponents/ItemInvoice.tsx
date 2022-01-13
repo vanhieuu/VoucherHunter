@@ -15,49 +15,63 @@ const ItemInvoice = ({items}: {items: InvoiceProps}) => {
         numberOfLines={2}
         color={'#000'}
         marginH-12>
-          {/* {items.paymentStatus === 1 ? 'Paid' : ''} */}
-        <Text style={styles.txt} color={items.paymentStatus === 3 ? 'green' : '#F7CA02'}>
+        {/* {items.paymentStatus === 1 ? 'Paid' : ''} */}
+        <Text
+          style={styles.txt}
+          color={items.paymentStatus === 3 ? 'green' : '#F7CA02'}>
           {' '}
           {items.paymentStatus === 3 ? 'Đặt hàng thành công' : 'Đang xử lý...'}
-       
         </Text>
       </Text>
       <TouchableOpacity onPress={() => true}>
         <View style={styles.container}>
-          <View style={styles.imgContainer}>
-            <Image
-              source={require('../../../../../assets/CreateAccountImg.png')}
-              style={styles.imgStyle}
-              resizeMode="contain"
-            />
-          </View>
           <View style={styles.contentZone}>
             {items.products.map((item, index) => (
-              <View key={item._id}>
-                <Text style={styles.txt} color="#E9707D" marginV-5 marginL-10>
-                  {items.note}
-                </Text>
+              <View key={item._id} flex row style={{borderBottomWidth:0.5}}>
+                <View style={styles.imgContainer} padding-5>
+                  <Image
+                    source={{uri: item?.product_id?.img}}
+                    style={styles.imgStyle}
+                    resizeMode="contain"
+                  />
+                </View>
 
-                <Box flexDirection="row" marginTop="xl">
-                  <Text style={styles.txt} color={'#000'} marginL-10>
-                    Số lượng:{' '}
-                    <Text style={styles.txt} color="#000">
-                      {item.quantity} |{' '}
+                <Box
+                  flexDirection="column"
+                  marginTop="m"
+                  flex={1}
+                  marginBottom="m">
+                  <Text style={styles.txt} color="#E9707D" marginV-5 marginL-10>
+                    {item?.product_id?.name}
+                  </Text>
+                  <Box flexDirection="row">
+                    <Text style={styles.txt} color={'#000'} marginL-10>
+                      Số lượng:{' '}
+                      <Text style={styles.txt} color="#000">
+                        {item.quantity} |{' '}
+                      </Text>
                     </Text>
-                  </Text>
 
-                  <Text style={styles.txt} color="#E9707D">
-                    - {numberFormat.format(item.discountPrice)}
-                  </Text>
+                    <Text style={styles.txt} color="#E9707D">
+                      - {numberFormat.format(item.discountPrice)}
+                    </Text>
+                  </Box>
+
+                  <Box
+                    marginTop="s"
+                    style={{
+                      alignSelf: 'center',
+                      justifyContent: 'center',
+                      marginRight: 30,
+                    }}>
+                    <Text style={styles.txt} color={'#000'}>
+                      {' '}
+                      <Text style={styles.txt} color="#E9707D" marginR-10>
+                        Ngày mua: {dayjs(items.createdAt).format('DD/MM/YYYY')}
+                      </Text>
+                    </Text>
+                  </Box>
                 </Box>
-
-                <Text style={styles.txt} color={'#000'} marginH-12>
-                  {' '}
-                  <Text style={styles.txt} color="#E9707D">
-                    {dayjs(items.createdAt).format('DD/MM/YYYY')}
-                  </Text>
-                </Text>
-                <View height={3} bg-dark80 marginT-30 />
               </View>
             ))}
           </View>
@@ -89,35 +103,31 @@ const styles = StyleSheet.create({
     // elevation: 0.5,
     flexDirection: 'row',
     borderRadius: 0,
-    // backgroundColor: '#fff',
+    flex: 1,
+
+    backgroundColor: '#fff',
   },
   imgStyle: {
-    width: 80,
+    width: 100,
     height: 80,
-    borderRightWidth: 1,
-    marginLeft: 20,
-    marginHorizontal: 20, 
     borderColor: '#000',
-   
-    flex:1
+    flex: 1,
   },
   imgContainer: {
     borderRightWidth: 0.5,
-    // borderRightWidth:1,
-    borderTopRightRadius: 8,
-    borderBottomRightRadius: 8,
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0.5,
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 0,
   },
   contentZone: {
-    paddingLeft: 5,
-    paddingRight: 20,
+    
+   
     // marginBottom:5,
-    borderBottomLeftRadius: 8,
-    borderTopLeftRadius: 8,
+    borderBottomLeftRadius: 0,
+    borderTopLeftRadius: 0,
     borderLeftWidth: 0.5,
-    backgroundColor: '#fff',
     width: '100%',
-    borderRadius: 8,
+    flex: 1,
   },
 });

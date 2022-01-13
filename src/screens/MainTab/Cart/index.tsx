@@ -67,6 +67,10 @@ const Cart = ({_id}: ICart) => {
   const addressDetail = JSON.stringify(address);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
+ const [productId, setProductId] = React.useState('');
+
+
+
 
   const numberCart = useSelector<RootState, number>(
     state => state.cart.numberCart,
@@ -90,10 +94,13 @@ const Cart = ({_id}: ICart) => {
       .then(response => response.json())
       .then(json => {
         setItemCart(json.cart.items);
+      
+       console.log(itemCart)
         setLoading(false);
+        console.log(json.cart.items)
       })
       .catch(err => {
-        if (err.name === 'AbortError') {
+        if (err.name === 'AbortError') {  
           console.log('Success Abort');
         } else {
           console.error(err);
@@ -111,40 +118,34 @@ const Cart = ({_id}: ICart) => {
     return () => ac.abort();
   }, [numberCart]);
 
-  const onPressCheckOut = React.useCallback(async () => {
+  const onPressCheckOut = React.useCallback(() => {
     setLoading(true);
     const controller = new AbortController();
     const signal = controller.signal;
-    for (let i = 0; i <= itemCart.length; i++) {
-      let dataToSend = {
-        note: 'NoNote',
-        deliveryAddress: addressDetail,
-        paymentMethod: 'COD',
-        item: [
-          {
-            _id: itemCart[i]._id,
-            product_id: itemCart[i].product_id._id,
-            quantity: itemCart[i].quantity,
-            totalPrice: itemCart[i].totalPrice,
-          },
-        ],
-      };
+  
+    itemCart.forEach((item) => {setProductId(item.product_id = item.product_id._id)});
+    let dataToSend = {
+      note: 'NOthing',
+      deliveryAddress: addressDetail,
+      paymentMethod: 'COD',
+      items:itemCart
+    };
 
-      await fetch(URL.createInvoice, {
-        signal: signal,
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(dataToSend),
-      })
-        .then(response => response.json())
-        .then(json => {
-          Alert.alert(json.message);
-        });
-    }
+    fetch(URL.createInvoice, {
+      signal: signal,
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(dataToSend),
+    })
+      .then(response => response.json())
+      .then(json => {
+        Alert.alert(json.message, 'Alert');
+        console.log(json)
+      });
   }, []);
   const onDelete = React.useCallback(
     async _id => {

@@ -36,6 +36,8 @@ const GetInvoice = () => {
       .then(response => response.json())
       .then(json => {
         setInvoice(json.data);
+        
+      
       });
   }, []);
   React.useEffect(() => {
@@ -59,12 +61,16 @@ const GetInvoice = () => {
         </Text>
       </Box>  
       <Box padding="m">
-      
-
        <ScrollView>
-         {invoice.map((item,index) =>(
-           <ItemInvoice   items={item} key={index}  />
-         ))}
+         {invoice.map((item,index)=>{
+           console.log(item)
+            return (
+              <ItemInvoice   items={item} key={index}  />
+            )
+         }
+          
+         
+         )}
        </ScrollView>
       </Box>
     </ScrollView>

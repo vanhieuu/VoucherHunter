@@ -9,6 +9,7 @@ export interface INewsData {
   created_at: string;
   updated_at: string;
   image:string;
+  tags:[]
 }
 export interface INews {
   totalNews: number;
@@ -35,6 +36,7 @@ const initValue: INews = {
     created_at: '',
     updated_at: '',
     image:'',
+    tags:[]
   },
   success: false,
   page: 1,
@@ -54,13 +56,16 @@ export const newSlice = createSlice({
       state.totalNews = action.payload.totalNews;
       state.totalPage = action.payload.totalPage;
       state.success = action.payload.success;
-      
     },
     onUpdatePageNumber: (
       state,
       action: PayloadAction<{page:IPageNumber}>,
     ) => {
-      state.page = action.payload.page;
+      if(state.page < state.totalPage){
+        state.page = action.payload.page
+      }else if(state.page > state.totalPage){
+        state.page  = 1 
+      }
     },
   },
 });

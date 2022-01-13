@@ -35,6 +35,7 @@ export type RootStackParamList = {
   };
   DetailNews: {
     item: INewsData;
+    
   };
   Search: undefined;
 };
