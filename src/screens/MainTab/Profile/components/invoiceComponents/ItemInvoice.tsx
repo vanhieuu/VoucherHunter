@@ -5,7 +5,17 @@ import {numberFormat} from '../../../../../config/formatCurrency';
 import {InvoiceProps} from '../../../../../types/InvoiceType';
 import dayjs from 'dayjs';
 import Box from '../../../../../components/Box';
+import { CommonActions, NavigationProp, TabActions, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../../../../../nav/RootStack';
+import MainTab from '../../../../../nav/MainTab';
 const ItemInvoice = ({items}: {items: InvoiceProps}) => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
+  
+  const jumpToAction = TabActions.jumpTo('DetailInvoice', { item: items });
+
+
+
+
   return (
     <View flex marginB-5>
       <Text
@@ -23,7 +33,12 @@ const ItemInvoice = ({items}: {items: InvoiceProps}) => {
           {items.paymentStatus === 3 ? 'Đặt hàng thành công' : 'Đang xử lý...'}
         </Text>
       </Text>
-      <TouchableOpacity onPress={() => true}>
+      <TouchableOpacity onPress={() =>   navigation.dispatch(CommonActions.navigate({
+        name:'DetailInvoice',
+        params:{
+          items:items
+        }
+      }))}>
         <View style={styles.container}>
           <View style={styles.contentZone}>
             {items.products.map((item, index) => (

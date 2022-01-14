@@ -4,7 +4,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 import OnboardingScreen from '../screens/Onboarding';
 import SignUp from '../screens/SignUp';
-import MainTab from './MainTab';
+import MainTab, { MainTabParamList } from './MainTab';
 import {IProduct} from '../types/IProduct';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/store';
@@ -24,13 +24,15 @@ import Search from '../screens/Search';
 import {Colors, View} from 'react-native-ui-lib';
 import ChangePassword from '../screens/ChangePassword';
 import { onGetNumberCart } from '../redux/authCartSlice';
+import { InvoiceProps } from '../types/InvoiceType';
+import DetailInvoice from '../screens/DetailInvoice';
 
 export type RootStackParamList = {
   Onboarding: undefined;
   SignIn: undefined;
   SignUp: undefined;
   ChangePassword: undefined;
-  MainTab: undefined;
+  MainTab: MainTabParamList;
   DetailItems: {
     item: IProduct;
   };
@@ -39,6 +41,9 @@ export type RootStackParamList = {
     
   };
   Search: undefined;
+  DetailInvoice:{
+    item:InvoiceProps
+  }
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -137,6 +142,15 @@ const RootStack = () => {
               options={{
                 headerShown: true,
               }}
+            />
+            <Stack.Screen
+            name='DetailInvoice'
+            component={DetailInvoice}
+            options={{
+              headerShown:true
+            }}
+
+            
             />
           </Stack.Group>
         ) : (

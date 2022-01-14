@@ -29,12 +29,14 @@ import EditInfo from './components/EditInfo';
 
 import * as ImagePicker from 'react-native-image-picker';
 import {launchImageLibrary} from 'react-native-image-picker';
-// import storage, { firebase } from '@react-native-firebase/storage';
-import {firebaseConfig, app, storage} from '../../../../firebaseConfig';
-import {ref, getDownloadURL, uploadBytesResumable} from 'firebase/storage';
 
-console.log(firebaseConfig);
+import {utils} from '@react-native-firebase/app';
+import storage from '@react-native-firebase/storage';
+import {firebase} from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+
 const {width} = Dimensions.get('window');
+
 const tabs = [
   {
     id: 'invoice',
@@ -64,6 +66,7 @@ const Profile = () => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [selectedImage, setSelectedImage] = React.useState<any>(null);
   const [uploading, setUploading] = React.useState<boolean>(false);
+  const [transferred, setTransferred] = React.useState<any>(null);
   const [status, setStatus] = React.useState('');
   React.useEffect(() => {
     let Timer1 = setTimeout(() => setLoading(true), 3000);
@@ -82,7 +85,7 @@ const Profile = () => {
       .then((json: IResUser | IResUserRegister) => {
         setUsers(json.user);
         setLoading(false);
-        console.log(user?.photoUrl);
+
         return clearTimeout(Timer1);
       })
       .catch(err => {
@@ -98,8 +101,8 @@ const Profile = () => {
     };
   }, [user?.photoUrl]);
 
-  const choosePicture = React.useCallback(() => {
-    launchImageLibrary({
+  const choosePicture = React.useCallback(async () => {
+    await launchImageLibrary({
       maxHeight: 200,
       maxWidth: 200,
       selectionLimit: 0,
@@ -107,33 +110,74 @@ const Profile = () => {
       includeExtra,
     }).then(res => {
       const uri = res?.assets?.[0].uri;
-
-      setSelectedImage(uri);
+      const imageUri =
+        Platform.OS === 'ios' ? res?.assets?.[0].uri : res?.assets?.[0].uri;
+      setSelectedImage(imageUri);
       console.log(selectedImage, 'set selected image');
-      const uploadUri = res?.assets?.[0].fileName;
-
-      console.log(uri, 'uri');
-      let reference = ref(storage, uploadUri);
-      setUploading(true);
-
-      let task = uploadBytesResumable(reference, selectedImage);
-      task.on(
-        (err: 'err') => console.log(err),
-        () => {
-          console.log('Image uploaded to the bucket!');
-          setLoading(false);
-          getDownloadURL(task.snapshot.ref).then(downloadURL => {
-            console.log(downloadURL, 'res');
-            setSelectedImage(downloadURL);
+      firebase
+        .auth()
+        .signInAnonymously()
+        .then(() => {
+          return firebase.firestore().collection('Hello').doc('hello').set({
+            id: 'fadsa',
           });
-          setStatus('Image upload');
-        },
-      );
+        })
+        .catch(err => {
+          Alert.alert(err);
+        });
+
+      // const reference =  storage().ref(`anh/${uploadUri}`)
+      // let reference = ref(storage, `anh/${uploadUri}`);
+      // setUploading(true);
+
+      // let task = uploadBytesResumable(reference, selectedImage);
+      // task.on(
+      //   (err: 'err') => console.log(err),
+      //   () => {
+      //     console.log('Image uploaded to the bucket!');
+      //     setLoading(false);
+      //     getDownloadURL(task.snapshot.ref).then(downloadURL => {
+      //       const fileReaderInstance = new FileReader();
+
+      //       console.log(downloadURL, 'res');
+      //       setSelectedImage(downloadURL);
+      //     });
+      //     setStatus('Image upload');
+      //   },
+      // );
       // storage().ref(fileName).putFile(uploadUri);
 
       setUploading(false);
       Alert.alert('Done');
     });
+  }, []);
+
+  const uploadImage = React.useCallback(async () => {
+    const uploadImage = selectedImage;
+    const fileName = selectedImage?.substring(
+      selectedImage.lastIndexOf('/') + 1,
+    );
+    setUploading(true);
+    setTransferred(0);
+    const task = storage().ref(fileName).putFile(uploadImage);
+    task.on('state_changed', taskSnapshot => {
+      console.log(
+        `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
+      );
+      setTransferred(
+        Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
+          100,
+      );
+    });
+
+    try {
+      await task;
+    } catch (e) {
+      console.log(e);
+    }
+  }, [selectedImage]);
+  React.useEffect(() => {
+    uploadImage;
   }, []);
 
   return (
