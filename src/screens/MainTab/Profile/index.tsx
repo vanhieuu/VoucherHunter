@@ -1,22 +1,24 @@
 import React from 'react';
-import {Dimensions, StyleSheet} from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import {useSelector} from 'react-redux';
 import URL from '../../../config/Api';
 import {IResUser, IUser} from '../../../redux/authSlice';
 import {RootState} from '../../../redux/store';
-import {Text, Image} from 'react-native-ui-lib';
+import {Text, Image, View} from 'react-native-ui-lib';
 
 import {
   IResUserRegister,
   IUserRegister,
 } from '../../../redux/authRegisterSlice';
-import {
-  NavigationProp,
-  RouteProp,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/core';
-import {MainTabParamList} from '../../../nav/MainTab';
+import {NavigationProp, useNavigation} from '@react-navigation/core';
+
 import Box from '../../../components/Box';
 import {RootStackParamList} from '../../../nav/RootStack';
 import {useTheme} from '@shopify/restyle';
@@ -24,6 +26,14 @@ import Header from '../../components/Header';
 import Tab from './components/Tab';
 import GetInvoice from './components/GetInvoice';
 import EditInfo from './components/EditInfo';
+
+import * as ImagePicker from 'react-native-image-picker';
+import {launchImageLibrary} from 'react-native-image-picker';
+import storage, { firebase } from '@react-native-firebase/storage';
+import { firebaseConfig } from '../../../../firebaseConfig';
+
+
+firebase.initializeApp(firebaseConfig);
 
 const {width} = Dimensions.get('window');
 const tabs = [
@@ -36,6 +46,13 @@ const tabs = [
     label: 'Thông tin cá nhân',
   },
 ];
+interface Action {
+  title: string;
+  type: 'capture' | 'library';
+  options: ImagePicker.CameraOptions | ImagePicker.ImageLibraryOptions;
+}
+
+const includeExtra = true;
 const Profile = () => {
   const theme = useTheme();
   const {navigate} = useNavigation<NavigationProp<RootStackParamList>>();
@@ -43,10 +60,12 @@ const Profile = () => {
   const registerToken = useSelector<RootState, string>(
     state => state.register.accessToken,
   );
+
   const [user, setUsers] = React.useState<IUser | IUserRegister>();
   const [loading, setLoading] = React.useState<boolean>(false);
-  const route = useRoute<RouteProp<MainTabParamList>>();
-
+  const [selectedImage, setSelectedImage] = React.useState<any>(null);
+  const [transferred, setTransferred] = React.useState<any>(null);
+  const [uploading, setUploading] = React.useState<boolean>(false);
   React.useEffect(() => {
     let Timer1 = setTimeout(() => setLoading(true), 3000);
     const controller = new AbortController();
@@ -63,8 +82,6 @@ const Profile = () => {
       .then(response => response.json())
       .then((json: IResUser | IResUserRegister) => {
         setUsers(json.user);
-        console.log(json, 'user');
-
         setLoading(false);
         return clearTimeout(Timer1);
       })
@@ -79,6 +96,32 @@ const Profile = () => {
       // cancel the request before component unmounts
       controller.abort();
     };
+  }, []);
+
+  const choosePicture = React.useCallback(() => {
+    launchImageLibrary({
+      maxHeight: 200,
+      maxWidth: 200,
+      selectionLimit: 1,
+      mediaType: 'photo',
+      includeBase64: false,
+      includeExtra,
+    }).then(res => {
+      console.log(res.assets);
+      setSelectedImage({uri: res?.assets?.map(item => item.uri)});
+      console.log(selectedImage.uri.toString(), 'Hello');
+      const uploadUri = selectedImage?.uri?.toString();
+      let fileName = uploadUri?.substring(uploadUri.lastIndexOf('/') + 1);
+      setUploading(true);
+      try {
+        storage().ref(fileName).putFile(uploadUri);
+
+        setUploading(false);
+        Alert.alert('Done');
+      } catch (err) {
+        console.log(err);
+      }
+    });
   }, []);
 
   return (
@@ -111,11 +154,20 @@ const Profile = () => {
           width={100}
           height={100}
           style={{borderRadius: 50}}>
-          <Image
-            source={{uri: user?.photoUrl}}
-            resizeMode="contain"
-            style={styles.img}
-          />
+          {selectedImage ? (
+            <Image
+              source={{uri: selectedImage?.uri.toString()}}
+              resizeMode="cover"
+              style={styles.img}
+            />
+          ) : (
+            <ActivityIndicator size="small" color="#e9707d" />
+          )}
+          <TouchableOpacity onPress={choosePicture} style={{marginTop: 30}}>
+            <Text center style={{fontSize: 14}}>
+              Chọn ảnh{' '}
+            </Text>
+          </TouchableOpacity>
         </Box>
         <Box marginVertical="m" style={{marginTop: 50 + theme.spacing.m}}>
           <Text h16 black style={{textAlign: 'center'}}>
@@ -127,6 +179,11 @@ const Profile = () => {
           <EditInfo />
         </Tab>
       </Box>
+      <TouchableOpacity onPress={() => {}}>
+        <Text center style={{fontSize: 14}}>
+          upload ảnh{' '}
+        </Text>
+      </TouchableOpacity>
     </Box>
   );
 };
@@ -138,8 +195,51 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     backgroundColor: 'white',
+    borderRadius: 50,
   },
   container: {
     justifyContent: 'space-between',
   },
+  thumbnail: {
+    width: 300,
+    height: 300,
+    resizeMode: 'contain',
+  },
+  container1: {
+    flex: 1,
+    backgroundColor: 'aliceblue',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginVertical: 8,
+  },
+
+  image: {
+    marginVertical: 24,
+    alignItems: 'center',
+  },
 });
+const actions: Action[] = [
+  {
+    title: 'Select Image',
+    type: 'library',
+    options: {
+      maxHeight: 200,
+      maxWidth: 200,
+      selectionLimit: 0,
+      mediaType: 'photo',
+      includeBase64: false,
+      includeExtra,
+    },
+  },
+  {
+    title: `Select Image or Video\n(mixed)`,
+    type: 'library',
+    options: {
+      selectionLimit: 0,
+      mediaType: 'mixed',
+      includeExtra,
+    },
+  },
+];
