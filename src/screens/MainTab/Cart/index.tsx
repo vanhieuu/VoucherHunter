@@ -34,7 +34,7 @@ const {width} = Dimensions.get('window');
 const height = 120 * (width / 375);
 interface ICart {
   _id: string;
-  product_id: IProduct;
+  product_id: IProduct | string;
   quantity: number;
   totalPrice: number;
 }
@@ -67,10 +67,8 @@ const Cart = ({_id}: ICart) => {
   const addressDetail = JSON.stringify(address);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
- const [productId, setProductId] = React.useState('');
-
-
-
+ 
+  const [productId, setProductId] = React.useState('');
 
   const numberCart = useSelector<RootState, number>(
     state => state.cart.numberCart,
@@ -94,13 +92,15 @@ const Cart = ({_id}: ICart) => {
       .then(response => response.json())
       .then(json => {
         setItemCart(json.cart.items);
-      
-       console.log(itemCart)
+        itemCart.forEach(item => {
+          setProductId((item.product_id = item.product_id._id));
+        });
+        console.log(itemCart);
         setLoading(false);
-        console.log(json.cart.items)
+        console.log(json.cart.items);
       })
       .catch(err => {
-        if (err.name === 'AbortError') {  
+        if (err.name === 'AbortError') {
           console.log('Success Abort');
         } else {
           console.error(err);
@@ -122,13 +122,14 @@ const Cart = ({_id}: ICart) => {
     setLoading(true);
     const controller = new AbortController();
     const signal = controller.signal;
-  
-    itemCart.forEach((item) => {setProductId(item.product_id = item.product_id._id)});
+
+   
+    console.log(itemCart)
     let dataToSend = {
       note: 'NOthing',
       deliveryAddress: addressDetail,
       paymentMethod: 'COD',
-      items:itemCart
+      items: itemCart,
     };
 
     fetch(URL.createInvoice, {
@@ -144,7 +145,7 @@ const Cart = ({_id}: ICart) => {
       .then(response => response.json())
       .then(json => {
         Alert.alert(json.message, 'Alert');
-        console.log(json)
+        console.log(json);
       });
   }, []);
   const onDelete = React.useCallback(
