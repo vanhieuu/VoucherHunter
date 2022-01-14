@@ -29,12 +29,11 @@ import EditInfo from './components/EditInfo';
 
 import * as ImagePicker from 'react-native-image-picker';
 import {launchImageLibrary} from 'react-native-image-picker';
-import storage, { firebase } from '@react-native-firebase/storage';
-import { firebaseConfig } from '../../../../firebaseConfig';
+// import storage, { firebase } from '@react-native-firebase/storage';
+import {firebaseConfig, app, storage} from '../../../../firebaseConfig';
+import {ref, getDownloadURL, uploadBytesResumable} from 'firebase/storage';
 
-
-firebase.initializeApp(firebaseConfig);
-
+console.log(firebaseConfig);
 const {width} = Dimensions.get('window');
 const tabs = [
   {
@@ -64,8 +63,8 @@ const Profile = () => {
   const [user, setUsers] = React.useState<IUser | IUserRegister>();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [selectedImage, setSelectedImage] = React.useState<any>(null);
-  const [transferred, setTransferred] = React.useState<any>(null);
   const [uploading, setUploading] = React.useState<boolean>(false);
+  const [status, setStatus] = React.useState('');
   React.useEffect(() => {
     let Timer1 = setTimeout(() => setLoading(true), 3000);
     const controller = new AbortController();
@@ -83,6 +82,7 @@ const Profile = () => {
       .then((json: IResUser | IResUserRegister) => {
         setUsers(json.user);
         setLoading(false);
+        console.log(user?.photoUrl);
         return clearTimeout(Timer1);
       })
       .catch(err => {
@@ -96,31 +96,43 @@ const Profile = () => {
       // cancel the request before component unmounts
       controller.abort();
     };
-  }, []);
+  }, [user?.photoUrl]);
 
   const choosePicture = React.useCallback(() => {
     launchImageLibrary({
       maxHeight: 200,
       maxWidth: 200,
-      selectionLimit: 1,
+      selectionLimit: 0,
       mediaType: 'photo',
-      includeBase64: false,
       includeExtra,
     }).then(res => {
-      console.log(res.assets);
-      setSelectedImage({uri: res?.assets?.map(item => item.uri)});
-      console.log(selectedImage.uri.toString(), 'Hello');
-      const uploadUri = selectedImage?.uri?.toString();
-      let fileName = uploadUri?.substring(uploadUri.lastIndexOf('/') + 1);
-      setUploading(true);
-      try {
-        storage().ref(fileName).putFile(uploadUri);
+      const uri = res?.assets?.[0].uri;
 
-        setUploading(false);
-        Alert.alert('Done');
-      } catch (err) {
-        console.log(err);
-      }
+      setSelectedImage(uri);
+      console.log(selectedImage, 'set selected image');
+      const uploadUri = res?.assets?.[0].fileName;
+
+      console.log(uri, 'uri');
+      let reference = ref(storage, uploadUri);
+      setUploading(true);
+
+      let task = uploadBytesResumable(reference, selectedImage);
+      task.on(
+        (err: 'err') => console.log(err),
+        () => {
+          console.log('Image uploaded to the bucket!');
+          setLoading(false);
+          getDownloadURL(task.snapshot.ref).then(downloadURL => {
+            console.log(downloadURL, 'res');
+            setSelectedImage(downloadURL);
+          });
+          setStatus('Image upload');
+        },
+      );
+      // storage().ref(fileName).putFile(uploadUri);
+
+      setUploading(false);
+      Alert.alert('Done');
     });
   }, []);
 
@@ -156,7 +168,7 @@ const Profile = () => {
           style={{borderRadius: 50}}>
           {selectedImage ? (
             <Image
-              source={{uri: selectedImage?.uri.toString()}}
+              source={{uri: selectedImage}}
               resizeMode="cover"
               style={styles.img}
             />

@@ -1,19 +1,24 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React from 'react';
-import { Assets, Colors, Image, View, Button } from 'react-native-ui-lib';
+import {Assets, Colors, Image, View, Button} from 'react-native-ui-lib';
 import Home from '../screens/MainTab/Home';
-import { Header } from '@react-navigation/elements';
+import {Header} from '@react-navigation/elements';
 import News from '../screens/MainTab/News';
 import Cart from '../screens/MainTab/Cart';
 import Profile from '../screens/MainTab/Profile';
-import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/core';
-import { RootStackParamList } from './RootStack';
-import { IProduct } from '../types/IProduct';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/core';
+import {RootStackParamList} from './RootStack';
+import {IProduct} from '../types/IProduct';
 
-import { RootState } from '../redux/store';
-import { useSelector } from 'react-redux';
-import { StatusBar } from 'react-native';
-
+import {RootState} from '../redux/store';
+import {useDispatch, useSelector} from 'react-redux';
+import {StatusBar} from 'react-native';
+import {onGetNumberCart} from '../redux/authCartSlice';
 
 interface ICart {
   _id: string;
@@ -32,12 +37,22 @@ export type MainTabParamList = {
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 const MainTab = () => {
- 
-
-  const numberCart = useSelector<RootState, number>(state => state.cart.numberCart);
+  const numberCart = useSelector<RootState, number>(
+    state => state.cart.numberCart,
+  );
+  console.log(numberCart)
   const [hidden, setHidden] = React.useState(true);
+  const dispatch = useDispatch();
+  React.useEffect(() => {
+    
+    dispatch(
+      onGetNumberCart({
+        numberItemsCart: 0,
+      }),
+    );
+  }, []);
 
-  const { navigate } = useNavigation<NavigationProp<RootStackParamList>>()
+  const {navigate} = useNavigation<NavigationProp<RootStackParamList>>();
   return (
     <Tab.Navigator
       screenOptions={{
@@ -48,9 +63,8 @@ const MainTab = () => {
         name="Home"
         component={Home}
         options={{
-          tabBarIcon: ({ color }) => (
-            <Image assetGroup="iconTab" assetName="ic_home" tintColor={color}
-            />
+          tabBarIcon: ({color}) => (
+            <Image assetGroup="iconTab" assetName="ic_home" tintColor={color} />
           ),
           tabBarLabel: 'Trang chủ',
           headerTransparent: true,
@@ -60,29 +74,27 @@ const MainTab = () => {
               headerTitleStyle={{
                 fontSize: 22,
                 fontWeight: 'bold',
-                color:Colors.black
+                color: Colors.black,
                 // backfaceVisibility
               }}
               headerTitleAlign="left"
-              headerRight={({ tintColor }) => {
+              headerRight={({tintColor}) => {
                 return (
                   <View row marginR-12>
-                      <StatusBar
-                    hidden={hidden} />
+                    <StatusBar hidden={hidden} />
                     <Button
                       iconSource={Assets.iconHeader.ic_search}
-                      style={{ width: 40, height: 40 }}
+                      style={{width: 40, height: 40}}
                       link
                       color={tintColor}
                       onPress={() => navigate('Search')}
                     />
-
                   </View>
                 );
               }}
               headerStyle={{
                 backgroundColor: Colors.white,
-                elevation:1,
+                elevation: 1,
               }}
               headerTintColor={Colors.black}
             />
@@ -93,35 +105,30 @@ const MainTab = () => {
         name="News"
         component={News}
         options={{
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({color}) => (
             <Image assetGroup="iconTab" assetName="ic_new" tintColor={color} />
           ),
           tabBarLabel: 'Tin tức',
           headerShown: true,
-
         }}
       />
       <Tab.Screen
         name="Cart"
         component={Cart}
         options={{
-          tabBarIcon: ({ color }) => (
-            <Image
-              assetGroup="iconTab"
-              assetName="ic_shop"
-              tintColor={color}
-            />
+          tabBarIcon: ({color}) => (
+            <Image assetGroup="iconTab" assetName="ic_shop" tintColor={color} />
           ),
           tabBarLabel: 'Giỏ hàng',
           headerShown: false,
-          tabBarBadge: numberCart
+          tabBarBadge: numberCart,
         }}
       />
       <Tab.Screen
         name="Profile"
         component={Profile}
         options={{
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({color}) => (
             <Image
               assetGroup="iconTab"
               assetName="ic_profile"
@@ -129,7 +136,7 @@ const MainTab = () => {
             />
           ),
           tabBarLabel: 'Cá nhân',
-          headerShown: false
+          headerShown: false,
         }}
       />
     </Tab.Navigator>
@@ -137,5 +144,3 @@ const MainTab = () => {
 };
 
 export default MainTab;
-
-

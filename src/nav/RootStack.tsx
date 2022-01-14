@@ -23,6 +23,7 @@ import URL from '../config/Api';
 import Search from '../screens/Search';
 import {Colors, View} from 'react-native-ui-lib';
 import ChangePassword from '../screens/ChangePassword';
+import { onGetNumberCart } from '../redux/authCartSlice';
 
 export type RootStackParamList = {
   Onboarding: undefined;
@@ -93,6 +94,7 @@ const RootStack = () => {
   React.useEffect(() => {
     checkLogin();
   }, [statusAuth]);
+  
 
   if (statusAuth === EStatusAuth.check) {
     return (

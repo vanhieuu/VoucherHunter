@@ -34,7 +34,7 @@ const {width} = Dimensions.get('window');
 const height = 120 * (width / 375);
 interface ICart {
   _id: string;
-  product_id: IProduct | string;
+  product_id: IProduct;
   quantity: number;
   totalPrice: number;
 }
@@ -67,8 +67,8 @@ const Cart = ({_id}: ICart) => {
   const addressDetail = JSON.stringify(address);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
- 
-  const [productId, setProductId] = React.useState('');
+
+  const [itemSend, setItemSend] = React.useState<ICart[]>([]);
 
   const numberCart = useSelector<RootState, number>(
     state => state.cart.numberCart,
@@ -76,7 +76,7 @@ const Cart = ({_id}: ICart) => {
   const [loading, setLoading] = React.useState<boolean>(true);
   const dispatch = useDispatch();
 
-  const fetchApi = React.useCallback(() => {
+  React.useEffect(() => {
     const controller = new AbortController();
     const signal = controller.signal;
     if (!token) return;
@@ -91,13 +91,9 @@ const Cart = ({_id}: ICart) => {
     })
       .then(response => response.json())
       .then(json => {
-        setItemCart(json.cart.items);
-        itemCart.forEach(item => {
-          setProductId((item.product_id = item.product_id._id));
-        });
-        console.log(itemCart);
+        setItemSend(json.cart.items);
         setLoading(false);
-        console.log(json.cart.items);
+        dispatch(onGetNumberCart({numberItemsCart: itemCart.length}));
       })
       .catch(err => {
         if (err.name === 'AbortError') {
@@ -112,27 +108,22 @@ const Cart = ({_id}: ICart) => {
     };
   }, [numberCart]);
 
-  React.useEffect(() => {
-    const ac = new AbortController();
-    fetchApi();
-    return () => ac.abort();
-  }, [numberCart]);
+  // React.useEffect(() => {
+  //   const ac = new AbortController();
+  //   fetchApi();
+  //   return () => ac.abort();
+  // }, [numberCart]);
 
-  const onPressCheckOut = React.useCallback(() => {
+  const onPressCheckOut = async () => {
     setLoading(true);
     const controller = new AbortController();
     const signal = controller.signal;
 
-   
-    console.log(itemCart)
-    let dataToSend = {
-      note: 'NOthing',
-      deliveryAddress: addressDetail,
-      paymentMethod: 'COD',
-      items: itemCart,
-    };
+    itemSend.forEach(item => {
+      setItemSend((item.product_id = item.product_id._id));
+    });
 
-    fetch(URL.createInvoice, {
+    await fetch(URL.createInvoice, {
       signal: signal,
       method: 'POST',
       headers: {
@@ -140,59 +131,64 @@ const Cart = ({_id}: ICart) => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(dataToSend),
+      body: JSON.stringify({
+        note: 'NOthing',
+        deliveryAddress: addressDetail,
+        paymentMethod: 'COD',
+        items: itemSend,
+      }),
     })
       .then(response => response.json())
       .then(json => {
-        Alert.alert(json.message, 'Alert');
-        console.log(json);
+        if (itemCart.length === 0) {
+          Alert.alert('Vui lòng chọn sản phẩm');
+        } else {
+          Alert.alert(json.message, 'Alert');
+        }
       });
-  }, []);
-  const onDelete = React.useCallback(
-    async _id => {
-      const controller = new AbortController();
-      const auth: IAuth | null = await getAuthAsync();
-      const registerAuth: IAuthRegister | null = await getAuthAsync();
-      const signal = controller.signal;
-      await fetch(URL.removeItem, {
-        signal: signal,
-        method: 'DELETE',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${
-            auth?.accessToken || registerAuth?.accessToken
-          }`,
-        },
-        body: JSON.stringify({id: _id}),
-      })
-        .then(response => response.json())
-        .then(json => {
-          // setItemCart([...itemCart,json.cart.items])
-          setItemCart(json.cart.items);
-          dispatch(
-            onGetNumberCart({
-              numberItemsCart: numberCart === 0 ? numberCart : numberCart - 1,
-            }),
-          );
-          // dispatch(removeFromCart(json.cart.items))
-          setLoading(false);
-        })
-        .catch(err => {
-          if (err.name === 'AbortError') {
-            console.log('Success Abort');
-          } else {
-            console.error(err);
-          }
-        });
-      return () => {
-        // cancel the request before component unmounts
-        controller.abort();
-      };
-    },
-    [_id],
-  );
+  };
 
+  const onDelete = React.useCallback(async _id => {
+    const controller = new AbortController();
+    const auth: IAuth | null = await getAuthAsync();
+    const registerAuth: IAuthRegister | null = await getAuthAsync();
+    const signal = controller.signal;
+    await fetch(URL.removeItem, {
+      signal: signal,
+      method: 'DELETE',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${
+          auth?.accessToken || registerAuth?.accessToken
+        }`,
+      },
+      body: JSON.stringify({id: _id}),
+    })
+      .then(response => response.json())
+      .then(json => {
+        // setItemCart([...itemCart,json.cart.items])
+        setItemCart(json.cart.items);
+        dispatch(
+          onGetNumberCart({
+            numberItemsCart: numberCart === 0 ? numberCart : numberCart - 1,
+          }),
+        );
+        // dispatch(removeFromCart(json.cart.items))
+        setLoading(false);
+      })
+      .catch(err => {
+        if (err.name === 'AbortError') {
+          console.log('Success Abort');
+        } else {
+          console.error(err);
+        }
+      });
+    return () => {
+      // cancel the request before component unmounts
+      controller.abort();
+    };
+  }, []);
   return (
     <CartContainer CheckOutComponent={CheckOut}>
       <Box>

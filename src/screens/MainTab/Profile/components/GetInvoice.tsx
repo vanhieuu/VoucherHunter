@@ -63,7 +63,7 @@ const GetInvoice = () => {
       <Box padding="m">
        <ScrollView>
          {invoice.map((item,index)=>{
-           console.log(item)
+        
             return (
               <ItemInvoice   items={item} key={index}  />
             )

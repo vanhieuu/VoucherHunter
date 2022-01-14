@@ -35,7 +35,6 @@ const ItemInvoice = ({items}: {items: InvoiceProps}) => {
                     resizeMode="contain"
                   />
                 </View>
-
                 <Box
                   flexDirection="column"
                   marginTop="m"
