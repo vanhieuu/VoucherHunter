@@ -91,6 +91,7 @@ const Cart = ({_id}: ICart) => {
     })
       .then(response => response.json())
       .then(json => {
+        setItemCart(json.cart.items)
         setItemSend(json.cart.items);
         setLoading(false);
         dispatch(onGetNumberCart({numberItemsCart: itemCart.length}));

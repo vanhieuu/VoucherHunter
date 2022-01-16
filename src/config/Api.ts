@@ -1,5 +1,5 @@
-const MainURL = 'https://voucherhunter.herokuapp.com';
-// const MainURL = 'http://118.70.184.229:4000'
+// const MainURL = 'https://voucherhunter.herokuapp.com';
+const MainURL = 'http://192.168.0.104:4000'
 const URL = {
   Login: MainURL + '/login',
   ValidateToken: MainURL + `/auth/profile`,

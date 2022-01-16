@@ -15,7 +15,7 @@ interface Props {
 }
 
 const ListProduct = ({ListHeaderComponent}: Props) => {
-  // const token = useSelector<RootState, string>(state => state.auth.accessToken);
+ 
   const [loading, setLoading] = React.useState(true);
   const [product, setProduct] = React.useState<IProduct[]>();
   const token = useSelector<RootState, string>(state => state.auth.accessToken);

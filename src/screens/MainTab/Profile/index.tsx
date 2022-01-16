@@ -29,8 +29,10 @@ import EditInfo from './components/EditInfo';
 
 import * as ImagePicker from 'react-native-image-picker';
 import {launchImageLibrary} from 'react-native-image-picker';
+import * as Icon from 'react-native-iconly'
 
-import {utils} from '@react-native-firebase/app';
+
+
 import storage from '@react-native-firebase/storage';
 import {firebase} from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -67,7 +69,8 @@ const Profile = () => {
   const [selectedImage, setSelectedImage] = React.useState<any>(null);
   const [uploading, setUploading] = React.useState<boolean>(false);
   const [transferred, setTransferred] = React.useState<any>(null);
-  const [status, setStatus] = React.useState('');
+  
+
   React.useEffect(() => {
     let Timer1 = setTimeout(() => setLoading(true), 3000);
     const controller = new AbortController();
@@ -101,7 +104,7 @@ const Profile = () => {
     };
   }, [user?.photoUrl]);
 
-  const choosePicture = React.useCallback(async () => {
+  const choosePicture = async () => {
     await launchImageLibrary({
       maxHeight: 200,
       maxWidth: 200,
@@ -111,10 +114,10 @@ const Profile = () => {
     }).then(res => {
       const uri = res?.assets?.[0].uri;
       const imageUri =
-        Platform.OS === 'ios' ? res?.assets?.[0].uri : res?.assets?.[0].uri;
+        Platform.OS === 'ios' ? uri :  uri;
       setSelectedImage(imageUri);
       console.log(selectedImage, 'set selected image');
-      firebase
+    firebase
         .auth()
         .signInAnonymously()
         .then(() => {
@@ -123,43 +126,27 @@ const Profile = () => {
           });
         })
         .catch(err => {
-          Alert.alert(err);
+          console.log(err);
         });
 
-      // const reference =  storage().ref(`anh/${uploadUri}`)
-      // let reference = ref(storage, `anh/${uploadUri}`);
-      // setUploading(true);
-
-      // let task = uploadBytesResumable(reference, selectedImage);
-      // task.on(
-      //   (err: 'err') => console.log(err),
-      //   () => {
-      //     console.log('Image uploaded to the bucket!');
-      //     setLoading(false);
-      //     getDownloadURL(task.snapshot.ref).then(downloadURL => {
-      //       const fileReaderInstance = new FileReader();
-
-      //       console.log(downloadURL, 'res');
-      //       setSelectedImage(downloadURL);
-      //     });
-      //     setStatus('Image upload');
-      //   },
-      // );
-      // storage().ref(fileName).putFile(uploadUri);
-
       setUploading(false);
-      Alert.alert('Done');
+      // setUsers({
+      //   photoUrl:imageUri
+      // })
+      // uploadImage();
+    
     });
-  }, []);
+  };
 
-  const uploadImage = React.useCallback(async () => {
+  const uploadImage = async () => {
     const uploadImage = selectedImage;
     const fileName = selectedImage?.substring(
       selectedImage.lastIndexOf('/') + 1,
     );
     setUploading(true);
     setTransferred(0);
-    const task = storage().ref(fileName).putFile(uploadImage);
+    console.log(uploadImage,'Upload image')
+    const task = storage().ref(`anh/`).putFile(`anh/${uploadImage}`);
     task.on('state_changed', taskSnapshot => {
       console.log(
         `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
@@ -168,17 +155,22 @@ const Profile = () => {
         Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
           100,
       );
+     taskSnapshot.ref.getDownloadURL().then(downloadURL => {
+        console.log(downloadURL,'res');
+        setSelectedImage(downloadURL)
+      })
     });
 
     try {
-      await task;
+    await task;
+    console.log(task,'task')
     } catch (e) {
       console.log(e);
     }
-  }, [selectedImage]);
-  React.useEffect(() => {
-    uploadImage;
-  }, []);
+  }
+  React.useEffect(() =>{
+    uploadImage();
+  },[selectedImage])
 
   return (
     <Box flex={1} backgroundColor="background">
@@ -217,11 +209,16 @@ const Profile = () => {
               style={styles.img}
             />
           ) : (
-            <ActivityIndicator size="small" color="#e9707d" />
+            <Image
+              source={{uri: user?.photoUrl}}
+              resizeMode="cover"
+              style={styles.img}
+            />
           )}
-          <TouchableOpacity onPress={choosePicture} style={{marginTop: 30}}>
+          <TouchableOpacity onPress={() => choosePicture()} style={{marginTop: 30,flexDirection:'row'}}>
+            <Icon.Edit set='bold' size={14} color={'#e9707d'}  />
             <Text center style={{fontSize: 14}}>
-              Chọn ảnh{' '}
+              Thay ảnh đại diện{' '} {transferred? <Text> {transferred} %</Text> : null}
             </Text>
           </TouchableOpacity>
         </Box>
@@ -235,11 +232,6 @@ const Profile = () => {
           <EditInfo />
         </Tab>
       </Box>
-      <TouchableOpacity onPress={() => {}}>
-        <Text center style={{fontSize: 14}}>
-          upload ảnh{' '}
-        </Text>
-      </TouchableOpacity>
     </Box>
   );
 };

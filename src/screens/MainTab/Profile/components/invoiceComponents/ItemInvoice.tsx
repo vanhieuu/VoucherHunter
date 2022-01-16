@@ -7,11 +7,11 @@ import dayjs from 'dayjs';
 import Box from '../../../../../components/Box';
 import { CommonActions, NavigationProp, TabActions, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../../../../nav/RootStack';
-import MainTab from '../../../../../nav/MainTab';
+
 const ItemInvoice = ({items}: {items: InvoiceProps}) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
   
-  const jumpToAction = TabActions.jumpTo('DetailInvoice', { item: items });
+
 
 
 
@@ -36,7 +36,7 @@ const ItemInvoice = ({items}: {items: InvoiceProps}) => {
       <TouchableOpacity onPress={() =>   navigation.dispatch(CommonActions.navigate({
         name:'DetailInvoice',
         params:{
-          items:items
+          item:items
         }
       }))}>
         <View style={styles.container}>

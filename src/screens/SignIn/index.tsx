@@ -10,10 +10,11 @@ import {Text, Colors, Image, View} from 'react-native-ui-lib';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {NavigationProp, useNavigation} from '@react-navigation/core';
 import {IAuth, onLogin, saveAuthAsync} from '../../redux/authSlice';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import URL from '../../config/Api';
 import {RootStackParamList} from '../../nav/RootStack';
 import {Input} from 'react-native-elements';
+import { RootState } from '../../redux/store';
 
 const SignIn = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -26,6 +27,7 @@ const SignIn = () => {
   const [password, setPassword] = React.useState('');
   const [loading, setLoading] = React.useState<boolean>(false);
   const [errorText, setErrorText] = React.useState('');
+  const token = useSelector<RootState, string>(state => state.auth.accessToken);
   
   const onPressLogin = async () => {
     const controller = new AbortController();
@@ -65,6 +67,7 @@ const SignIn = () => {
         //login Success
         console.log(json.accessToken)
         console.log(json)
+        console.log(token)
         // (5) is component still mounted?
         dispatch(onLogin(json));
         saveAuthAsync(json);

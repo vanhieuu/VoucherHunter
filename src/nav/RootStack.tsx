@@ -4,7 +4,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 import OnboardingScreen from '../screens/Onboarding';
 import SignUp from '../screens/SignUp';
-import MainTab, { MainTabParamList } from './MainTab';
+import MainTab, {MainTabParamList} from './MainTab';
 import {IProduct} from '../types/IProduct';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/store';
@@ -23,8 +23,8 @@ import URL from '../config/Api';
 import Search from '../screens/Search';
 import {Colors, View} from 'react-native-ui-lib';
 import ChangePassword from '../screens/ChangePassword';
-import { onGetNumberCart } from '../redux/authCartSlice';
-import { InvoiceProps } from '../types/InvoiceType';
+import {onGetNumberCart} from '../redux/authCartSlice';
+import {InvoiceProps} from '../types/InvoiceType';
 import DetailInvoice from '../screens/DetailInvoice';
 
 export type RootStackParamList = {
@@ -38,17 +38,16 @@ export type RootStackParamList = {
   };
   DetailNews: {
     item: INewsData;
-    
   };
   Search: undefined;
-  DetailInvoice:{
-    item:InvoiceProps
-  }
+  DetailInvoice: {
+    item: InvoiceProps;
+  };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export type TStatusLogin = "check" | "true" | "false";
+export type TStatusLogin = 'check' | 'true' | 'false';
 const RootStack = () => {
   const statusAuth = useSelector<RootState, EStatusAuth>(
     state => state.auth.statusAuth,
@@ -58,8 +57,6 @@ const RootStack = () => {
   const dispatch = useDispatch();
   const [isLogin, setIsLogin] = React.useState<TStatusLogin>('check');
 
-
-  
   const checkLogin = async () => {
     const auth: IAuth | null = await getAuthAsync();
     if (auth) {
@@ -71,7 +68,7 @@ const RootStack = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          accesToken: auth.accessToken,
+          accesToken: token,
         }),
       })
         .then(response => response.json())
@@ -99,7 +96,6 @@ const RootStack = () => {
   React.useEffect(() => {
     checkLogin();
   }, [statusAuth]);
-  
 
   if (statusAuth === EStatusAuth.check) {
     return (
@@ -144,13 +140,12 @@ const RootStack = () => {
               }}
             />
             <Stack.Screen
-            name='DetailInvoice'
-            component={DetailInvoice}
-            options={{
-              headerShown:true
-            }}
-
-            
+              name="DetailInvoice"
+              component={DetailInvoice}
+              options={{
+                headerShown: true,
+                headerTitle: 'Thông tin đơn hàng',
+              }}
             />
           </Stack.Group>
         ) : (
