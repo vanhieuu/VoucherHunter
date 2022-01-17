@@ -101,7 +101,7 @@ const Profile = () => {
     };
   }, []);
 
-  const choosePicture = React.useCallback(async () => {
+  const choosePicture = React.useCallback(async (selectedImage) => {
     await launchImageLibrary({
       maxHeight: 200,
       maxWidth: 200,
@@ -110,26 +110,26 @@ const Profile = () => {
       includeExtra,
     }).then(res => {
       const uri = res?.assets?.[0].uri;
-      const imageUri = Platform.OS === 'ios' ? uri : uri;
-      setSelectedImage(imageUri);
+      const selectedImage = Platform.OS === 'ios' ? uri : uri;
+      setSelectedImage(selectedImage);
       
       setUploading(false);
       // setUsers({
-      //   photoUrl:imageUri
+      //   photoUrl:selectedImage
       // })
-      uploadImage(imageUri);
+      uploadImage(selectedImage);
     });
   },[selectedImage]);
 
   const uploadImage = React.useCallback(async (selectedImage) => {
     const uploadImage = selectedImage;
-    const fileName = selectedImage?.substring(
+    const fileName = selectedImage.substring(
       selectedImage.lastIndexOf('/') + 1,
     );
     setUploading(true);
     setTransferred(0);
-    
-    const task = storage().ref(fileName).putFile(`${uploadImage}`,{
+    console.log(selectedImage,'selected')
+    const task = storage().ref(`anh/${fileName}`).putFile(`${uploadImage}`,{
       cacheControl: 'no-store', // disable caching
     });
     task.on('state_changed', taskSnapshot => {
@@ -140,7 +140,6 @@ const Profile = () => {
       );
       
       taskSnapshot.ref.getDownloadURL().then(downloadURL => {
-      
         setSelectedImage(downloadURL);
       });
     });
@@ -201,7 +200,7 @@ const Profile = () => {
             />
           )}
           <TouchableOpacity
-            onPress={() => choosePicture()}
+            onPress={() => choosePicture(selectedImage)}
             style={{marginTop: 30, flexDirection: 'row'}}>
             <Icon.Edit set="bold" size={14} color={'#e9707d'} />
             {uploading ? (
