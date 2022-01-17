@@ -6,9 +6,10 @@ import {IProduct} from '../../../../types/IProduct';
 import {numberFormat} from '../../../../config/formatCurrency';
 
 import URL from '../../../../config/Api';
-import { useSelector} from 'react-redux';
+import { useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../../../redux/store';
 import {saveAuthAsync} from './AsynStoreCart';
+import { onGetQuantity } from '../../../../redux/authCartSlice';
 interface ICart {
   _id: string;
   product_id: IProduct;
@@ -100,7 +101,7 @@ const Items = ({items, onDelete}: Props) => {
   const [quantity, setQuantity] = React.useState(items.quantity);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemQuantity, setItemQuantity] = React.useState<ICart[]>([]);
-  const [price, setPrice] = React.useState(0);
+  
 
   const putQuantity = React.useCallback(() => {
     const controller = new AbortController();
@@ -122,8 +123,9 @@ const Items = ({items, onDelete}: Props) => {
       .then(json => {
         // dispatch(onUpdateQuantity(json.cart.items));
         
-        setPrice(json.cart.totalPrice);
+       
         setItemQuantity(json.cart.items);
+
         setLoading(false);
       })
       .catch(err => {
@@ -164,9 +166,9 @@ const Items = ({items, onDelete}: Props) => {
           style={styles.btnMinus}
           //   onPress={() => setQuantity(quantity - 1)}
           onPress={() => {
+            setQuantity(prev => prev - 1);
             putQuantity();
 
-            setQuantity(prev => prev - 1);
           }}>
           <Image source={require('../../../../assets/minus.png')} />
         </TouchableOpacity>
@@ -175,8 +177,8 @@ const Items = ({items, onDelete}: Props) => {
           style={styles.btnPlus}
           //   onPress={() => setQuantity(quantity + 1)}
           onPress={() => {
-            putQuantity();
             setQuantity(prev => prev + 1);
+            putQuantity();
           }}>
           <Image source={require('../../../../assets/plus.png')} />
         </TouchableOpacity>

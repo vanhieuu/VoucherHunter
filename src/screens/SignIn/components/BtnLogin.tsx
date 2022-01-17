@@ -29,7 +29,7 @@ const BtnLogin = ({infoLogin}: Props) => {
   const [errorText, setErrorText] = React.useState('');
   const [loading, setLoading] = React.useState<boolean>(false);
   const onPressLogin = React.useCallback( ()=>{
-    console.log('pressIn')
+    
     setErrorText('');
     if (!username) {
       Alert.alert('Tên đăng nhập không được để trống');
@@ -56,7 +56,7 @@ const BtnLogin = ({infoLogin}: Props) => {
       .then(response => response.json())
       .then((json: IAuth) => {
         const accessToken = json.accessToken;
-        console.log(json)
+        
         //login fail
         if (!accessToken) {
           Alert.alert('Sai thông tin đăng nhập ', json.message);

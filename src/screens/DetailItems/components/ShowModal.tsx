@@ -20,6 +20,7 @@ const ShowModal = ({item}: {item: IProduct}) => {
   );
   const product = route.params.item;
   const id = product._id;
+
   const dispatch = useDispatch();
   const addItemCart = React.useCallback(async () => {
     const auth: IAuth | null = await getAuthAsync();
@@ -41,7 +42,7 @@ const ShowModal = ({item}: {item: IProduct}) => {
       .then(response => response.json())
       .then(json => {
         Alert.alert(json.message);
-        console.log(json, 'Json add cart');
+        
         dispatch(onGetNumberCart({numberItemsCart: numberCart + 1}));
       })
       .catch(err => {

@@ -85,8 +85,11 @@ export const CartSlice = createSlice({
     ) => {
       state.numberCart = action.payload.numberItemsCart;
     },
+    onGetQuantity: (state, action: PayloadAction<{quantity: number}>) => {
+        state.items[0].quantity= action.payload.quantity
+    },
   },
 });
 
-export const {onGetNumberCart} = CartSlice.actions;
+export const {onGetNumberCart,onGetQuantity} = CartSlice.actions;
 export default CartSlice.reducer;

@@ -46,8 +46,7 @@ const Search = () => {
   const {navigate} = useNavigation<NavigationProp<RootStackParamList>>();
 
   const [filterData, setFilterData] = React.useState<IProduct[]>([]);
-  // const [dataFilter, setDataFilter] = React.useState(dataFilterFood);
-  const [masterData, setMasterData] = React.useState<IProduct[]>([]);
+  
   const [search, setSearch] = React.useState('');
 
   React.useEffect(() => {
@@ -65,11 +64,13 @@ const Search = () => {
       .then(json => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
         setFilterData(json);
-        setMasterData(json);
+        // setMasterData(json);
+        controller.abort()
         return json;
       })
       .catch(err => {
         if (err.name === 'AbortError') {
+          controller.abort();
           console.log('Success Abort');
         } else {
           console.error(err);
@@ -84,7 +85,7 @@ const Search = () => {
   const searchFilter = React.useCallback(
     debounce(text => {
       if (text) {
-        const newData = masterData.filter(item => {
+        const newData = filterData.filter(item => {
           const itemData = item.name
             ? item.name.toUpperCase()
             : '.'.toUpperCase();
@@ -136,7 +137,7 @@ const Search = () => {
                 navigate('DetailItems', {
                   item: item.item,
                 });
-                console.log(item);
+               
               }}>
               <View style={styles.contentItem}>
                 <Image

@@ -86,7 +86,6 @@ const styles = StyleSheet.create({
     borderRadius: 0,
   },
   contentZone: {
-    
     borderBottomLeftRadius: 0,
     borderTopLeftRadius: 0,
     borderLeftWidth: 0.5,

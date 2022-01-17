@@ -29,9 +29,7 @@ import EditInfo from './components/EditInfo';
 
 import * as ImagePicker from 'react-native-image-picker';
 import {launchImageLibrary} from 'react-native-image-picker';
-import * as Icon from 'react-native-iconly'
-
-
+import * as Icon from 'react-native-iconly';
 
 import storage from '@react-native-firebase/storage';
 import {firebase} from '@react-native-firebase/auth';
@@ -69,7 +67,6 @@ const Profile = () => {
   const [selectedImage, setSelectedImage] = React.useState<any>(null);
   const [uploading, setUploading] = React.useState<boolean>(false);
   const [transferred, setTransferred] = React.useState<any>(null);
-  
 
   React.useEffect(() => {
     let Timer1 = setTimeout(() => setLoading(true), 3000);
@@ -102,9 +99,9 @@ const Profile = () => {
       // cancel the request before component unmounts
       controller.abort();
     };
-  }, [user?.photoUrl]);
+  }, []);
 
-  const choosePicture = async () => {
+  const choosePicture = React.useCallback(async () => {
     await launchImageLibrary({
       maxHeight: 200,
       maxWidth: 200,
@@ -113,64 +110,52 @@ const Profile = () => {
       includeExtra,
     }).then(res => {
       const uri = res?.assets?.[0].uri;
-      const imageUri =
-        Platform.OS === 'ios' ? uri :  uri;
+      const imageUri = Platform.OS === 'ios' ? uri : uri;
       setSelectedImage(imageUri);
-      console.log(selectedImage, 'set selected image');
-    firebase
-        .auth()
-        .signInAnonymously()
-        .then(() => {
-          return firebase.firestore().collection('Hello').doc('hello').set({
-            id: 'fadsa',
-          });
-        })
-        .catch(err => {
-          console.log(err);
-        });
-
+      
       setUploading(false);
       // setUsers({
       //   photoUrl:imageUri
       // })
-      // uploadImage();
-    
+      uploadImage(imageUri);
     });
-  };
+  },[selectedImage]);
 
-  const uploadImage = async () => {
+  const uploadImage = React.useCallback(async (selectedImage) => {
     const uploadImage = selectedImage;
     const fileName = selectedImage?.substring(
       selectedImage.lastIndexOf('/') + 1,
     );
     setUploading(true);
     setTransferred(0);
-    console.log(uploadImage,'Upload image')
-    const task = storage().ref(`anh/`).putFile(`anh/${uploadImage}`);
+    
+    const task = storage().ref(fileName).putFile(`${uploadImage}`,{
+      cacheControl: 'no-store', // disable caching
+    });
     task.on('state_changed', taskSnapshot => {
-      console.log(
-        `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
-      );
+      
       setTransferred(
         Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
           100,
       );
-     taskSnapshot.ref.getDownloadURL().then(downloadURL => {
-        console.log(downloadURL,'res');
-        setSelectedImage(downloadURL)
-      })
+      
+      taskSnapshot.ref.getDownloadURL().then(downloadURL => {
+      
+        setSelectedImage(downloadURL);
+      });
     });
 
     try {
-    await task;
-    console.log(task,'task')
+      await task;
+     
+      setUploading(false)
     } catch (e) {
       console.log(e);
     }
-  }
-  React.useEffect(() =>{
-    uploadImage();
-  },[selectedImage])
+  }, [choosePicture]);
+  // React.useEffect(() =>{
+  //   uploadImage();
+  // },[choosePicture])
 
   return (
     <Box flex={1} backgroundColor="background">
@@ -187,7 +172,7 @@ const Profile = () => {
             left={{
               icon: 'arrow-left',
               onPress: () => {
-                console.log('click');
+                
               },
             }}
             title="Cá nhân"
@@ -215,11 +200,17 @@ const Profile = () => {
               style={styles.img}
             />
           )}
-          <TouchableOpacity onPress={() => choosePicture()} style={{marginTop: 30,flexDirection:'row'}}>
-            <Icon.Edit set='bold' size={14} color={'#e9707d'}  />
-            <Text center style={{fontSize: 14}}>
-              Thay ảnh đại diện{' '} {transferred? <Text> {transferred} %</Text> : null}
-            </Text>
+          <TouchableOpacity
+            onPress={() => choosePicture()}
+            style={{marginTop: 30, flexDirection: 'row'}}>
+            <Icon.Edit set="bold" size={14} color={'#e9707d'} />
+            {uploading ? (
+              <Text> {transferred} %</Text>
+            ) : (
+              <Text center style={{fontSize: 14}}>
+                Thay ảnh đại diện{' '}
+              </Text>
+            )}
           </TouchableOpacity>
         </Box>
         <Box marginVertical="m" style={{marginTop: 50 + theme.spacing.m}}>

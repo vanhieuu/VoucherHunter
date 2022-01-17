@@ -73,7 +73,7 @@ const navigation = useNavigation();
         if (error) {
           Alert.alert(json.message,json.error);
         }
-        console.log(json)
+      
         Alert.alert('Đổi mật khẩu thành công')
         setLoading(false);
         clearAsyncStorage();

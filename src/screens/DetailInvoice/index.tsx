@@ -1,8 +1,14 @@
 import {RouteProp, useRoute} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React from 'react';
-import {StyleSheet, TouchableOpacity} from 'react-native';
-import {Text, View} from 'react-native-ui-lib';
+import {
+  Alert,
+  Dimensions,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
+import {Modal, Text, View} from 'react-native-ui-lib';
 import * as Iconly from 'react-native-iconly';
 import {RootStackParamList} from '../../nav/RootStack';
 import ItemDetail from './componentsInvoice/ItemDetail';
@@ -11,12 +17,65 @@ import {ScrollView} from 'react-native-gesture-handler';
 
 import dayjs from 'dayjs';
 import {numberFormat} from '../../config/formatCurrency';
-type Props = NativeStackScreenProps<RootStackParamList, 'DetailInvoice'>;
+import {MainTabParamList} from '../../nav/MainTab';
+import {getAuthAsync, IAuth} from '../../redux/authSlice';
+import {IAuthRegister} from '../../redux/authRegisterSlice';
+import URL from '../../config/Api';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../redux/store';
+import {onGetNumberCart} from '../../redux/authCartSlice';
+import ShowModal from './componentsInvoice/Modal';
+type Props = NativeStackScreenProps<MainTabParamList, 'Cart'>;
 
+const {width, height} = Dimensions.get('window');
 const DetailInvoice = ({navigation}: Props) => {
   const route = useRoute<RouteProp<RootStackParamList, 'DetailInvoice'>>();
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const invoiceItem = route.params.item;
-  console.log(invoiceItem);
+  const invoiceProps = invoiceItem.products;
+  
+  const productId = invoiceItem.products.map(item => item.product_id._id);
+ 
+  const numberCart = useSelector<RootState, number>(
+    state => state.cart.numberCart,
+  );
+  const dispatch = useDispatch();
+
+  const onPress = React.useCallback(() => {
+    setModalVisible(prev => !prev);
+    
+  }, []);
+
+  const addItemCart = React.useCallback(async () => {
+    const auth: IAuth | null = await getAuthAsync();
+    const registerAuth: IAuthRegister | null = await getAuthAsync();
+    setLoading(true);
+    await fetch(URL.addItemCart, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${
+          auth?.accessToken || registerAuth?.accessToken
+        }`,
+      },
+      body: JSON.stringify({
+        product_id: productId[0],
+      }),
+    })
+      .then(response => response.json())
+      .then(json => {
+        Alert.alert(json.message);
+        
+        dispatch(onGetNumberCart({numberItemsCart: numberCart + 1}));
+        setModalVisible(prev => !prev);
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }, []);
+
   return (
     <View flex>
       <View
@@ -187,7 +246,19 @@ const DetailInvoice = ({navigation}: Props) => {
       </ScrollView>
 
       <View>
-        <TouchableOpacity style={styles.btnCheckout} onPress={() => true}>
+        <TouchableOpacity
+          style={styles.btnCheckout}
+          onPress={() => {
+            setModalVisible(prev => !prev);
+          }}>
+          {modalVisible ? (
+            <ShowModal
+              onPress={addItemCart}
+              visible={modalVisible}
+              onRequestClose={onPress}
+              items={invoiceProps}
+            />
+          ) : null}
           <Text style={styles.textStyle}>Mua lại</Text>
         </TouchableOpacity>
       </View>
@@ -245,5 +316,44 @@ const styles = StyleSheet.create({
   txtTimeStamp: {
     fontSize: 15,
     fontWeight: 'bold',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginTop: 15,
+  },
+  modalView: {
+    margin: 15,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 10,
+    width: width,
+    height: height / 2 - 50,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    position: 'absolute',
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
   },
 });

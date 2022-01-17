@@ -40,7 +40,7 @@ const MainTab = () => {
   const numberCart = useSelector<RootState, number>(
     state => state.cart.numberCart,
   );
-  console.log(numberCart)
+
   const [hidden, setHidden] = React.useState(true);
   const dispatch = useDispatch();
   React.useEffect(() => {

@@ -70,7 +70,7 @@ const ListHorizontal = () => {
           LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
           setNews([...news, ...json.data]);
           setTotalPage(json.totalPage)
-          console.log(json)
+          
           setLoading(false);
         }
         return () => {

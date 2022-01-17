@@ -40,7 +40,7 @@ const Banner = () => {
   const onMomentumScrollEnd = React.useCallback(({nativeEvent}) => {
     const x = nativeEvent.contentOffset.x;
     let indexFocus = Math.round(x / widthScreen);
-    console.log(indexFocus);
+  
 
     refDots.current?.setIndexPageFocus(indexFocus);
   }, []);

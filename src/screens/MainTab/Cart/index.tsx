@@ -59,12 +59,13 @@ const initStateAddress: addressProps = {
   street: 'Nguyễn Văn Lộc',
 };
 
-const Cart = ({_id}: ICart) => {
+const Cart = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const theme = useTheme<Theme>();
 
   const [address, setAddress] = React.useState<addressProps>(initStateAddress);
   const addressDetail = JSON.stringify(address);
+  
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
 
@@ -120,11 +121,11 @@ const Cart = ({_id}: ICart) => {
     const controller = new AbortController();
     const signal = controller.signal;
 
-    itemSend.forEach(item => {
+    await  itemSend.forEach(item => {
       setItemSend((item.product_id = item.product_id._id));
     });
-
-    await fetch(URL.createInvoice, {
+    
+    fetch(URL.createInvoice, {
       signal: signal,
       method: 'POST',
       headers: {
@@ -143,6 +144,7 @@ const Cart = ({_id}: ICart) => {
       .then(json => {
         if (itemCart.length === 0) {
           Alert.alert('Vui lòng chọn sản phẩm');
+          
         } else {
           Alert.alert(json.message, 'Alert');
         }

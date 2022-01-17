@@ -38,7 +38,7 @@ const DetailNews = ({navigation}: Props) => {
   const detailNews = route.params?.item;
   const tagItem = detailNews?.tags!.map(item => item);
   const [loading, setLoading] = React.useState<boolean>(false);
-  console.log(tagItem);
+ 
   const [news, setNews] = React.useState<INewsData[]>();
   const textAni = React.useRef(new Animated.Value(0)).current;
 
@@ -81,7 +81,7 @@ React.useEffect(() =>{
       .then(json => {
         if (componentMounted.current) {
           LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
-          console.log(json, 'json');
+   
           setNews(json.data);
           setLoading(false);
         }

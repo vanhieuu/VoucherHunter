@@ -57,7 +57,7 @@ const SignUp = () => {
       email: email,
       password: password,
     };
-    console.log(dataToSend);
+ 
     await fetch(URL.Register, {
       method: 'POST',
       headers: {
@@ -69,7 +69,7 @@ const SignUp = () => {
       .then(response => response.json())
       .then((json: IAuthRegister) => {
         // Register fail
-        console.log(dataToSend);
+       
         if (!json.accessToken) {
           Alert.alert('Register fail', json.message);
           setLoading(false);

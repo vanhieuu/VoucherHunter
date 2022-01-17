@@ -50,11 +50,11 @@ const BtnLogin = ({dataSend}: Props) => {
     })
     .then(response => response.json())
     .then((json: IAuthRegister) => {
-        console.log(json);
+        
         // Register fail
         if (!json.accessToken) {
           Alert.alert('Register fail', json.message);
-          console.log(json);
+          
           setLoading(false);
           return;
         }
