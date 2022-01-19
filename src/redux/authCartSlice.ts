@@ -86,7 +86,9 @@ export const CartSlice = createSlice({
       state.numberCart = action.payload.numberItemsCart;
     },
     onGetQuantity: (state, action: PayloadAction<{quantity: number}>) => {
-        state.items[0].quantity= action.payload.quantity
+        const index = state.items.findIndex((item) => item)
+            state.items[index].quantity = action.payload.quantity
+        
     },
   },
 });

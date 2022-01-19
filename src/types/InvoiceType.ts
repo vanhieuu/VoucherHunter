@@ -3,7 +3,7 @@ import { IProduct } from "./IProduct";
 
 export enum PaymentStatus {
   pending = 1,
-  cancel = 2,
+  failed = 2,
   done = 3,
 }
 

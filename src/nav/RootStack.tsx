@@ -23,9 +23,11 @@ import URL from '../config/Api';
 import Search from '../screens/Search';
 import {Colors, View} from 'react-native-ui-lib';
 import ChangePassword from '../screens/ChangePassword';
-import {onGetNumberCart} from '../redux/authCartSlice';
+import * as Iconly from 'react-native-iconly'
 import {InvoiceProps} from '../types/InvoiceType';
 import DetailInvoice from '../screens/DetailInvoice';
+import CheckOrder from '../screens/CheckOrder';
+import { ICart } from '../screens/MainTab/Cart';
 
 export type RootStackParamList = {
   Onboarding: undefined;
@@ -42,6 +44,9 @@ export type RootStackParamList = {
   Search: undefined;
   DetailInvoice: {
     item: InvoiceProps;
+  };
+  CheckOrder: {
+    item:ICart[]
   };
 };
 
@@ -145,6 +150,14 @@ const RootStack = () => {
               options={{
                 headerShown: true,
                 headerTitle: 'Thông tin đơn hàng',
+              }}
+            />
+             <Stack.Screen
+              name="CheckOrder"
+              component={CheckOrder}
+              options={{
+                headerShown: true,
+                headerTitle: 'Thanh toán', 
               }}
             />
           </Stack.Group>

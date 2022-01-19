@@ -7,7 +7,7 @@ const useBoolean = ():[
     onHideModal:()=>void ,
 ] =>
     {
-    const [showModal,setShowModal] =React.useState<boolean>(false)
+    const [showModal,setShowModal] = React.useState<boolean>(false)
     const onShowModal =React.useCallback(()=>{
         setShowModal(true);
     },[])

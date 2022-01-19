@@ -27,12 +27,12 @@ import {getAuthAsync, IAuth} from '../../../redux/authSlice';
 import {RootState} from '../../../redux/store';
 import {IProduct} from '../../../types/IProduct';
 import CartContainer from './components/CartContainer';
-import CheckOut from './components/CheckOut';
-import Items from './components/Items';
 
+import Items from './components/Items';
+import useBoolean from '../../../hook/useBoolean';
 const {width} = Dimensions.get('window');
 const height = 120 * (width / 375);
-interface ICart {
+export interface ICart {
   _id: string;
   product_id: IProduct;
   quantity: number;
@@ -44,9 +44,7 @@ interface CheckOut {
   quantity: number;
   totalPrice: number;
 }
-interface Props {
-  items: ICart;
-}
+
 interface addressProps {
   number: string;
   city: string;
@@ -62,19 +60,17 @@ const initStateAddress: addressProps = {
 const Cart = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const theme = useTheme<Theme>();
-
   const [address, setAddress] = React.useState<addressProps>(initStateAddress);
-  const addressDetail = JSON.stringify(address);
-  
+ 
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemCart, setItemCart] = React.useState<ICart[]>([]);
-
   const [itemSend, setItemSend] = React.useState<ICart[]>([]);
-
+  const quantity = useSelector<RootState, number>(state => state.cart.items[0].quantity)
   const numberCart = useSelector<RootState, number>(
     state => state.cart.numberCart,
   );
   const [loading, setLoading] = React.useState<boolean>(true);
+
   const dispatch = useDispatch();
 
   React.useEffect(() => {
@@ -108,7 +104,7 @@ const Cart = () => {
       // cancel the request before component unmounts
       controller.abort();
     };
-  }, [numberCart]);
+  }, [quantity,numberCart]);
 
   // React.useEffect(() => {
   //   const ac = new AbortController();
@@ -116,41 +112,7 @@ const Cart = () => {
   //   return () => ac.abort();
   // }, [numberCart]);
 
-  const onPressCheckOut = async () => {
-    setLoading(true);
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    await  itemSend.forEach(item => {
-      setItemSend((item.product_id = item.product_id._id));
-    });
-    
-    fetch(URL.createInvoice, {
-      signal: signal,
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        note: 'NOthing',
-        deliveryAddress: addressDetail,
-        paymentMethod: 'COD',
-        items: itemSend,
-      }),
-    })
-      .then(response => response.json())
-      .then(json => {
-        if (itemCart.length === 0) {
-          Alert.alert('Vui lòng chọn sản phẩm');
-          
-        } else {
-          Alert.alert(json.message, 'Alert');
-        }
-      });
-  };
-
+ 
   const onDelete = React.useCallback(async _id => {
     const controller = new AbortController();
     const auth: IAuth | null = await getAuthAsync();
@@ -193,7 +155,7 @@ const Cart = () => {
     };
   }, []);
   return (
-    <CartContainer CheckOutComponent={CheckOut}>
+    <CartContainer >
       <Box>
         <Box backgroundColor="primary">
           <Header
@@ -265,7 +227,9 @@ const Cart = () => {
         <View flex-end width-120>
           <TouchableOpacity
             style={styles.btnCheckout}
-            onPress={onPressCheckOut}>
+            onPress={() => navigation.navigate('CheckOrder',{
+              item:itemSend
+            })}>
             <Text style={{fontSize: 20, lineHeight: 22}}>Thanh toán</Text>
           </TouchableOpacity>
         </View>

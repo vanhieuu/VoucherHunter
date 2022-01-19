@@ -1,15 +1,14 @@
 import React from 'react';
 import {Dimensions, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import Box from '../../../../components/Box';
-import { Text, View} from 'react-native-ui-lib';
+import {Text, View} from 'react-native-ui-lib';
 import {IProduct} from '../../../../types/IProduct';
 import {numberFormat} from '../../../../config/formatCurrency';
 
 import URL from '../../../../config/Api';
-import { useDispatch, useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../../../redux/store';
-import {saveAuthAsync} from './AsynStoreCart';
-import { onGetQuantity } from '../../../../redux/authCartSlice';
+import {onGetQuantity} from '../../../../redux/authCartSlice';
 interface ICart {
   _id: string;
   product_id: IProduct;
@@ -101,8 +100,8 @@ const Items = ({items, onDelete}: Props) => {
   const [quantity, setQuantity] = React.useState(items.quantity);
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const [itemQuantity, setItemQuantity] = React.useState<ICart[]>([]);
+  const dispatch = useDispatch();
   
-
   const putQuantity = React.useCallback(() => {
     const controller = new AbortController();
 
@@ -122,8 +121,7 @@ const Items = ({items, onDelete}: Props) => {
       .then(response => response.json())
       .then(json => {
         // dispatch(onUpdateQuantity(json.cart.items));
-        
-       
+
         setItemQuantity(json.cart.items);
 
         setLoading(false);
@@ -166,9 +164,14 @@ const Items = ({items, onDelete}: Props) => {
           style={styles.btnMinus}
           //   onPress={() => setQuantity(quantity - 1)}
           onPress={() => {
-            setQuantity(prev => prev - 1);
-            putQuantity();
-
+            if (quantity === 0) {
+              setQuantity(quantity);
+              onDelete();
+            } else {
+              setQuantity(prev => prev - 1);
+              dispatch(onGetQuantity({quantity: quantity}));
+              putQuantity();
+            }
           }}>
           <Image source={require('../../../../assets/minus.png')} />
         </TouchableOpacity>
@@ -178,6 +181,7 @@ const Items = ({items, onDelete}: Props) => {
           //   onPress={() => setQuantity(quantity + 1)}
           onPress={() => {
             setQuantity(prev => prev + 1);
+            dispatch(onGetQuantity({quantity: quantity}));
             putQuantity();
           }}>
           <Image source={require('../../../../assets/plus.png')} />

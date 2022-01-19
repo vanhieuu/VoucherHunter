@@ -1,6 +1,6 @@
 import { BoxProps } from '@shopify/restyle';
 import React, {ReactNode} from 'react';
-import { StyleSheet} from 'react-native';
+import { StyleSheet, TouchableOpacity} from 'react-native';
 import {BorderlessButton} from 'react-native-gesture-handler';
 
 import Box from '../../../../components/Box';
@@ -26,7 +26,7 @@ interface CardProps {
 
 const CardLayOut = ({ onPress, children,backgroundColor}: CardProps) => {
   return (
-    <BorderlessButton onPress={onPress}>
+    <TouchableOpacity onPress={onPress}>
       <Box
         marginLeft="m"
         borderRadius="m"
@@ -37,7 +37,7 @@ const CardLayOut = ({ onPress, children,backgroundColor}: CardProps) => {
         >
         {children}
       </Box>
-    </BorderlessButton>
+    </TouchableOpacity>
   );
 };
 

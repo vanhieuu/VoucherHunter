@@ -28,15 +28,15 @@ import ShowModal from './componentsInvoice/Modal';
 type Props = NativeStackScreenProps<MainTabParamList, 'Cart'>;
 
 const {width, height} = Dimensions.get('window');
-const DetailInvoice = ({navigation}: Props) => {
+const DetailInvoice = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'DetailInvoice'>>();
   const [modalVisible, setModalVisible] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const invoiceItem = route.params.item;
   const invoiceProps = invoiceItem.products;
-  
+  console.log(invoiceItem);
   const productId = invoiceItem.products.map(item => item.product_id._id);
- 
+
   const numberCart = useSelector<RootState, number>(
     state => state.cart.numberCart,
   );
@@ -44,7 +44,6 @@ const DetailInvoice = ({navigation}: Props) => {
 
   const onPress = React.useCallback(() => {
     setModalVisible(prev => !prev);
-    
   }, []);
 
   const addItemCart = React.useCallback(async () => {
@@ -67,7 +66,7 @@ const DetailInvoice = ({navigation}: Props) => {
       .then(response => response.json())
       .then(json => {
         Alert.alert(json.message);
-        
+
         dispatch(onGetNumberCart({numberItemsCart: numberCart + 1}));
         setModalVisible(prev => !prev);
       })
@@ -75,6 +74,16 @@ const DetailInvoice = ({navigation}: Props) => {
         console.error(err);
       });
   }, []);
+
+  if (invoiceItem.paymentStatus === 2) {
+    return (
+      <View centerV marginL-10>
+        <Text style={{fontSize: 15, fontWeight: 'bold', color: 'white'}}>
+          Đơn hàng đã bị huỷ
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View flex>

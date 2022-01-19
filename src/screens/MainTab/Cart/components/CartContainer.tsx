@@ -25,7 +25,7 @@ interface ICart {
 }
 interface CartProps {
   children: ReactNode;
-  CheckOutComponent: FC<{minHeight: number}>;
+  
 }
 const {width} = Dimensions.get('window');
 const height = (680 * width) / 375;
@@ -33,7 +33,7 @@ const minHeight = (200 * width) / 375;
 const snapPoints = [-(height - minHeight), 0];
 
 const CartContainer = gestureHandlerRootHOC(
-  ({children, CheckOutComponent}: CartProps) => {
+  ({children}: CartProps) => {
     const [items, setItems] = React.useState<ICart[]>([]);
     const theme = useTheme<Theme>();
     const translateY = useSharedValue(0);
@@ -71,7 +71,7 @@ const CartContainer = gestureHandlerRootHOC(
     });
     return (
       <Box flex={1}>
-        <CheckOutComponent minHeight={minHeight} />
+      
 
         <Animated.View
           style={[

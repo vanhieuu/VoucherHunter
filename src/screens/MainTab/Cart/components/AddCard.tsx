@@ -14,7 +14,7 @@ const AddCard = () => {
         justifyContent="center"
         alignItems="center"
         style={{backgroundColor: 'rgba(255,255,255,0.05)'}}
-        borderRadius="m">
+        borderRadius="s">
         <IconlyPack.Wallet
           set="bulk"
           primaryColor="white"
