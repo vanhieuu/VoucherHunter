@@ -8,7 +8,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import {Modal, Text, View} from 'react-native-ui-lib';
+import {Colors, Modal, Text, View} from 'react-native-ui-lib';
 import * as Iconly from 'react-native-iconly';
 import {RootStackParamList} from '../../nav/RootStack';
 import ItemDetail from './componentsInvoice/ItemDetail';
@@ -25,16 +25,21 @@ import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
 import {onGetNumberCart} from '../../redux/authCartSlice';
 import ShowModal from './componentsInvoice/Modal';
-type Props = NativeStackScreenProps<MainTabParamList, 'Cart'>;
 
 const {width, height} = Dimensions.get('window');
+
+interface IRefDots {
+  setIndexPageFocus: React.Dispatch<React.SetStateAction<number>>;
+}
+
 const DetailInvoice = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'DetailInvoice'>>();
   const [modalVisible, setModalVisible] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [show, setShow] = React.useState(false);
   const invoiceItem = route.params.item;
   const invoiceProps = invoiceItem.products;
-  console.log(invoiceItem);
+  console.log(invoiceItem.logs);
   const productId = invoiceItem.products.map(item => item.product_id._id);
 
   const numberCart = useSelector<RootState, number>(
@@ -44,6 +49,41 @@ const DetailInvoice = () => {
 
   const onPress = React.useCallback(() => {
     setModalVisible(prev => !prev);
+  }, []);
+
+  const Dots = React.forwardRef<IRefDots>((props, ref) => {
+    const [indexPageFocus, setIndexPageFocus] = React.useState<number>(0);
+
+    React.useImperativeHandle(ref, () => {
+      return {
+        setIndexPageFocus,
+      };
+    });
+    const renderDots = React.useCallback(() => {
+      let views = [];
+      let length = invoiceItem.logs.length;
+      for (let i = 0; i < length; i++) {
+        views.push(
+          <View
+            backgroundColor={
+              indexPageFocus === i ? Colors.primary : Colors.dark40
+            }
+            style={styles.dot}
+            key={i}
+          />,
+        );
+      }
+      return views;
+    }, [indexPageFocus]);
+    return <View style={styles.containerDots}>{renderDots()}</View>;
+  });
+
+  const refDots = React.useRef<IRefDots>(null);
+  const refScrollView = React.useRef<ScrollView>(null);
+  const onMomentumScrollEnd = React.useCallback(({nativeEvent}) => {
+    const x = nativeEvent.contentOffset.x;
+    let indexFocus = Math.round(x / width);
+    refDots.current?.setIndexPageFocus(indexFocus);
   }, []);
 
   const addItemCart = React.useCallback(async () => {
@@ -84,9 +124,9 @@ const DetailInvoice = () => {
       </View>
     );
   }
-
+  console.log(invoiceItem.status);
   return (
-    <View flex>
+    <ScrollView style={{flex: 1}}>
       <View
         backgroundColor="#e9707d"
         style={{
@@ -114,18 +154,87 @@ const DetailInvoice = () => {
         </View>
         <Text style={styles.itemStatusContainer}> Trạng thái đơn hàng</Text>
         <View flex centerV>
-          <Text style={styles.txtDetails}> Xem </Text>
+          <Text
+            style={styles.txtDetails}
+            onPress={() => setShow(prev => !prev)}>
+            {' '}
+            Xem{' '}
+          </Text>
         </View>
       </View>
       <View style={{backgroundColor: '#fff'}}>
+        {!!show && (
+          <ScrollView
+            pagingEnabled
+            onMomentumScrollEnd={onMomentumScrollEnd}
+            showsVerticalScrollIndicator
+            ref={refScrollView}>
+            {invoiceItem.logs?.map((item, index) => (
+              <View key={index} marginH-20>
+                {item.changeAction.map((items, index) => (
+                  <View key={index} flex row>
+                    <View
+                      backgroundColor={
+                        index === index ? Colors.primary : Colors.dark40
+                      }
+                      style={styles.dot}
+                      centerH
+                      centerV
+                    />
+                    <Text
+                      flex
+                      centerH
+                      centerV
+                      marginV-10
+                      style={{fontSize: 15, fontWeight: 'bold'}}
+                      color={
+                        items === 'status'
+                          ? 'black'
+                          : items === 'pending'
+                          ? '#f7ca02'
+                          : items === 'failed'
+                          ? 'red'
+                          : 'green'
+                      }>
+                      {console.log(items)}
+                      {items === 'status'
+                        ? 'Trạng thái đơn hàng lúc'
+                        : items === 'pending'
+                        ? 'Chờ thanh toán lúc'
+                        : items === 'failed'
+                        ? 'Đặt hàng thất bại lúc'
+                        : items === ''
+                        ? 'Đặt hàng vào lúc'
+                        : 'Đặt hàng thành công lúc'}{' '}
+                    </Text>
+                   
+                    <Text flex style={{alignSelf: 'center'}} centerH centerV>
+                      {dayjs(item.updatedAt).format('MM/DD/YYYY - h:mm:ss A')}{' '}
+                    </Text>
+                    
+                  </View>
+                ))}
+                <View height={2} bg-black marginT-10 />
+              </View>
+            ))}
+          </ScrollView>
+        )}
         <Text
           marginT-12
           marginL-28
-          color={invoiceItem.paymentStatus === 3 ? 'green' : '#F7CA02'}
+          color={
+            invoiceItem.status === 'done'
+              ? 'green'
+              : invoiceItem.status === 'failed'
+              ? 'red'
+              : '#F7CA02'
+          }
           style={{fontSize: 15, fontWeight: 'bold'}}>
-          {invoiceItem.paymentStatus === 3
-            ? ' đặt hàng thành công'
-            : 'đang xử lý...'}
+          {invoiceItem.status === 'done'
+            ? 'Đặt hàng thành công '
+            : invoiceItem.status === 'failed'
+            ? 'Đặt hàng thất bại '
+            : 'Đơn hàng đang xử lý '}
         </Text>
       </View>
       <View height={1} style={{backgroundColor: '#f5f5f5'}} marginB-10 />
@@ -196,13 +305,20 @@ const DetailInvoice = () => {
               <Text
                 marginB-10
                 style={{
-                  color: invoiceItem.paymentStatus === 3 ? '#000' : '#f7ca02',
+                  color:
+                    invoiceItem.status === 'done'
+                      ? 'green'
+                      : invoiceItem.status === 'failed'
+                      ? 'red'
+                      : '#F7CA02',
                   fontSize: 15,
                   fontWeight: 'bold',
                 }}>
-                {invoiceItem.paymentStatus === 3
+                {invoiceItem.status === 'done'
                   ? dayjs(invoiceItem.createdAt).format('DD/MM/YYYY')
-                  : 'đang xử lý...'}
+                  : invoiceItem.status === 'failed'
+                  ? 'Đặt hàng thất bại '
+                  : 'Đang xử lý '}
               </Text>
             </View>
           </View>
@@ -254,7 +370,7 @@ const DetailInvoice = () => {
         </View>
       </ScrollView>
 
-      <View>
+      <View flex>
         <TouchableOpacity
           style={styles.btnCheckout}
           onPress={() => {
@@ -271,7 +387,7 @@ const DetailInvoice = () => {
           <Text style={styles.textStyle}>Mua lại</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -364,5 +480,21 @@ const styles = StyleSheet.create({
   },
   buttonClose: {
     backgroundColor: '#2196F3',
+  },
+  containerDots: {
+    position: 'absolute',
+    top: (width / 250) * 405,
+    height: 10,
+    alignSelf: 'center',
+    flexDirection: 'row',
+  },
+  dot: {
+    borderRadius: 5,
+    marginHorizontal: 5,
+    height: 5,
+    width: 5,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

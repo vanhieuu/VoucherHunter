@@ -1,10 +1,17 @@
-import { ImageSourcePropType } from "react-native";
-import { IProduct } from "./IProduct";
+import {ImageSourcePropType} from 'react-native';
+import {IProduct} from './IProduct';
 
 export enum PaymentStatus {
   pending = 1,
   failed = 2,
   done = 3,
+}
+
+interface LogProps {
+  user_id: string;
+  changeAction: [];
+  updatedAt: string;
+  _id: string;
 }
 
 export interface InvoiceProps {
@@ -15,21 +22,22 @@ export interface InvoiceProps {
       listPrice: number;
       discountPrice: number;
       quantity: number;
-      _id:string
+      _id: string;
     },
   ];
   totalListPrice: number;
   totalDiscountPrice: number;
   paymentMethod: 'COD' | 'VISA';
   paymentStatus: PaymentStatus;
-  status: PaymentStatus.pending;
+  status: "failed" | "pending" | 'done';
   deliveryAddress: '{"number":"23 ngách 17/2","city":"Hà Nội","street":"Nguyễn Văn Lộc"}';
   note: string;
   createdAt: string;
+  logs: LogProps[];
   __v: 0;
 }
 interface TreeRoot {
-  data:[
+  data: [
     {
       _id: string;
       products: [
@@ -49,6 +57,6 @@ interface TreeRoot {
       note: string;
       createdAt: string;
       __v: 0;
-    }
-  ]
+    },
+  ];
 }
