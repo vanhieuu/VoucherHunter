@@ -229,8 +229,8 @@ const [loading,setLoading] = React.useState<boolean>(false)
               {' '}
               {numberFormat.format(
                 items
-                  .map(item => item.product_id.listedPrice)
-                  .reduceRight((a, b) => a + b, 0),
+                  .map(item => item.product_id.listedPrice * item.quantity)
+                  .reduceRight((a, b) => a + b, 0) ,
               )}
             </Text>
           </View>
@@ -245,10 +245,10 @@ const [loading,setLoading] = React.useState<boolean>(false)
               {' '}
               {numberFormat.format(
                 items
-                  .map(item => item.product_id.discountPrice)
+                  .map(item => item.product_id.discountPrice * item.quantity)
                   .reduceRight((a, b) => a + b, 0) -
                   items
-                    .map(item => item.product_id.listedPrice)
+                    .map(item => item.product_id.listedPrice * item.quantity)
                     .reduceRight((a, b) => a + b, 0),
               )}
             </Text>
@@ -264,7 +264,7 @@ const [loading,setLoading] = React.useState<boolean>(false)
               {' '}
               {numberFormat.format(
                 items
-                  .map(item => item.product_id.discountPrice)
+                  .map(item => item.product_id.discountPrice * item.quantity)
                   .reduceRight((a, b) => a + b, 0),
               )}
             </Text>

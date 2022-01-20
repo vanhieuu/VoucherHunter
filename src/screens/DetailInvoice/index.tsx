@@ -1,23 +1,18 @@
 import {RouteProp, useRoute} from '@react-navigation/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React from 'react';
 import {
   Alert,
   Dimensions,
-  Pressable,
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import {Colors, Modal, Text, View} from 'react-native-ui-lib';
+import {Colors,  Text, View} from 'react-native-ui-lib';
 import * as Iconly from 'react-native-iconly';
 import {RootStackParamList} from '../../nav/RootStack';
 import ItemDetail from './componentsInvoice/ItemDetail';
-
 import {ScrollView} from 'react-native-gesture-handler';
-
 import dayjs from 'dayjs';
 import {numberFormat} from '../../config/formatCurrency';
-import {MainTabParamList} from '../../nav/MainTab';
 import {getAuthAsync, IAuth} from '../../redux/authSlice';
 import {IAuthRegister} from '../../redux/authRegisterSlice';
 import URL from '../../config/Api';
@@ -51,32 +46,6 @@ const DetailInvoice = () => {
     setModalVisible(prev => !prev);
   }, []);
 
-  const Dots = React.forwardRef<IRefDots>((props, ref) => {
-    const [indexPageFocus, setIndexPageFocus] = React.useState<number>(0);
-
-    React.useImperativeHandle(ref, () => {
-      return {
-        setIndexPageFocus,
-      };
-    });
-    const renderDots = React.useCallback(() => {
-      let views = [];
-      let length = invoiceItem.logs.length;
-      for (let i = 0; i < length; i++) {
-        views.push(
-          <View
-            backgroundColor={
-              indexPageFocus === i ? Colors.primary : Colors.dark40
-            }
-            style={styles.dot}
-            key={i}
-          />,
-        );
-      }
-      return views;
-    }, [indexPageFocus]);
-    return <View style={styles.containerDots}>{renderDots()}</View>;
-  });
 
   const refDots = React.useRef<IRefDots>(null);
   const refScrollView = React.useRef<ScrollView>(null);
