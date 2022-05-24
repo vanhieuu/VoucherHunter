@@ -1,39 +1,27 @@
 import React from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  Dimensions,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import {Dimensions, Platform, StyleSheet, TouchableOpacity} from 'react-native';
 import {useSelector} from 'react-redux';
 import URL from '../../../config/Api';
 import {IResUser, IUser} from '../../../redux/authSlice';
 import {RootState} from '../../../redux/store';
-import {Text, Image, View} from 'react-native-ui-lib';
+import {Text, Image} from 'react-native-ui-lib';
 
 import {
   IResUserRegister,
   IUserRegister,
 } from '../../../redux/authRegisterSlice';
-import {NavigationProp, useNavigation} from '@react-navigation/core';
 
 import Box from '../../../components/Box';
-import {RootStackParamList} from '../../../nav/RootStack';
+
 import {useTheme} from '@shopify/restyle';
 import Header from '../../components/Header';
 import Tab from './components/Tab';
 import GetInvoice from './components/GetInvoice';
 import EditInfo from './components/EditInfo';
-
 import * as ImagePicker from 'react-native-image-picker';
 import {launchImageLibrary} from 'react-native-image-picker';
 import * as Icon from 'react-native-iconly';
-
 import storage from '@react-native-firebase/storage';
-import {firebase} from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
 
 const {width} = Dimensions.get('window');
 
@@ -56,7 +44,7 @@ interface Action {
 const includeExtra = true;
 const Profile = () => {
   const theme = useTheme();
-  const {navigate} = useNavigation<NavigationProp<RootStackParamList>>();
+
   const token = useSelector<RootState, string>(state => state.auth.accessToken);
   const registerToken = useSelector<RootState, string>(
     state => state.register.accessToken,
@@ -70,6 +58,7 @@ const Profile = () => {
 
   React.useEffect(() => {
     let Timer1 = setTimeout(() => setLoading(true), 3000);
+    setLoading(true);
     const controller = new AbortController();
     const signal = controller.signal;
     fetch(URL.ValidateToken, {
@@ -101,7 +90,7 @@ const Profile = () => {
     };
   }, []);
 
-  const choosePicture = React.useCallback(async (selectedImage) => {
+  const choosePicture = React.useCallback(async () => {
     await launchImageLibrary({
       maxHeight: 200,
       maxWidth: 200,
@@ -112,46 +101,48 @@ const Profile = () => {
       const uri = res?.assets?.[0].uri;
       const selectedImage = Platform.OS === 'ios' ? uri : uri;
       setSelectedImage(selectedImage);
-      
+
       setUploading(false);
       // setUsers({
       //   photoUrl:selectedImage
       // })
       uploadImage(selectedImage);
     });
-  },[selectedImage]);
+  }, [selectedImage]);
 
-  const uploadImage = React.useCallback(async (selectedImage) => {
-    const uploadImage = selectedImage;
-    const fileName = selectedImage.substring(
-      selectedImage.lastIndexOf('/') + 1,
-    );
-    setUploading(true);
-    setTransferred(0);
-    console.log(selectedImage,'selected')
-    const task = storage().ref(`anh/${fileName}`).putFile(`${uploadImage}`,{
-      cacheControl: 'no-store', // disable caching
-    });
-    task.on('state_changed', taskSnapshot => {
-      
-      setTransferred(
-        Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
-          100,
+  const uploadImage = React.useCallback(
+    async selectedImage => {
+      const uploadImage = selectedImage;
+      const fileName = selectedImage?.substring(
+        selectedImage.lastIndexOf('/') + 1,
       );
-      
-      taskSnapshot.ref.getDownloadURL().then(downloadURL => {
-        setSelectedImage(downloadURL);
+      setUploading(true);
+      setTransferred(0);
+      console.log(selectedImage, 'selected');
+      const task = storage().ref(`anh/${fileName}`).putFile(`${uploadImage}`, {
+        cacheControl: 'no-store', // disable caching
       });
-    });
+      task.on('state_changed', taskSnapshot => {
+        setTransferred(
+          Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
+            100,
+        );
 
-    try {
-      await task;
-     
-      setUploading(false)
-    } catch (e) {
-      console.log(e);
-    }
-  }, [choosePicture]);
+        taskSnapshot.ref.getDownloadURL().then(downloadURL => {
+          setSelectedImage(downloadURL);
+        });
+      });
+
+      try {
+        await task;
+
+        setUploading(false);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    [choosePicture],
+  );
   // React.useEffect(() =>{
   //   uploadImage();
   // },[choosePicture])
@@ -170,9 +161,7 @@ const Profile = () => {
           <Header
             left={{
               icon: 'arrow-left',
-              onPress: () => {
-                
-              },
+              onPress: () => {},
             }}
             title="Cá nhân"
           />
@@ -200,7 +189,7 @@ const Profile = () => {
             />
           )}
           <TouchableOpacity
-            onPress={() => choosePicture(selectedImage)}
+            onPress={() => choosePicture()}
             style={{marginTop: 30, flexDirection: 'row'}}>
             <Icon.Edit set="bold" size={14} color={'#e9707d'} />
             {uploading ? (
